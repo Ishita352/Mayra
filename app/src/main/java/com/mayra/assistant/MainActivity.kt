@@ -128,6 +128,11 @@ class MainActivity : FragmentActivity() {
         })
 
         layout.addView(TextView(this).apply {
+            text = "\n🔒 Payment Safety: ON\nMayra কোনো payment/banking/wallet app automate করে টাকা পাঠানো বা লেনদেন শুরু করতে পারবে না."
+            textSize = 15f
+        })
+
+        layout.addView(TextView(this).apply {
             text = "\nভাষা"
             textSize = 18f
         })
