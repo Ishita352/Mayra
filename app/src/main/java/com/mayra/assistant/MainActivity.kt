@@ -125,6 +125,13 @@ class MainActivity : FragmentActivity() {
         layout.addView(sectionButton("Job Watcher") {
             showModule("Job Watcher", "পরবর্তী ধাপে আপনার career profile অনুযায়ী job/freelancing opportunity search, duplicate filtering এবং notification যুক্ত হবে.")
         })
+        layout.addView(sectionButton("🧵 Textile Design Studio — OFFLINE") {
+            showModule(
+                TextileDesignStudio.title,
+                TextileDesignStudio.capabilities.joinToString("\n• ", prefix = "• ") +
+                    "\n\n" + TextileDesignStudio.note
+            )
+        })
         layout.addView(sectionButton("Excel / Data Analysis") {
             showModule("Excel / Data Analysis", "পরবর্তী ধাপে Excel formulas, data cleaning, lookup, Pivot Table, charts, dashboards এবং analysis workflow যুক্ত হবে.")
         })
