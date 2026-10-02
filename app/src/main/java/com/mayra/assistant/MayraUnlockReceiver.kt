@@ -13,9 +13,8 @@ class MayraUnlockReceiver : BroadcastReceiver() {
         if (!prefs.getBoolean("owner_verified", false)) return
 
         val pending = goAsync()
-        TextToSpeech(context) { status ->
+        val tts = TextToSpeech(context) { status ->
             if (status == TextToSpeech.SUCCESS) {
-                val tts = it
                 tts.language = Locale("bn", "IN")
                 tts.speak(
                     "স্বাগতম গোপাল বসাক। মায়রা প্রস্তুত আছে। আপনার আজকের কাজ শুরু করা যাক।",
