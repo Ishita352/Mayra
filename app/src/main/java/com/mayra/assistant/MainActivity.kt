@@ -2,15 +2,15 @@ package com.mayra.assistant
 
 import android.os.Bundle
 import android.widget.*
-import androidx.activity.ComponentActivity
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
 
     private val prefs by lazy { getSharedPreferences("mayra_secure", MODE_PRIVATE) }
 
@@ -74,19 +74,26 @@ class MainActivity : ComponentActivity() {
 
     private fun authenticateOwner() {
         val manager = BiometricManager.from(this)
-        if (manager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
-            != BiometricManager.BIOMETRIC_SUCCESS) {
+        if (manager.canAuthenticate(
+                BiometricManager.Authenticators.BIOMETRIC_STRONG or
+                    BiometricManager.Authenticators.DEVICE_CREDENTIAL
+            ) != BiometricManager.BIOMETRIC_SUCCESS) {
             Toast.makeText(this, "এই ডিভাইসে biometric/device authentication প্রস্তুত নেই।", Toast.LENGTH_LONG).show()
             return
         }
+
         val executor = ContextCompat.getMainExecutor(this)
-        val prompt = BiometricPrompt(this, executor,
+        val prompt = BiometricPrompt(
+            this,
+            executor,
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
                     showAssistant()
                 }
-            })
+            }
+        )
+
         val info = BiometricPrompt.PromptInfo.Builder()
             .setTitle("Mayra Owner Verification")
             .setSubtitle("Fingerprint/face/device credential দিয়ে Owner যাচাই করুন")
@@ -95,6 +102,7 @@ class MainActivity : ComponentActivity() {
                     BiometricManager.Authenticators.DEVICE_CREDENTIAL
             )
             .build()
+
         prompt.authenticate(info)
     }
 
