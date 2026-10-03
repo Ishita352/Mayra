@@ -58,12 +58,22 @@ object DocumentDocxWriter {
 
     internal fun documentXml(text: String): String {
         val paragraphs = text.split("\n").joinToString("") { line ->
-            "<w:p><w:r><w:t xml:space=\"preserve\">${escapeXml(line)}</w:t></w:r></w:p>"
+            "<w:p>${inlineXml(line)}</w:p>"
         }
         return """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
 <w:body>$paragraphs</w:body>
 </w:document>"""
+    }
+
+    private fun inlineXml(line: String): String {
+        val parts = line.split("\t", ignoreCase = false, limit = Int.MAX_VALUE)
+        return parts.mapIndexed { index, part ->
+            buildString {
+                if (part.isNotEmpty()) append("<w:r><w:t xml:space=\"preserve\">${escapeXml(part)}</w:t></w:r>")
+                if (index < parts.lastIndex) append("<w:r><w:tab/></w:r>")
+            }
+        }.joinToString("")
     }
 
     private fun escapeXml(value: String): String = buildString(value.length) {
