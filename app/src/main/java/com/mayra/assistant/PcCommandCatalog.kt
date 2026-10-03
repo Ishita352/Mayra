@@ -8,7 +8,15 @@ object PcCommandCatalog {
     enum class CommandId {
         PING, OPEN_NOTEPAD, OPEN_CALCULATOR, OPEN_WINDOWS_SETTINGS,
         OPEN_NETWORK_SETTINGS, OPEN_DISPLAY_SETTINGS, OPEN_SOUND_SETTINGS,
-        GET_PC_STATUS, GET_SECURITY_STATUS, REVOKE_SESSION
+        GET_PC_STATUS, GET_SECURITY_STATUS,
+        LIST_SHARED_FILES, OPEN_SHARED_FILE, SEND_FILE_TO_PC, RECEIVE_FILE_FROM_PC,
+        READ_CLIPBOARD, WRITE_CLIPBOARD,
+        OPEN_BROWSER, BROWSER_AUTOMATION,
+        MEDIA_PLAY_PAUSE, MEDIA_NEXT, MEDIA_PREVIOUS, SET_VOLUME,
+        SCREEN_VIEW, SCREEN_CONTROL,
+        PHONE_CAMERA_FRONT, PHONE_CAMERA_BACK, PHONE_MICROPHONE, PHONE_SPEAKER,
+        PHONE_RECOVERY_STATUS,
+        REVOKE_SESSION
     }
 
     private val publishedCommands = setOf(
@@ -21,6 +29,25 @@ object PcCommandCatalog {
         CommandId.OPEN_SOUND_SETTINGS,
         CommandId.GET_PC_STATUS,
         CommandId.GET_SECURITY_STATUS,
+        CommandId.LIST_SHARED_FILES,
+        CommandId.OPEN_SHARED_FILE,
+        CommandId.SEND_FILE_TO_PC,
+        CommandId.RECEIVE_FILE_FROM_PC,
+        CommandId.READ_CLIPBOARD,
+        CommandId.WRITE_CLIPBOARD,
+        CommandId.OPEN_BROWSER,
+        CommandId.BROWSER_AUTOMATION,
+        CommandId.MEDIA_PLAY_PAUSE,
+        CommandId.MEDIA_NEXT,
+        CommandId.MEDIA_PREVIOUS,
+        CommandId.SET_VOLUME,
+        CommandId.SCREEN_VIEW,
+        CommandId.SCREEN_CONTROL,
+        CommandId.PHONE_CAMERA_FRONT,
+        CommandId.PHONE_CAMERA_BACK,
+        CommandId.PHONE_MICROPHONE,
+        CommandId.PHONE_SPEAKER,
+        CommandId.PHONE_RECOVERY_STATUS,
         CommandId.REVOKE_SESSION
     )
 
@@ -39,6 +66,25 @@ object PcCommandCatalog {
         CommandId.OPEN_SOUND_SETTINGS -> "Open Sound Settings"
         CommandId.GET_PC_STATUS -> "Read PC status"
         CommandId.GET_SECURITY_STATUS -> "Read Windows security status"
+        CommandId.LIST_SHARED_FILES -> "List shared files"
+        CommandId.OPEN_SHARED_FILE -> "Open shared file"
+        CommandId.SEND_FILE_TO_PC -> "Send file to PC"
+        CommandId.RECEIVE_FILE_FROM_PC -> "Receive file from PC"
+        CommandId.READ_CLIPBOARD -> "Read PC clipboard"
+        CommandId.WRITE_CLIPBOARD -> "Write PC clipboard"
+        CommandId.OPEN_BROWSER -> "Open browser"
+        CommandId.BROWSER_AUTOMATION -> "Approved browser automation"
+        CommandId.MEDIA_PLAY_PAUSE -> "Play or pause media"
+        CommandId.MEDIA_NEXT -> "Next media"
+        CommandId.MEDIA_PREVIOUS -> "Previous media"
+        CommandId.SET_VOLUME -> "Set PC volume"
+        CommandId.SCREEN_VIEW -> "View PC screen"
+        CommandId.SCREEN_CONTROL -> "Control PC screen"
+        CommandId.PHONE_CAMERA_FRONT -> "Use phone front camera"
+        CommandId.PHONE_CAMERA_BACK -> "Use phone rear camera"
+        CommandId.PHONE_MICROPHONE -> "Use phone microphone"
+        CommandId.PHONE_SPEAKER -> "Use phone speaker"
+        CommandId.PHONE_RECOVERY_STATUS -> "Read phone recovery status"
         CommandId.REVOKE_SESSION -> "Revoke PC session"
     }
 }
