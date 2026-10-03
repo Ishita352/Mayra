@@ -27,6 +27,7 @@ class MainActivity : FragmentActivity() {
     private val notificationRequestCode = 7002
     private var responseTts: TextToSpeech? = null
     private var masterSwitch: Switch? = null
+    private var pendingPdfText: String? = null
 
     private val documentPicker = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -76,6 +77,19 @@ class MainActivity : FragmentActivity() {
             }
             else -> showVoiceResult("এই document type Mayra এখনো গ্রহণ করছে না।")
         }
+    }
+
+    private val pdfCreatePicker = registerForActivityResult(
+        ActivityResultContracts.CreateDocument("application/pdf")
+    ) { uri ->
+        val text = pendingPdfText
+        pendingPdfText = null
+        if (uri == null || text == null) {
+            showVoiceResult("PDF output তৈরি করা হয়নি।")
+            return@registerForActivityResult
+        }
+        val result = DocumentTxtToPdfConverter.write(contentResolver, uri, text)
+        showVoiceResult(result.message)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
