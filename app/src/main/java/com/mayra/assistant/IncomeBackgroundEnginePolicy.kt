@@ -14,6 +14,8 @@ object IncomeBackgroundEnginePolicy {
         PASSIVE_INCOME_DISCOVERY,
         ACTIVE_INCOME_DISCOVERY,
         WORK_OPPORTUNITY_DISCOVERY,
+        REMOTE_JOB_DISCOVERY,
+        FREELANCING_DISCOVERY,
         SKILL_TO_INCOME_DISCOVERY
     }
 
@@ -21,6 +23,7 @@ object IncomeBackgroundEnginePolicy {
         SEARCH,
         COLLECT_PUBLIC_OPPORTUNITIES,
         CHECK_PLATFORM_RULES,
+        DETECT_AI_RESTRICTIONS,
         CHECK_ELIGIBILITY,
         SCORE_RELEVANCE,
         PREPARE_DRAFT,
@@ -34,6 +37,7 @@ object IncomeBackgroundEnginePolicy {
         Action.SEARCH,
         Action.COLLECT_PUBLIC_OPPORTUNITIES,
         Action.CHECK_PLATFORM_RULES,
+        Action.DETECT_AI_RESTRICTIONS,
         Action.CHECK_ELIGIBILITY,
         Action.SCORE_RELEVANCE,
         Action.PREPARE_DRAFT,
