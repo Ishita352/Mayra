@@ -35,6 +35,14 @@ class MainActivity : FragmentActivity() {
             showVoiceResult("কোনো document নির্বাচন করা হয়নি।")
             return@registerForActivityResult
         }
+        val mimeType = contentResolver.getType(uri)
+        val allowed = mimeType == "application/pdf" ||
+            mimeType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+            mimeType == "text/plain"
+        if (!allowed) {
+            showVoiceResult("এই document type Mayra এখনো গ্রহণ করছে না। PDF, DOCX বা TXT নির্বাচন করুন।")
+            return@registerForActivityResult
+        }
         try {
             contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
         } catch (_: SecurityException) { }
@@ -363,7 +371,7 @@ class MainActivity : FragmentActivity() {
         }
         // Defense-in-depth: re-check the physical device lock immediately before execution.
         // Voice results can return after the phone transitions between locked/unlocked states.
-        if (!DeviceSecurityGate.mayExecuteUserCommand(this, prefs)) {
+        if (!DeviceSecurityGate.mayExecuteUserCommand(this)) {
             showVoiceResult(if (LockModePolicy.isEnabled(prefs)) {
                 "ফোন locked — Locked Phone Mode চালু আছে, কিন্তু এই voice command-এর নিরাপদ locked-device execution path এখনো সম্পূর্ণভাবে সক্রিয় নয়।"
             } else {
