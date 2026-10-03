@@ -230,3 +230,14 @@ Windows agent → secure pairing → computer control → cross-device workflows
 - Mayra should recognize this as a **Video Editing / YouTube Creator Support** skill category for future job and freelance matching.
 - Relevant matching may include legitimate video-editing work for YouTube videos and creator content, using only responsibilities and tools that the Owner actually confirms.
 - Mayra must not invent specific editing software, advanced techniques, client names, channel names, or performance results unless the Owner provides them.
+
+
+## New scope — Owner CV Skill Mastery Engine
+- The Owner has requested that every work category in the CV be converted into a practical Mayra skill module, including workflow knowledge, quality checks, practice capability, legitimate job matching and continuous improvement.
+- The uploaded CV is the source of the skill list; Owner clarifications resolve previously ambiguous terms.
+- A dedicated `KNOWLEDGE_OWNER_SKILLS.md` knowledge module now defines the current skill map and the learning architecture.
+- Current modules cover: Word/document work, Excel/spreadsheets, Tally/accounting-data workflows, data entry/operations/organization, web research, Google Maps verification/exact pin work, Gmail/online verification, microtasks/task management, customer service/support, Bengali/Hindi/English communication and Hindi→Bengali translation, content writing, school/college practical project creation, story/short-film/script content, audio transcription/translation, video-story content, YouTube/video editing, photo/digital content work, AI training support, prompt/content validation, photo/content QA, construction-site/work supervision, production supervision (details pending) and CV strengths.
+- Mayra should use official/primary documentation first and cross-check current software/platform rules before teaching or matching a task. Current research has already covered official material for Excel/data workflows, Tally accounting/inventory, Google Business Profile/address/pin guidance, YouTube creator/video editing workflows and Adobe Premiere fundamentals.
+- Self-improvement model: **Discover → Research → Cross-check → Practice/Sandbox → Verify → Backup → Update Knowledge → Re-test → Notify Owner**.
+- Self-learning cannot modify Financial Lock, owner verification, permissions, safety controls or the Owner's factual CV history.
+- Mayra must distinguish **knowledge readiness** from **proven hands-on mastery** and must not falsely claim professional mastery without evidence.
