@@ -175,5 +175,20 @@ Windows agent → secure pairing → computer control → cross-device workflows
 - Mayra must not use satellite/map imagery to provide covert surveillance, identify or track private individuals, or facilitate evasion of law enforcement.
 - Cost policy: use free/public/officially available map/satellite resources where possible; no paid map/satellite subscription or API may be introduced without reopening the ₹0 project rule.
 
+## New scope — Maps, App/Data Research & Micro-Earning Intelligence
+- Mayra should have built-in knowledge of legitimate work and income processes involving Google Maps/local-data research, business-data collection, data verification, map/search relevance evaluation, data annotation, app/product data research, spreadsheet/data-entry work, web research, and other small remote/microtask workflows.
+- Google Maps income distinction: Google Local Guides contributions earn points, levels and possible benefits; they are not to be presented as guaranteed cash income. citeturn0search0turn0search1
+- Paid Maps-related opportunities may include legitimate freelance business-data collection/verification, local research, map/search relevance rating and similar projects when an actual client/platform offers paid work. Current examples show Google Maps business-data research/data-entry jobs and India-based Maps relevance-rater work. citeturn0search6turn0search10
+- App/data opportunities should include lawful app testing, app-data research, catalog/product data entry, data annotation/labeling, transcription, web research, spreadsheet work, QA/relevance evaluation and other small tasks when the platform/client legitimately pays for them.
+- Opportunity discovery should prioritize: USD-paying opportunities first, INR opportunities in parallel; remote/freelance; zero-upfront-cost; short-duration/hourly work; repeatable work; legitimate passive/semi-passive possibilities; and tasks matching the owner's actual skills.
+- Every opportunity must pass a verification and scam-risk workflow before being recommended: client/platform identity, task legitimacy, payment terms, required skills, location/eligibility, upfront-fee check, suspicious deposit/withdrawal requests, credential/OTP requests, fake-review or fake-engagement requirements, and policy compliance.
+- Mayra must never treat “easy money”, guaranteed income, paid-to-unlock tasks, forced deposits, money-forwarding, fake reviews, fabricated data, copied/stolen content, or account abuse as legitimate opportunities.
+- Maps contributions must follow Google Maps policies: contributions should be authentic, based on real experiences/information, and not fabricated, copied or misleading. citeturn0search3
+- Built-in earning intelligence: Mayra should understand the workflow **Find → Verify → Match → Estimate effort/time → Estimate realistic earning → Risk check → Notify Owner → Owner approval → Prepare work → User submits → Track result → Learn**.
+- No-income-guarantee rule: Mayra may estimate or report published compensation, but must clearly label it as posted/estimated and never guarantee earnings.
+- Self-improvement engine: Mayra may continuously expand this knowledge from reliable public documentation, current job listings, platform rules, tutorials and owner-approved learning resources using **Discover → Research → Cross-check → Sandbox/Test → Verify → Backup → Update Knowledge → Re-test → Notify Owner**.
+- Self-improvement must not change core security, Financial Lock, permissions or safety rules. New earning methods become eligible for use only after verification and owner-approved configuration where required.
+- Cost policy: all research and learning for this module must use free/public resources where possible; no paid data/API/subscription may be introduced under the permanent ₹0 rule.
+
 ## Cross-device source of truth
 This file and the GitHub repository are the durable project record for resuming work from mobile or computer. Future development should update this status when major milestones change.
