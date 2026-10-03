@@ -76,7 +76,7 @@ class MainActivity : FragmentActivity() {
                 if (result.success) {
                     showModule("DOCX Document Read", "ফাইল: $name\n\n" + result.message + "\n\n--- Text Preview ---\n" +
                         DocumentTextReader.preview(result.text) +
-                        "\n\nএই ধাপে DOCX read-only ছিল; original structure/file পরিবর্তন করা হয়নি.")
+                        "\n\nএই ধাপে DOCX read-only ছিল; original file পরিবর্তন করা হয়নি। Basic text structure রাখা হয়েছে, কিন্তু advanced formatting/layout preserve করা হয়নি.")
                 } else showVoiceResult(result.message)
             }
             else -> showVoiceResult("এই document type Mayra এখনো গ্রহণ করছে না।")
@@ -119,7 +119,7 @@ class MainActivity : FragmentActivity() {
             showVoiceResult(result.message)
             return@registerForActivityResult
         }
-        showDocxEditor(uri, result.text)
+        showDocxEditor(result.text)
     }
 
     private val docxEditPicker = registerForActivityResult(
@@ -463,7 +463,7 @@ class MainActivity : FragmentActivity() {
         setContentView(ScrollView(this).apply { addView(layout) })
     }
 
-    private fun showDocxEditor(uri: Uri, initialText: String) {
+    private fun showDocxEditor(initialText: String) {
         val layout = baseLayout()
         layout.addView(TextView(this).apply {
             text = "✏️ Edit DOCX"
