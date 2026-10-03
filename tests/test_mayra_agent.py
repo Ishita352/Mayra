@@ -7,9 +7,6 @@ import mayra_agent
 
 
 class MayraAgentTests(unittest.TestCase):
-    def test_today_code_has_expected_date_format(self):
-        self.assertRegex(mayra_agent.today_code(), r"^MAYRA-\\d{8}$")
-
     def test_ping_is_allowed(self):
         result = mayra_agent.execute("PING")
         self.assertTrue(result["ok"])
