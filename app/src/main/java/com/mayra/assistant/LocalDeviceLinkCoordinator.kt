@@ -23,7 +23,8 @@ class LocalDeviceLinkCoordinator(
     data class Session(
         val deviceId: String,
         val capabilities: Set<NetworkDeviceControlPolicy.Capability>,
-        val createdAtMs: Long
+        val createdAtMs: Long,
+        val securityScan: DevicePreConnectionScan
     )
 
     private val pending = ConcurrentHashMap<String, PairingInvite>()
@@ -52,7 +53,7 @@ class LocalDeviceLinkCoordinator(
             return null
         }
         if (capabilities.isEmpty()) return null
-        val session = Session(deviceId, capabilities.toSet(), clockMs())
+        val session = Session(deviceId, capabilities.toSet(), clockMs(), scan)
         sessions[deviceId] = session
         pending.remove(deviceId)
         return session
