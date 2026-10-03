@@ -21,6 +21,21 @@ object JobSkillMatchWorkflow {
         return Match(candidate, matched, matched.size)
     }
 
+    fun jamesBillingsTransferMatch(candidate: JobWatcherWorkflow.Candidate): Boolean {
+        if (!candidate.verified || candidate.upfrontCost) return false
+        val terms = candidate.matchedSkills.map { it.lowercase() }.toSet()
+        val jbTerms = JamesBillingsKnowledge.topics
+            .filter { it.verified }
+            .flatMap { topic ->
+                when (topic.name) {
+                    "tasks", "worker_flow", "assignment_events", "cashout_status" ->
+                        listOf("mturk", "mechanical turk", "microtask", "hit", "data labeling", "data collection", "transcription", "ai evaluation")
+                    else -> emptyList()
+                }
+            }.toSet()
+        return terms.any { it in jbTerms }
+    }
+
     fun rank(candidates: List<JobWatcherWorkflow.Candidate>): List<Match> =
         candidates
             .filter { it.verified && !it.upfrontCost }
