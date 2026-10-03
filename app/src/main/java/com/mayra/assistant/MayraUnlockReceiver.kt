@@ -13,6 +13,8 @@ class MayraUnlockReceiver : BroadcastReceiver() {
         if (intent?.action != Intent.ACTION_USER_PRESENT) return
         val prefs = context.getSharedPreferences("mayra_secure", Context.MODE_PRIVATE)
         if (!prefs.getBoolean("owner_verified", false)) return
+        if (!prefs.getBoolean("master_on", true)) return
+        if (!FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.VOICE_COMMAND)) return
 
         val pending = goAsync()
         lateinit var speech: TextToSpeech
