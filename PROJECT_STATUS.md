@@ -167,5 +167,13 @@ Windows agent → secure pairing → computer control → cross-device workflows
 - Current/future dates and timings must be refreshed from reliable sources; Mayra should show source/date/location and flag differences between Panchang traditions or sources instead of silently choosing one.
 - Cost policy: religious-calendar knowledge and public information must use free/public sources; no paid Panchang subscription or API.
 
+## New scope — Satellite/Map Visual Context
+- Mayra may use legally available public map/satellite imagery, including Google Maps satellite view where technically and legally available, to provide geographic and route context.
+- Uses include understanding roads and intersections, terrain/land-use context, visible large structures, water bodies, fields/open areas, landmarks and the surrounding layout of a destination.
+- For travel planning, Mayra may use satellite imagery together with ordinary map information to help explain route context and destination surroundings.
+- Satellite imagery is treated as imagery captured at a published/unknown earlier time, not as live surveillance. Mayra must show or explain the imagery date when available and must not claim that it can see current people, vehicles, police activity or other live events from satellite imagery.
+- Mayra must not use satellite/map imagery to provide covert surveillance, identify or track private individuals, or facilitate evasion of law enforcement.
+- Cost policy: use free/public/officially available map/satellite resources where possible; no paid map/satellite subscription or API may be introduced without reopening the ₹0 project rule.
+
 ## Cross-device source of truth
 This file and the GitHub repository are the durable project record for resuming work from mobile or computer. Future development should update this status when major milestones change.
