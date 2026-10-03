@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 /**
  * Minimal in-memory SharedPreferences used only by local JVM unit tests.
  */
-private class FakeSharedPreferences : SharedPreferences {
+class FakeSharedPreferences : SharedPreferences {
     private val values = mutableMapOf<String, Any?>()
     private val listeners = mutableSetOf<SharedPreferences.OnSharedPreferenceChangeListener>()
 
