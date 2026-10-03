@@ -20,8 +20,18 @@ object NetworkDeviceControlPolicy {
     fun mayTreatNetworkPresenceAsConsent(): Boolean = false
     fun requiresExplicitPairing(): Boolean = true
     fun requiresOwnerApprovalForSensitiveCapability(capability: Capability): Boolean =
-        capability in setOf(Capability.SCREEN_VIEW, Capability.SCREEN_CONTROL,
-            Capability.APP_LAUNCH, Capability.CLIPBOARD_SYNC, Capability.NOTIFICATION_MIRROR)
+        capability in setOf(
+            Capability.SCREEN_VIEW,
+            Capability.SCREEN_CONTROL,
+            Capability.APP_LAUNCH,
+            Capability.CLIPBOARD_SYNC,
+            Capability.NOTIFICATION_MIRROR,
+            Capability.PHONE_CAMERA_FRONT,
+            Capability.PHONE_CAMERA_BACK,
+            Capability.PHONE_MICROPHONE,
+            Capability.PHONE_SPEAKER,
+            Capability.PHONE_REMOTE_RECOVERY
+        )
     fun mayControlDevice(state: PairingState, capabilityGranted: Boolean): Boolean =
         state == PairingState.PAIRED && capabilityGranted
     fun mayAccessWithoutPairing(): Boolean = false
