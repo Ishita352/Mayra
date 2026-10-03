@@ -41,8 +41,11 @@ class LocalDeviceLinkCoordinator(
     fun acceptInvite(
         deviceId: String,
         code: String,
-        capabilities: Set<NetworkDeviceControlPolicy.Capability>
+        capabilities: Set<NetworkDeviceControlPolicy.Capability>,
+        risk: DevicePreConnectionSecurityPolicy.Risk = DevicePreConnectionSecurityPolicy.Risk.UNKNOWN,
+        ownerApproved: Boolean = false
     ): Session? {
+        if (risk != DevicePreConnectionSecurityPolicy.Risk.CLEAN || !ownerApproved) return null
         val invite = pending[deviceId] ?: return null
         if (clockMs() >= invite.expiresAtMs || invite.code != code) {
             pending.remove(deviceId)
