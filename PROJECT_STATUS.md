@@ -8,6 +8,8 @@
 - Financial lock: Mayra must never spend, purchase, subscribe, withdraw, or execute financial transactions.
 
 ## Current development status
+The latest Android safety work has removed the locked-phone foreground voice service path. Locked-phone background voice execution is no longer part of the Android runtime path; the unlock welcome receiver remains.
+
 The project is a work-in-progress. Android CI builds have succeeded, but the final Android APK is not yet ready for release.
 
 Estimated overall completion: ~35% (planning estimate based on feature scope, not code-line percentage).
@@ -17,7 +19,7 @@ Estimated overall completion: ~35% (planning estimate based on feature scope, no
 - Android application foundation
 - One-time strong biometric Owner verification
 - Master ON/OFF switch foundation
-- Locked-phone safety policy foundation
+- Locked-phone safety enforcement strengthened: removed locked-phone foreground voice service path
 - Bengali/English/Hindi voice command foundation
 - Android Settings/Browser/Camera/Time/Help commands
 - Payment/financial safety policy foundation
