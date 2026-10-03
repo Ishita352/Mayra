@@ -29,9 +29,10 @@ class DocumentWorkflowTest {
     }
 
     @Test
-    fun structurePreservationIsExplicitlyNotReady() {
+    fun basicStructurePreservationIsReady() {
         val result = DocumentWorkflow.plan("DOCX edit করে structure ঠিক রাখো")
         assertTrue(result.message.contains("structure-preserving"))
+        assertTrue(!result.message.contains("এখনো সক্রিয় নয়"))
     }
 
     @Test
