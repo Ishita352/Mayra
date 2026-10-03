@@ -16,6 +16,19 @@ class NetworkDeviceControlPolicyTest {
         assertFalse(NetworkDeviceControlPolicy.mayControlDevice(
             NetworkDeviceControlPolicy.PairingState.PAIRED, false))
     }
+    @Test fun phoneMediaAndRecoveryRequireOwnerApproval() {
+        assertTrue(NetworkDeviceControlPolicy.requiresOwnerApprovalForSensitiveCapability(
+            NetworkDeviceControlPolicy.Capability.PHONE_CAMERA_FRONT))
+        assertTrue(NetworkDeviceControlPolicy.requiresOwnerApprovalForSensitiveCapability(
+            NetworkDeviceControlPolicy.Capability.PHONE_CAMERA_BACK))
+        assertTrue(NetworkDeviceControlPolicy.requiresOwnerApprovalForSensitiveCapability(
+            NetworkDeviceControlPolicy.Capability.PHONE_MICROPHONE))
+        assertTrue(NetworkDeviceControlPolicy.requiresOwnerApprovalForSensitiveCapability(
+            NetworkDeviceControlPolicy.Capability.PHONE_SPEAKER))
+        assertTrue(NetworkDeviceControlPolicy.requiresOwnerApprovalForSensitiveCapability(
+            NetworkDeviceControlPolicy.Capability.PHONE_REMOTE_RECOVERY))
+    }
+
     @Test fun sensitiveControlCannotBypassSecurity() {
         assertTrue(NetworkDeviceControlPolicy.requiresOwnerApprovalForSensitiveCapability(
             NetworkDeviceControlPolicy.Capability.SCREEN_CONTROL))
