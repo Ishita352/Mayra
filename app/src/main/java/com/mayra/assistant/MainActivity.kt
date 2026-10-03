@@ -109,9 +109,11 @@ class MainActivity : FragmentActivity() {
             setOnCheckedChangeListener { _, checked ->
                 prefs.edit().putBoolean("master_on", checked).apply()
                 if (!checked) {
-                    showVoiceResult("Mayra Master OFF — সব কাজ ও background activity বন্ধ। কোনো memory বা saved progress মুছবে না।")
+                    BackgroundWorkCoordinator.cancelAll(this@MainActivity)
+                    showVoiceResult("Mayra Master OFF — background jobs বন্ধ হয়েছে। কোনো memory বা saved progress মুছবে না।")
                 } else {
-                    showVoiceResult("Mayra Master ON — saved state রেখে কাজ আবার চালু হয়েছে।")
+                    BackgroundWorkCoordinator.scheduleDefaults(this@MainActivity)
+                    showVoiceResult("Mayra Master ON — saved state রেখে background jobs আবার চালু হয়েছে।")
                 }
             }
         })
