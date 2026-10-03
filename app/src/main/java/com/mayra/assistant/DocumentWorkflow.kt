@@ -1,11 +1,11 @@
 package com.mayra.assistant
 
 /**
- * Offline-first document workflow foundation.
+ * Offline-first document workflow planner.
  *
- * This layer describes safe operations for supported document types without
- * reading, modifying, or exporting user files by itself. File I/O is added
- * later behind Android storage/permission and Owner gates.
+ * This layer describes safe operations for supported document types but does
+ * not perform file I/O itself. Concrete readers/writers handle file access
+ * behind Android storage and Owner/security gates.
  */
 object DocumentWorkflow {
     enum class Format { PDF, DOCX, TXT, UNKNOWN }
@@ -30,10 +30,10 @@ object DocumentWorkflow {
         }
 
         val actions = linkedSetOf<Action>()
-        if (containsAny(text, "read", "open", "পড়", "দেখ", "read")) actions += Action.READ
+        if (containsAny(text, "read", "open", "পড়", "দেখ")) actions += Action.READ
         if (containsAny(text, "create", "make", "বান", "তৈরি")) actions += Action.CREATE
         if (containsAny(text, "edit", "modify", "সম্পাদ", "পরিবর্তন")) actions += Action.EDIT
-        if (containsAny(text, "convert", "রূপান্তর", "convert")) actions += Action.CONVERT
+        if (containsAny(text, "convert", "রূপান্তর")) actions += Action.CONVERT
         if (containsAny(text, "structure", "format", "layout", "গঠন", "ফরম্যাট")) actions += Action.PRESERVE_STRUCTURE
 
         val recognized = format != Format.UNKNOWN && actions.isNotEmpty()
