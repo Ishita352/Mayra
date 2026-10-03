@@ -12,6 +12,7 @@ class MayraHomeControlCatalogTest {
                 MayraHomeControlCatalog.ControlId.VOICE_ASSISTANT,
                 MayraHomeControlCatalog.ControlId.CALL_ASSISTANT,
                 MayraHomeControlCatalog.ControlId.CAMERA,
+                MayraHomeControlCatalog.ControlId.WHATSAPP_ASSISTANT,
                 MayraHomeControlCatalog.ControlId.SECURITY,
                 MayraHomeControlCatalog.ControlId.PC_CONTROL
             ),
