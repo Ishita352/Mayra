@@ -5,6 +5,13 @@ import org.junit.Test
 import org.junit.Assert.assertTrue
 
 class DocumentDocxReaderTest {
+    @Test fun hasSecurityLimits() {
+        assertEquals(10L * 1024L * 1024L, DocumentDocxReader.MAX_BYTES)
+        assertEquals(128, DocumentDocxReader.MAX_ZIP_ENTRIES)
+        assertEquals(5L * 1024L * 1024L, DocumentDocxReader.MAX_XML_BYTES)
+        assertEquals(500_000, DocumentDocxReader.MAX_TEXT_CHARS)
+    }
+
     @Test fun hasTenMbLimit() { assertEquals(10L * 1024L * 1024L, DocumentDocxReader.MAX_BYTES) }
 
     @Test fun writerPreservesParagraphBoundariesAndEscapesXml() {
