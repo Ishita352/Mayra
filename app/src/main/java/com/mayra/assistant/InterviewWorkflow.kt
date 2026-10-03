@@ -7,6 +7,7 @@ package com.mayra.assistant
  */
 object InterviewWorkflow {
     enum class Mode { PREPARATION, AUTHORIZED_ASSISTANCE, HUMAN_ONLY }
+    enum class AiPermission { ALLOWED, NOT_PROHIBITED, BANNED }
     enum class Action { REVIEW_CV, PRACTICE_QUESTION, EXPLAIN_QUESTION, PREPARE_ANSWER, PRONUNCIATION, UNKNOWN }
 
     data class Plan(
@@ -36,6 +37,8 @@ object InterviewWorkflow {
             } else help()
         )
     }
+
+    fun mayUseAi(permission: AiPermission): Boolean = permission != AiPermission.BANNED
 
     fun mayCovertlyAssist(): Boolean = false
     fun mayBypassInterviewRules(): Boolean = false
