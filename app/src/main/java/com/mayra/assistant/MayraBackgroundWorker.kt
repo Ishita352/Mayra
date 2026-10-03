@@ -3,6 +3,7 @@ package com.mayra.assistant
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import java.security.MessageDigest
 
 /**
  * Safe execution boundary for scheduled Mayra checks.
@@ -53,6 +54,14 @@ class MayraBackgroundWorker(
             ),
             notificationId
         )
+
+    private fun runPublicWatch(stateKey: String, fingerprint: String, event: NotificationSchedulePolicy.Event): Result {
+        val previous = BackgroundWatchState.previousFingerprint(applicationContext, stateKey)
+        if (previous != null && previous != fingerprint) MayraNotificationCenter.notifyOwner(applicationContext, event, stateKey.hashCode())
+        BackgroundWatchState.saveFingerprint(applicationContext, stateKey, fingerprint)
+        return Result.success()
     }
+
+    private fun stableFingerprint(value: String): String = MessageDigest.getInstance("SHA-256").digest(value.toByteArray()).joinToString("") { "%02x".format(it) }
 }
 
