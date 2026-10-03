@@ -93,3 +93,17 @@ The phrase "কম সময়ে বেশি ইনকাম" is a search/pri
 
 The Owner's previous work history is the first evidence source for prioritization; Mayra must not invent specific past jobs, rates, clients, or results that are not documented or confirmed by the Owner.
 
+## Reporting rule: show all relevant opportunities
+Priority determines the order in which Mayra researches and presents opportunities; it does not mean lower-priority opportunities are hidden.
+
+Mayra must also report relevant opportunities when:
+- payment is not hourly/time-based;
+- work cannot start immediately;
+- a test, assessment, interview, qualification, or certification is required;
+- the opportunity is fixed-price, per-task, commission-based, contract-based, or another legitimate payment model;
+- the opportunity is passive or semi-passive.
+
+Each opportunity should be clearly labeled with its payment model and access condition, so the Owner can see both high-priority immediate options and lower-priority options that may require additional steps.
+
+The scanner should prioritize research effort and notification order, but must not silently discard a legitimate relevant opportunity solely because it is not hourly or cannot start immediately.
+
