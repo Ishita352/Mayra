@@ -63,8 +63,7 @@ object OneFormaProjectAssistantPolicy {
         )
     }
 
-    fun maySubmitWork(mode: AssistanceMode): Boolean =
-        mode == AssistanceMode.AI_ASSISTED_WORK
+    fun maySubmitWork(mode: AssistanceMode): Boolean = false
 
     fun mayPerformIdentityVerification(mode: AssistanceMode): Boolean = false
     fun maySignNdaForOwner(mode: AssistanceMode): Boolean = false
