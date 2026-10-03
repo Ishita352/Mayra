@@ -66,6 +66,36 @@ class MainActivity : FragmentActivity() {
             .build()
         prompt.authenticate(info)
     }
+
+    private fun authenticateTemporaryOwner() {
+        if (TemporaryOwnerAccessManager.isActive(this)) {
+            showVoiceResult("Temporary Owner Mode ইতিমধ্যে সক্রিয় আছে।")
+            return
+        }
+        val manager = BiometricManager.from(this)
+        val authenticators = BiometricManager.Authenticators.BIOMETRIC_STRONG or
+            BiometricManager.Authenticators.DEVICE_CREDENTIAL
+        if (manager.canAuthenticate(authenticators) != BiometricManager.BIOMETRIC_SUCCESS) {
+            showVoiceResult("Temporary Owner verification-এর জন্য Face/Fingerprint অথবা ফোনের secure Pattern/PIN/Password দরকার।")
+            return
+        }
+        val executor = ContextCompat.getMainExecutor(this)
+        val prompt = BiometricPrompt(this, executor, object : BiometricPrompt.AuthenticationCallback() {
+            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                super.onAuthenticationSucceeded(result)
+                TemporaryOwnerAccessManager.start(this@MainActivity)
+                showVoiceResult("Temporary Owner Mode চালু হয়েছে। সর্বোচ্চ ২৪ ঘণ্টা।")
+                speakResponse("বস, Temporary Owner Mode চালু হয়েছে।")
+            }
+        })
+        val info = BiometricPrompt.PromptInfo.Builder()
+            .setTitle("Mayra Temporary Owner Verification")
+            .setSubtitle("Owner হিসেবে Face/Fingerprint অথবা ফোনের secure credential দিয়ে যাচাই করুন")
+            .setAllowedAuthenticators(authenticators)
+            .build()
+        prompt.authenticate(info)
+    }
+
     private fun startLockedVoiceMode() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), voiceRequestCode)
@@ -82,6 +112,7 @@ class MainActivity : FragmentActivity() {
             textSize = 17f
         })
         layout.addView(Button(this).apply { text = "🎙️ Voice Command"; setOnClickListener { startVoiceCommand() } })
+        layout.addView(Button(this).apply { text = "👑 Temporary Owner Mode (24h)"; setOnClickListener { authenticateTemporaryOwner() } })
         layout.addView(TextView(this).apply {
             text = "\n🔒 Locked Voice Mode: ON\nলক অবস্থায় শুধু “মায়রা, কাহাঁপে হো?” এবং একই অর্থের বাংলা/English/Hindi নির্দিষ্ট wake phrase-এ উত্তর দেবে। অন্য কোনো কাজ করবে না এবং ফোন unlock করতে পারবে না."
             textSize = 15f
