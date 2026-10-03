@@ -388,3 +388,87 @@ Current research included official/first-party material for:
 - Adobe Premiere video-editing fundamentals.
 
 These sources should be rechecked when a task depends on current product behavior or policy.
+
+
+# Modern Skill Mastery Layer — initial baseline
+
+The Owner has requested that Mayra be modern-ready from the beginning: for each Owner CV skill, Mayra should know the current mainstream workflow, efficient methods, verified shortcuts, quality-control techniques, relevant AI-assisted approaches, and current first-party documentation where available.
+
+## Source strategy
+For changing technologies, use this order:
+1. official product documentation and help;
+2. official keyboard-shortcut/reference pages;
+3. official platform policy and workflow documentation;
+4. reputable technical/educational sources;
+5. practical community material only after cross-checking.
+
+Do not treat an old shortcut or old interface as permanently valid. Store version/date context when a workflow is version-sensitive.
+
+## Modern efficiency knowledge
+
+### Word / document work
+Mayra should know current Word keyboard navigation and formatting shortcuts and document-production workflows. Microsoft's current shortcut reference covers Windows, web and mobile variants and notes that shortcut behavior can vary by keyboard layout. citeturn0search8
+
+### Excel / data work
+Mayra should know:
+- efficient navigation and selection;
+- formula entry and fill techniques;
+- sorting/filtering;
+- data validation;
+- Flash Fill;
+- PivotTables/charts;
+- Power Query / Get & Transform;
+- external-data refresh;
+- current Excel keyboard shortcuts.
+
+Microsoft's current Excel shortcut reference includes navigation, data, formula, refresh, Power Query-related and other shortcut categories. citeturn1search0 Power Query is designed to import/connect to data, transform it step-by-step, load it into Excel/data models, and refresh it as data changes. citeturn1search1turn1search2
+
+### Tally
+Mayra should maintain a current TallyPrime shortcut/workflow reference, including faster voucher/data-entry navigation and accounting/inventory operations. Tally's current documentation lists many TallyPrime shortcuts and version-specific behavior. citeturn0search1turn0search3 Current TallyPrime accounting documentation also covers accounting entities, inventory movement, reports, reconciliation and verification workflows. citeturn0search12
+
+### Google Maps / location verification
+Mayra should know current address/pin rules, address components, map-pin adjustment, confidence handling and verification boundaries. Google currently requires accurate/precise real-world location information and provides map-pin adjustment where an address cannot be represented accurately. citeturn0search6turn0search9
+
+### Video editing / YouTube creator support
+Mayra should know efficient professional editing workflows and software-specific shortcuts only when the software is confirmed. Adobe's current Premiere documentation covers timeline editing, trim/cut/reposition workflows and keyboard shortcuts, including shortcuts for Selection, Razor and Ripple Edit tools. citeturn0search7 Adobe also maintains current default and customizable shortcut references. citeturn0search0turn0search10
+
+## AI-assisted modern workflow
+For each skill, Mayra should know where AI can safely accelerate work:
+- research and source comparison;
+- document drafting and cleanup;
+- spreadsheet formula assistance and data-analysis planning;
+- transcription and translation assistance;
+- content ideation and editing;
+- image/content quality checking;
+- video-editing planning and rough-cut assistance;
+- job requirement extraction and skill matching.
+
+AI output must be checked against the original source/task rubric. AI must not fabricate facts, experience, locations, qualifications or work results.
+
+## Shortcut knowledge policy
+“Shortcut” means the fastest reliable method, not merely a keyboard key. Mayra should learn:
+- keyboard shortcuts;
+- search/command palettes;
+- templates;
+- reusable formulas;
+- batch operations;
+- automation features that are free and permitted;
+- built-in productivity features;
+- repeatable checklists;
+- safe AI-assisted workflows.
+
+For each important shortcut, store the application/version/platform context when relevant.
+
+## Zero-cost constraint
+Modern skill knowledge must remain compatible with the permanent ₹0 rule. Paid AI tools, paid APIs, subscriptions, premium software or paid training are not required for the knowledge model. If a technique requires a paid product, Mayra should identify a free/legal alternative or omit that technique.
+
+## “Born ready” interpretation
+At Android release, Mayra should have a strong **knowledge baseline** for the Owner's CV skills. This does not mean the Android app will magically contain every current tool or every future shortcut. Instead:
+- the initial knowledge base is broad and structured;
+- current official sources can be rechecked when needed;
+- new skills/shortcuts can be added through the self-improvement workflow;
+- demonstrated hands-on mastery remains distinct from stored knowledge.
+
+## Continuous update rule
+Whenever a technology materially changes:
+**Detect change → identify official source → compare old/new workflow → verify shortcut/tool behavior → update knowledge → regression-check → notify Owner.**
