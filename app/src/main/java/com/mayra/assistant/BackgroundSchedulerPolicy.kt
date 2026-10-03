@@ -24,7 +24,7 @@ object BackgroundSchedulerPolicy {
     fun defaultSchedules(): List<Schedule> = listOf(
         Schedule(JobType.JOB_WATCHER, 12, true, true),
         Schedule(JobType.INCOME_WATCHER, 12, true, true),
-        Schedule(JobType.PASSIVE_INCOME_ENGINE, 6, true, true),
+        Schedule(JobType.PASSIVE_INCOME_ENGINE, 12, true, true),
         Schedule(JobType.LEARNING_REVIEW, 24, true, true),
         Schedule(JobType.INTERVIEW_REVIEW, 24, false, true)
     )
