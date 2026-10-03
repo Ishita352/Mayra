@@ -11,6 +11,7 @@ object MayraHomeControlCatalog {
         VOICE_ASSISTANT,
         CALL_ASSISTANT,
         CAMERA,
+        WHATSAPP_ASSISTANT,
         SECURITY,
         PC_CONTROL
     }
@@ -25,6 +26,7 @@ object MayraHomeControlCatalog {
         Control(ControlId.VOICE_ASSISTANT, "Voice Assistant"),
         Control(ControlId.CALL_ASSISTANT, "Call Assistant"),
         Control(ControlId.CAMERA, "Camera"),
+        Control(ControlId.WHATSAPP_ASSISTANT, "WhatsApp Read & Voice Reply"),
         Control(ControlId.SECURITY, "Security"),
         Control(ControlId.PC_CONTROL, "PC Control", toggleable = false)
     )
