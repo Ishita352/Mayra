@@ -29,7 +29,8 @@ class MayraBackgroundWorker(
 
         return when (jobType) {
             BackgroundSchedulerPolicy.JobType.JOB_WATCHER.name,
-            BackgroundSchedulerPolicy.JobType.INCOME_WATCHER.name -> runOpportunityWatch()
+            BackgroundSchedulerPolicy.JobType.INCOME_WATCHER.name,
+            BackgroundSchedulerPolicy.JobType.PASSIVE_INCOME_ENGINE.name -> runIncomeBackgroundCycle()
 
             BackgroundSchedulerPolicy.JobType.LEARNING_REVIEW.name,
             BackgroundSchedulerPolicy.JobType.INTERVIEW_REVIEW.name -> Result.success()
@@ -75,6 +76,19 @@ class MayraBackgroundWorker(
             workDataOf(
                 "background_task" to task.name,
                 "status" to "ALLOWED_PENDING_TASK_ADAPTER"
+            )
+        )
+    }
+
+    private fun runIncomeBackgroundCycle(): Result {
+        val policy = IncomeBackgroundEnginePolicy
+        return Result.success(
+            workDataOf(
+                "income_background" to "ACTIVE",
+                "passive_income_objective" to policy.PASSIVE_INCOME_PRIMARY_OBJECTIVE,
+                "continuous_search_allowed" to policy.continuousSearchAllowed(),
+                "automation_permission_required" to true,
+                "execution_status" to "RULE_CHECK_REQUIRED"
             )
         )
     }
