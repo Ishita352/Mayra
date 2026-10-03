@@ -36,14 +36,15 @@ object DocumentWorkflow {
         if (containsAny(text, "convert", "রূপান্তর", "convert")) actions += Action.CONVERT
         if (containsAny(text, "structure", "format", "layout", "গঠন", "ফরম্যাট")) actions += Action.PRESERVE_STRUCTURE
 
-        return Request(
-            format = format,
-            actions = actions,
-            recognized = format != Format.UNKNOWN && actions.isNotEmpty(),
-            message = if (format != Format.UNKNOWN && actions.isNotEmpty()) {
-                "Document plan প্রস্তুত: file type ও requested action শনাক্ত হয়েছে; বাস্তব file access পরে permission/Owner gate-এর পেছনে চলবে।"
-            } else help()
-        )
+        val recognized = format != Format.UNKNOWN && actions.isNotEmpty()
+        val message = when {
+            !recognized -> help()
+            Action.PRESERVE_STRUCTURE in actions ->
+                "Document plan প্রস্তুত, কিন্তু structure-preserving editing/conversion এখনো সক্রিয় নয়; basic text workflow ব্যবহার করতে হবে।"
+            else ->
+                "Document plan প্রস্তুত: file type ও requested action শনাক্ত হয়েছে; বাস্তব file access permission/Owner gate-এর পেছনে চলবে।"
+        }
+        return Request(format, actions, recognized, message)
     }
 
     fun help(): String =
