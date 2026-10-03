@@ -2,6 +2,7 @@ package com.mayra.assistant
 
 import android.Manifest
 import android.content.Intent
+import android.app.KeyguardManager
 import android.net.Uri
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -265,6 +266,12 @@ class MainActivity : FragmentActivity() {
     private fun executeVoiceCommand(spoken: String) {
         if (!prefs.getBoolean("master_on", true)) {
             showVoiceResult("Mayra Master OFF — কমান্ড চালানো যাবে না।")
+            return
+        }
+        // Defense-in-depth: re-check the physical device lock immediately before execution.
+        // Voice results can return after the phone transitions between locked/unlocked states.
+        if (!DeviceSecurityGate.mayExecuteUserCommand(this)) {
+            showVoiceResult("ফোন locked — Mayra কোনো command চালাবে না। আগে ফোন unlock করুন।")
             return
         }
         if (isFinishing) return
