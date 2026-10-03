@@ -23,37 +23,18 @@ class MayraBackgroundWorker(
         }
 
         return when (jobType) {
-            BackgroundSchedulerPolicy.JobType.JOB_WATCHER.name -> {
-                MayraNotificationCenter.notifyOwner(
-                    applicationContext,
-                    NotificationSchedulePolicy.Event(
-                        NotificationSchedulePolicy.EventType.JOB_OPPORTUNITY,
-                        "Mayra Job Watcher",
-                        "Background job check is scheduled and ready for verified opportunities.",
-                        important = false
-                    ),
-                    2101
-                )
-                Result.success()
-            }
-            BackgroundSchedulerPolicy.JobType.INCOME_WATCHER.name -> {
-                MayraNotificationCenter.notifyOwner(
-                    applicationContext,
-                    NotificationSchedulePolicy.Event(
-                        NotificationSchedulePolicy.EventType.INCOME_UPDATE,
-                        "Mayra Income Watcher",
-                        "Background income check is scheduled. No financial action is performed automatically.",
-                        important = false
-                    ),
-                    2102
-                )
-                Result.success()
-            }
+            BackgroundSchedulerPolicy.JobType.JOB_WATCHER.name,
+            BackgroundSchedulerPolicy.JobType.INCOME_WATCHER.name -> runOpportunityWatch()
             BackgroundSchedulerPolicy.JobType.LEARNING_REVIEW.name,
-            BackgroundSchedulerPolicy.JobType.INTERVIEW_REVIEW.name -> {
-                Result.success()
-            }
+            BackgroundSchedulerPolicy.JobType.INTERVIEW_REVIEW.name -> Result.success()
             else -> Result.failure()
         }
     }
+
+    private fun runOpportunityWatch(): Result {
+        // Public-source adapters will be connected separately. Until then,
+        // do not invent opportunities or claim that a live scan occurred.
+        return Result.success()
+    }
 }
+
