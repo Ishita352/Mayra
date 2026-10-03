@@ -85,6 +85,14 @@ Core AI → Security → Documents → Excel → CV → Jobs/Income → Intervie
 Then Windows 10:
 Windows agent → secure pairing → computer control → cross-device workflows → testing → final release.
 
+## New scope — Owner-controlled Incoming Call Assistant
+- Add a dedicated ON/OFF option inside the Mayra Android app for the incoming-call assistant/auto-answer feature.
+- Safe default: OFF. The Owner can enable or disable it from Mayra's own app UI at any time.
+- When enabled, the planned feature may monitor an incoming call state and, if the Owner does not answer within the configured allowed window, use an Android-supported call-answer flow where the device/OS and permissions legally allow it.
+- Caller information may be checked using available public/authorized data; Mayra must not invent a caller's identity, exact location or personal details.
+- The feature must respect Android permissions, telecom/device restrictions and privacy requirements. No covert recording, credential collection or financial action.
+- This scope is a planned Android feature; it is not yet considered fully implemented or release-verified.
+
 ## Scope exclusions
 - No India-law bypass or prohibited-work circumvention.
 - No covert/stealth unauthorized access.
