@@ -6,7 +6,7 @@ package com.mayra.assistant
  * It describes safe, periodic work rather than a stealth background service.
  */
 object BackgroundSchedulerPolicy {
-    enum class JobType { JOB_WATCHER, INCOME_WATCHER, LEARNING_REVIEW, INTERVIEW_REVIEW }
+    enum class JobType { JOB_WATCHER, INCOME_WATCHER, PASSIVE_INCOME_ENGINE, LEARNING_REVIEW, INTERVIEW_REVIEW }
 
     data class Schedule(
         val jobType: JobType,
@@ -24,6 +24,7 @@ object BackgroundSchedulerPolicy {
     fun defaultSchedules(): List<Schedule> = listOf(
         Schedule(JobType.JOB_WATCHER, 12, true, true),
         Schedule(JobType.INCOME_WATCHER, 12, true, true),
+        Schedule(JobType.PASSIVE_INCOME_ENGINE, 6, true, true),
         Schedule(JobType.LEARNING_REVIEW, 24, true, true),
         Schedule(JobType.INTERVIEW_REVIEW, 24, false, true)
     )
