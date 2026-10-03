@@ -4,11 +4,14 @@ import android.content.ContentResolver
 import android.net.Uri
 import java.io.IOException
 import java.util.zip.ZipInputStream
+import javax.xml.XMLConstants
 import javax.xml.parsers.DocumentBuilderFactory
 
 object DocumentDocxReader {
     const val MAX_BYTES = 10L * 1024L * 1024L
     const val MAX_TEXT_CHARS = 500_000
+    const val MAX_ZIP_ENTRIES = 128
+    const val MAX_XML_BYTES = 5L * 1024L * 1024L
     data class Result(val success: Boolean, val text: String = "", val message: String)
 
     fun read(resolver: ContentResolver, uri: Uri): Result {
@@ -34,14 +37,20 @@ object DocumentDocxReader {
 
             ZipInputStream(raw.inputStream()).use { zip ->
                 var entry = zip.nextEntry
+                var entryCount = 0
                 while (entry != null) {
+                    entryCount++
+                    if (entryCount > MAX_ZIP_ENTRIES) throw IOException("too many ZIP entries")
                     if (entry.name == "word/document.xml") {
-                        val xml = readEntryBytesLimited(zip, MAX_BYTES)
+                        val xml = readEntryBytesLimited(zip, MAX_XML_BYTES)
                         val factory = DocumentBuilderFactory.newInstance()
                         factory.isNamespaceAware = false
-                        try { factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true) } catch (_: Exception) {}
-                        try { factory.setFeature("http://xml.org/sax/features/external-general-entities", false) } catch (_: Exception) {}
-                        try { factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false) } catch (_: Exception) {}
+                        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
+                        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+                        factory.setFeature("http://xml.org/sax/features/external-general-entities", false)
+                        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false)
+                        factory.isXIncludeAware = false
+                        factory.isExpandEntityReferences = false
                         val parsed = factory.newDocumentBuilder().parse(xml.inputStream())
                         val paragraphs = parsed.getElementsByTagName("w:p")
                         val out = StringBuilder()
