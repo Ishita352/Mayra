@@ -99,7 +99,11 @@ class MainActivity : FragmentActivity() {
 
     private fun showAssistant() {
         MayraNotificationCenter.ensureChannel(this)
-        BackgroundWorkCoordinator.scheduleDefaults(this)
+        if (prefs.getBoolean("master_on", true)) {
+            BackgroundWorkCoordinator.scheduleDefaults(this)
+        } else {
+            BackgroundWorkCoordinator.cancelAll(this)
+        }
         val layout = baseLayout()
         layout.addView(TextView(this).apply { text = "মায়রা প্রস্তুত ✓"; textSize = 30f })
         layout.addView(Switch(this).apply {
@@ -161,7 +165,7 @@ class MainActivity : FragmentActivity() {
         layout.addView(Button(this).apply { text = "👑 Temporary Owner Mode (24h)"; setOnClickListener { authenticateTemporaryOwner() } })
         layout.addView(TextView(this).apply {
             text = if (LockModePolicy.isEnabled(prefs)) {
-                "\n🔐 Locked Phone Mode: ON\nআপনার অনুমতি অনুযায়ী ফোন locked থাকলেও Mayra-এর অনুমোদিত কাজ চালানোর mode সক্রিয়।"
+                "\n🔐 Locked Phone Mode: ON\nSetting সংরক্ষিত আছে; ফোন locked থাকলে Mayra এখনো কোনো command চালাবে না।"
             } else {
                 "\n🔒 Locked Phone Mode: OFF\nফোন locked থাকলে Mayra কাজ করবে না। কাজের জন্য ফোন unlock করতে হবে।"
             }
