@@ -133,6 +133,9 @@ class MainActivity : FragmentActivity() {
         layout.addView(sectionButton("Job Watcher") {
             showModule("Job Watcher", "পরবর্তী ধাপে আপনার career profile অনুযায়ী job/freelancing opportunity search, duplicate filtering এবং notification যুক্ত হবে.")
         })
+        layout.addView(sectionButton("📝 Online Test Participation") {
+            showOnlineTestModule()
+        })
         layout.addView(sectionButton("🧵 Textile Design Studio — OFFLINE") {
             showModule(
                 TextileDesignStudio.title,
@@ -151,6 +154,57 @@ class MainActivity : FragmentActivity() {
         })
         layout.addView(sectionButton("🛡️ Cybersecurity / Security Check") {
             showModule("Cybersecurity Mode", "শুধু আপনার নিজের বা স্পষ্ট অনুমতি থাকা ডিভাইস, নেটওয়ার্ক ও ওয়েবসাইটে defensive security check করা যাবে.\n\nযা থাকবে: security configuration review, port/service inventory, authorized vulnerability assessment, log ও suspicious activity analysis, malware/security hygiene checks, এবং CTF/private lab practice.\n\nপ্রতিটি কাজের আগে Owner authorization, target এবং scope যাচাই বাধ্যতামূলক. Password/OTP চুরি, authentication bypass, malware deployment বা অনুমতি ছাড়া access করা যাবে না.")
+        })
+        setContentView(ScrollView(this).apply { addView(layout) })
+    }
+
+    private fun showOnlineTestModule() {
+        val layout = baseLayout()
+        layout.addView(TextView(this).apply {
+            text = "📝 Online Test Participation"
+            textSize = 28f
+        })
+        layout.addView(TextView(this).apply {
+            text = "\nMayra online test platform খুলতে, test instructions পড়তে, timer/status বুঝতে এবং—শুধু অনুমোদিত হলে—প্রশ্ন বোঝা ও উত্তর প্রস্তুতিতে সাহায্য করতে পারবে.\n\nAI নিষিদ্ধ হলে Mayra live answer দেবে না."
+            textSize = 17f
+        })
+        layout.addView(TextView(this).apply {
+            text = "\nTest provider-এর rules এখানে লিখুন/paste করুন:"
+            textSize = 16f
+        })
+        val rulesInput = EditText(this).apply {
+            hint = "যেমন: AI assistance allowed / No AI / external assistance..."
+            minLines = 3
+        }
+        layout.addView(rulesInput)
+        layout.addView(Button(this).apply {
+            text = "🔎 Test Rules Check"
+            setOnClickListener {
+                val mode = OnlineTestPolicy.modeForRuleText(rulesInput.text.toString())
+                showVoiceResult(OnlineTestPolicy.description(mode))
+            }
+        })
+        layout.addView(Button(this).apply {
+            text = "🧪 Preparation / Mock Test"
+            setOnClickListener {
+                showModule("Online Test — Preparation", "Practice questions, explanations, timing strategy, revision এবং mock test-এ Mayra সাহায্য করতে পারবে.")
+            }
+        })
+        layout.addView(Button(this).apply {
+            text = "✅ Authorized AI Assistance"
+            setOnClickListener {
+                showModule("Online Test — Authorized Assistance", "Test provider স্পষ্টভাবে AI assistance অনুমোদন করলে Mayra প্রশ্ন বোঝা, তথ্য/ব্যাখ্যা খোঁজা, উত্তর draft করা এবং test workflow-এ সহায়তা করতে পারবে.\n\nচূড়ান্ত submission-এর আগে user-এর নিয়ন্ত্রণ থাকবে.")
+            }
+        })
+        layout.addView(Button(this).apply {
+            text = "👤 Human-Only Test"
+            setOnClickListener {
+                showModule("Online Test — Human Only", "AI বা external assistance নিষিদ্ধ হলে Mayra live answer, answer selection বা test-taking automation করবে না. শুধু সাধারণ প্রস্তুতি ও প্রযুক্তিগত সহায়তা দিতে পারবে.")
+            }
+        })
+        layout.addView(Button(this).apply {
+            text = "← Mayra Home"
+            setOnClickListener { showAssistant() }
         })
         setContentView(ScrollView(this).apply { addView(layout) })
     }
