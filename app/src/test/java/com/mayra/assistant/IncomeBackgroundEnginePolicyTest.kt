@@ -12,6 +12,8 @@ class IncomeBackgroundEnginePolicyTest {
                 IncomeBackgroundEnginePolicy.IncomeMode.PASSIVE_INCOME_DISCOVERY,
                 IncomeBackgroundEnginePolicy.IncomeMode.ACTIVE_INCOME_DISCOVERY,
                 IncomeBackgroundEnginePolicy.IncomeMode.WORK_OPPORTUNITY_DISCOVERY,
+                IncomeBackgroundEnginePolicy.IncomeMode.REMOTE_JOB_DISCOVERY,
+                IncomeBackgroundEnginePolicy.IncomeMode.FREELANCING_DISCOVERY,
                 IncomeBackgroundEnginePolicy.IncomeMode.SKILL_TO_INCOME_DISCOVERY
             ),
             IncomeBackgroundEnginePolicy.backgroundModes().toSet()
