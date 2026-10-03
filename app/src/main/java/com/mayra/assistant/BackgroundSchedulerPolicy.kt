@@ -6,7 +6,7 @@ package com.mayra.assistant
 object BackgroundSchedulerPolicy {
     enum class JobType {
         JOB_WATCHER, INCOME_WATCHER, PASSIVE_INCOME_ENGINE, LEARNING_REVIEW,
-        INTERVIEW_REVIEW, GOVERNMENT_UPDATE_WATCH, LOCAL_CIVIC_WATCH, WEATHER_TRAVEL_WATCH
+        INTERVIEW_REVIEW, ONEFORMA_PROJECT_WATCH, GOVERNMENT_UPDATE_WATCH, LOCAL_CIVIC_WATCH, WEATHER_TRAVEL_WATCH
     }
 
     data class Schedule(
@@ -26,6 +26,7 @@ object BackgroundSchedulerPolicy {
         Schedule(JobType.PASSIVE_INCOME_ENGINE, 2, true, true),
         Schedule(JobType.LEARNING_REVIEW, 24, true, true),
         Schedule(JobType.INTERVIEW_REVIEW, 24, false, true),
+        Schedule(JobType.ONEFORMA_PROJECT_WATCH, 6, true, true),
         Schedule(JobType.GOVERNMENT_UPDATE_WATCH, 12, true, true),
         Schedule(JobType.LOCAL_CIVIC_WATCH, 2, true, true),
         Schedule(JobType.WEATHER_TRAVEL_WATCH, 2, true, true)
