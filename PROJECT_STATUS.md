@@ -8,7 +8,7 @@
 - Financial lock: Mayra must never spend, purchase, subscribe, withdraw, or execute financial transactions.
 
 ## Current development status
-The latest Android safety work has removed the locked-phone foreground voice service path. Locked-phone background voice execution is no longer part of the Android runtime path; the unlock welcome receiver remains.
+The latest Android safety work now includes an owner-controlled Locked Phone Mode setting. The safe default is OFF; when OFF, locked-phone execution is denied. When ON, Mayra is allowed to enter the future locked-device execution path for explicitly permitted, non-financial tasks. The current Android UI/gate foundation is implemented, but the complete locked-device background execution service and its final security testing remain part of Android integration/testing.
 
 The project is a work-in-progress. Android CI builds have succeeded, but the final Android APK is not yet ready for release.
 
@@ -20,6 +20,7 @@ Estimated overall completion: ~35% (planning estimate based on feature scope, no
 - One-time strong biometric Owner verification
 - Master ON/OFF switch foundation
 - Locked-phone safety enforcement strengthened: removed locked-phone foreground voice service path
+- Owner-controlled Locked Phone Mode setting foundation (default OFF; financial lock remains absolute)
 - Bengali/English/Hindi voice command foundation
 - Android Settings/Browser/Camera/Time/Help commands
 - Payment/financial safety policy foundation
@@ -36,6 +37,7 @@ Estimated overall completion: ~35% (planning estimate based on feature scope, no
 
 ## Partially implemented
 - Owner/security integration
+- Locked Phone Mode: owner-controlled setting and execution gate are added; full locked-device background execution path is still pending
 - Master switch enforcement across all modules
 - Lock/unlock behavior and background lifecycle
 - Voice/TTS
@@ -144,6 +146,15 @@ Windows agent → secure pairing → computer control → cross-device workflows
 - Booking/cancellation lock: Mayra may **view and report** publicly available availability and pricing, but it must **never book, reserve, pay for, cancel, modify, refund, transfer or otherwise execute** hotel, dharmashala, restaurant, meal, lodging or other travel-service transactions.
 - User action: the user remains responsible for final reservation, cancellation and payment actions.
 - Cost policy: use free/public/official sources wherever technically possible; no paid booking-data subscription or API may be introduced.
+
+## New scope — Owner-controlled Locked Phone Mode
+- Home-screen option: **Locked Phone Mode ON/OFF**.
+- Default state: **OFF** for safety. If OFF, Mayra must not execute work while the phone is locked.
+- If the Owner explicitly turns it **ON**, Mayra may use the future locked-device execution path for explicitly permitted tasks while the phone is locked.
+- This setting does **not** override the permanent Financial Lock: Mayra must never spend, purchase, subscribe, transfer, withdraw, or execute financial transactions, whether the phone is locked or unlocked.
+- Master OFF still overrides all Mayra work.
+- Locked-device work must remain within explicitly permitted, security-reviewed capabilities; no covert access or unauthorized device control.
+- Current implementation: owner-facing switch, persistent preference and deny/allow gate foundation are present. Full Android locked-device background execution and final device/security testing are still pending before the final APK.
 
 ## Cross-device source of truth
 This file and the GitHub repository are the durable project record for resuming work from mobile or computer. Future development should update this status when major milestones change.
