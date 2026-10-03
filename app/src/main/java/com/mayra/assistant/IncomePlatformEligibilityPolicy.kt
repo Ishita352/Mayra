@@ -2,7 +2,6 @@ package com.mayra.assistant
 
 /**
  * Rules for identifying income platforms and adapting to their AI/automation policy.
- *
  * Unknown or unclear AI permission is treated as restricted until verified.
  */
 object IncomePlatformEligibilityPolicy {
@@ -15,11 +14,7 @@ object IncomePlatformEligibilityPolicy {
     }
 
     enum class OpportunityType {
-        REMOTE_JOB,
-        FREELANCE,
-        PASSIVE_INCOME,
-        ACTIVE_INCOME,
-        SKILL_TO_INCOME
+        REMOTE_JOB, FREELANCE, PASSIVE_INCOME, ACTIVE_INCOME, SKILL_TO_INCOME
     }
 
     fun classify(aiPolicyKnown: Boolean, aiAllowed: Boolean, humanOnly: Boolean): PlatformAccess =
@@ -31,8 +26,12 @@ object IncomePlatformEligibilityPolicy {
         }
 
     fun mayGenerateSubmissionContent(access: PlatformAccess): Boolean =
-        access == PlatformAccess.AI_ALLOWED ||
-            access == PlatformAccess.AI_ASSISTANCE_LIMITED
+        access == PlatformAccess.AI_ALLOWED || access == PlatformAccess.AI_ASSISTANCE_LIMITED
+
+    fun mayAssistOwnerForHumanOnly(access: PlatformAccess): Boolean =
+        access == PlatformAccess.AI_BANNED ||
+            access == PlatformAccess.HUMAN_ONLY ||
+            access == PlatformAccess.UNKNOWN_RESTRICTED
 
     fun shouldSeparateFromAiAssistedOpportunities(access: PlatformAccess): Boolean =
         access == PlatformAccess.AI_BANNED ||
