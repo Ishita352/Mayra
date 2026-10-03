@@ -145,3 +145,11 @@ Find → Verify company/task → Check Google/platform policy → Check scam ris
   **Auto Mode = Find → Research → Verify → Analyze → Prepare → Notify Owner**
   **Owner Command = Approve the specific next action → Mayra performs only that permitted non-financial step**
   **Final public/client submission = Owner command required**
+
+
+## Owner clarification — CV creative/audio/video/construction roles
+- **Writing Creator:** creating different kinds of school/college practical projects. This should be understood as educational practical project creation/document preparation, not an invented technical specialization.
+- **Audio Writing:** converting audio into written text (transcription) and converting audio content from one language into another language. Match legitimate transcription, audio-to-text and audio-language-conversion/translation work accordingly.
+- **Video Writing:** providing short stories/story content for people who need a story for their own short story, video or other content project. Do not reinterpret this as a specific technical video-editing or subtitle role unless the Owner later clarifies it.
+- **Supervisor Engineer — Aparna Construction:** supervising construction-line work. Mayra may use this for construction-site/work supervision matching at the level supported by the Owner's statement, but must not invent engineering duties, certifications, measurements or technical responsibilities.
+- These meanings are Owner-provided and should remain the default interpretations unless the Owner changes them.
