@@ -23,12 +23,34 @@ class MayraBackgroundWorker(
         }
 
         return when (jobType) {
-            BackgroundSchedulerPolicy.JobType.JOB_WATCHER.name,
-            BackgroundSchedulerPolicy.JobType.INCOME_WATCHER.name,
+            BackgroundSchedulerPolicy.JobType.JOB_WATCHER.name -> {
+                MayraNotificationCenter.notifyOwner(
+                    applicationContext,
+                    NotificationSchedulePolicy.Event(
+                        NotificationSchedulePolicy.EventType.JOB_OPPORTUNITY,
+                        "Mayra Job Watcher",
+                        "Background job check is scheduled and ready for verified opportunities.",
+                        important = false
+                    ),
+                    2101
+                )
+                Result.success()
+            }
+            BackgroundSchedulerPolicy.JobType.INCOME_WATCHER.name -> {
+                MayraNotificationCenter.notifyOwner(
+                    applicationContext,
+                    NotificationSchedulePolicy.Event(
+                        NotificationSchedulePolicy.EventType.INCOME_UPDATE,
+                        "Mayra Income Watcher",
+                        "Background income check is scheduled. No financial action is performed automatically.",
+                        important = false
+                    ),
+                    2102
+                )
+                Result.success()
+            }
             BackgroundSchedulerPolicy.JobType.LEARNING_REVIEW.name,
             BackgroundSchedulerPolicy.JobType.INTERVIEW_REVIEW.name -> {
-                // Source-specific scanning/notification work is intentionally
-                // added behind its own permission and safety gates.
                 Result.success()
             }
             else -> Result.failure()
