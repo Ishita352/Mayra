@@ -1,10 +1,10 @@
 package com.mayra.assistant
 
 import android.app.Notification
-import android.app.NotificationListenerService
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.speech.tts.TextToSpeech
 import java.util.Locale
@@ -59,9 +59,7 @@ class MayraNotificationListenerService : NotificationListenerService() {
 
         val replyAction = sbn.notification.actions
             ?.firstOrNull { it.remoteInputs?.isNotEmpty() == true }
-        if (replyAction != null) {
-            pendingReply = PendingReply(replyAction, sbn.packageName)
-        }
+        if (replyAction != null) pendingReply = PendingReply(replyAction, sbn.packageName)
 
         val spoken = if (title.isNotBlank() && text.isNotBlank()) {
             "WhatsApp message from " + title + ". " + text
