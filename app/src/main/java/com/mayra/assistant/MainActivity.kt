@@ -22,6 +22,7 @@ import java.util.Locale
 class MainActivity : FragmentActivity() {
     private val prefs by lazy { getSharedPreferences("mayra_secure", MODE_PRIVATE) }
     private val voiceRequestCode = 7001
+    private val notificationRequestCode = 7002
     private var responseTts: TextToSpeech? = null
     private var masterSwitch: Switch? = null
 
@@ -97,8 +98,20 @@ class MainActivity : FragmentActivity() {
         prompt.authenticate(info)
     }
 
+    private fun requestNotificationPermissionIfNeeded() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                notificationRequestCode
+            )
+        }
+    }
     private fun showAssistant() {
         MayraNotificationCenter.ensureChannel(this)
+        requestNotificationPermissionIfNeeded()
         if (prefs.getBoolean("master_on", true)) {
             BackgroundWorkCoordinator.scheduleDefaults(this)
         } else {
