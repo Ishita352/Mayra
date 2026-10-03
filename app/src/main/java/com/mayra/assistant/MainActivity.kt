@@ -151,6 +151,12 @@ class MainActivity : FragmentActivity() {
                     "\n\n" + TextileDesignStudio.note
             )
         })
+        layout.addView(sectionButton("🧠 Core AI & Knowledge Engine") {
+            showModule(
+                "Core AI & Knowledge Engine",
+                "Offline-first request understanding foundation. Documents, Excel, CV/Biodata, Jobs, Income, Interview, Learning, Textile ও Security domain চিনে নিরাপদ workflow নির্বাচন করে।\n\nএটি কোনো paid API বা network call করে না; বাস্তব file/network action পরে permission gates-এর পেছনে যুক্ত হবে."
+            )
+        })
         layout.addView(sectionButton("Excel / Data Analysis") {
             showModule("Excel / Data Analysis", "পরবর্তী ধাপে Excel formulas, data cleaning, lookup, Pivot Table, charts, dashboards এবং analysis workflow যুক্ত হবে.")
         })
@@ -292,9 +298,16 @@ class MainActivity : FragmentActivity() {
                 speakResponse(result.response + " এখন সময় " + time)
                 return
             }
-            VoiceCommandResult.Action.SHOW_HELP, VoiceCommandResult.Action.NONE -> {
+            VoiceCommandResult.Action.SHOW_HELP -> {
                 showVoiceResult(result.response)
                 speakResponse(result.response)
+                return
+            }
+            VoiceCommandResult.Action.NONE -> {
+                val core = CoreKnowledgeEngine.answer(spoken)
+                val message = if (core.recognized) core.message else result.response
+                showVoiceResult(message)
+                speakResponse(message)
                 return
             }
         }
