@@ -189,6 +189,18 @@ Windows agent → secure pairing → computer control → cross-device workflows
 - Self-improvement must not change core security, Financial Lock, permissions or safety rules. New earning methods become eligible for use only after verification and owner-approved configuration where required.
 - Cost policy: all research and learning for this module must use free/public resources where possible; no paid data/API/subscription may be introduced under the permanent ₹0 rule.
 
+## New scope — Owner-command Auto Research Mode for Hotel/Restaurant Work
+- This category is owner-command controlled: the Owner retains final authority over every review, report, submission and platform action.
+- Mayra may run automatic research/opportunity discovery for this category without waiting for a command for each search step.
+- In auto mode, Mayra may find legitimate mystery-shopping/customer-experience opportunities, inspect public/official hotel and restaurant websites, collect factual published information, compare task requirements, verify platform rules, perform scam checks, estimate effort and published compensation, and prepare drafts/checklists/reports.
+- Website research is research only. It does not grant permission to publish a public review.
+- Mayra may prepare a review/report draft from the Owner's real first-hand experience and explicitly supplied observations, photos or notes; it must not invent missing experience or facts.
+- No public review, client report, survey, rating, platform submission or other final external action may be made without an explicit Owner command for that specific action.
+- Auto mode therefore follows: **Find → Research → Verify → Analyze → Prepare → Notify Owner**.
+- After the Owner commands a specific permitted step, Mayra performs only that step. Financial actions remain permanently blocked.
+- The Owner's long travel experience may be used as first-hand source material when the Owner supplies the relevant experience for the specific place/visit.
+- Permanent Google Maps/platform rules, safety rules and Financial Lock cannot be overridden by Owner commands.
+
 ## New scope — Hotel/Restaurant Review Work & Mystery Shopping
 - Mayra must distinguish genuine Google Maps contributions from paid customer-experience/mystery-shopping work and from prohibited paid/fake public reviews.
 - Google Maps reviews must be based on a genuine experience and be genuine and unbiased. Paid/incentivized reviews, rating manipulation, fake engagement, copied reviews, multiple-account review campaigns and reviews posted without a real experience must not be recommended.
