@@ -22,6 +22,19 @@ class DocumentWorkflowTest {
     }
 
     @Test
+    fun conversionEngineSupportsBasicPdfTargets() {
+        assertTrue(DocumentConversionEngine.supports(DocumentConversionEngine.Source.TXT, DocumentConversionEngine.Target.PDF))
+        assertTrue(DocumentConversionEngine.supports(DocumentConversionEngine.Source.DOCX, DocumentConversionEngine.Target.PDF))
+        assertTrue(!DocumentConversionEngine.supports(DocumentConversionEngine.Source.DOCX, DocumentConversionEngine.Target.DOCX))
+    }
+
+    @Test
+    fun structurePreservationIsExplicitlyNotReady() {
+        val result = DocumentWorkflow.plan("DOCX edit করে structure ঠিক রাখো")
+        assertTrue(result.message.contains("structure-preserving"))
+    }
+
+    @Test
     fun unknownRequestFailsClosed() {
         val result = DocumentWorkflow.plan("weather")
         assertEquals(DocumentWorkflow.Format.UNKNOWN, result.format)
