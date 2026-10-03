@@ -114,6 +114,30 @@ class MainActivity : FragmentActivity() {
             }
         })
         layout.addView(Switch(this).apply {
+            text = "🎙️ Voice Command ON/OFF"
+            isChecked = FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.VOICE_COMMAND)
+            setOnCheckedChangeListener { _, checked ->
+                FeatureToggleRegistry.setEnabled(prefs, FeatureToggleRegistry.VOICE_COMMAND, checked)
+                showVoiceResult(if (checked) "Voice Command ON — এখন Mayra voice command গ্রহণ করবে।" else "Voice Command OFF — Home Page থেকে আবার ON না করা পর্যন্ত সাধারণ voice command বন্ধ।")
+            }
+        })
+        layout.addView(Switch(this).apply {
+            text = "📷 Camera ON/OFF"
+            isChecked = FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.CAMERA)
+            setOnCheckedChangeListener { _, checked ->
+                FeatureToggleRegistry.setEnabled(prefs, FeatureToggleRegistry.CAMERA, checked)
+                showVoiceResult(if (checked) "Camera ON — অনুমোদিত camera command চালু।" else "Camera OFF — সাধারণ camera command বন্ধ।")
+            }
+        })
+        layout.addView(Switch(this).apply {
+            text = "📞 Incoming Call Assistant ON/OFF"
+            isChecked = FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.INCOMING_CALL_ASSISTANT)
+            setOnCheckedChangeListener { _, checked ->
+                FeatureToggleRegistry.setEnabled(prefs, FeatureToggleRegistry.INCOMING_CALL_ASSISTANT, checked)
+                showVoiceResult(if (checked) "Incoming Call Assistant ON — Android-supported call workflow-এর জন্য প্রস্তুত।" else "Incoming Call Assistant OFF।")
+            }
+        })
+        layout.addView(Switch(this).apply {
             text = "🔐 Locked Phone Mode — লক অবস্থায় Mayra কাজ করতে পারবে"
             isChecked = LockModePolicy.isEnabled(prefs)
             setOnCheckedChangeListener { _, checked ->
@@ -129,7 +153,7 @@ class MainActivity : FragmentActivity() {
             text = "\nOwner: গোপাল বসাক\n\nআমি আপনার ব্যক্তিগত AI assistant-এর Android test build.\nআপনি আমাকে বাংলা, English বা हिन्दी-তে কমান্ড দিতে পারেন."
             textSize = 17f
         })
-        layout.addView(Button(this).apply { text = "🎙️ Voice Command"; setOnClickListener { startVoiceCommand() } })
+        layout.addView(Button(this).apply { text = "🎙️ Voice Command"; setOnClickListener { if (FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.VOICE_COMMAND)) startVoiceCommand() else showVoiceResult("Voice Command OFF — আগে Home Page থেকে ON করুন।") } })
         layout.addView(Button(this).apply { text = "👑 Temporary Owner Mode (24h)"; setOnClickListener { authenticateTemporaryOwner() } })
         layout.addView(TextView(this).apply {
             text = if (LockModePolicy.isEnabled(prefs)) {
@@ -284,6 +308,10 @@ class MainActivity : FragmentActivity() {
             showVoiceResult("Mayra Master OFF — কমান্ড চালানো যাবে না।")
             return
         }
+        if (!FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.VOICE_COMMAND)) {
+            showVoiceResult("Voice Command OFF — এই voice command চালানো যাবে না।")
+            return
+        }
         // Defense-in-depth: re-check the physical device lock immediately before execution.
         // Voice results can return after the phone transitions between locked/unlocked states.
         if (!DeviceSecurityGate.mayExecuteUserCommand(this, prefs)) {
@@ -302,7 +330,43 @@ class MainActivity : FragmentActivity() {
         when (result.action) {
             VoiceCommandResult.Action.OPEN_SETTINGS -> startActivity(Intent(android.provider.Settings.ACTION_SETTINGS))
             VoiceCommandResult.Action.OPEN_BROWSER -> startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com")))
-            VoiceCommandResult.Action.OPEN_CAMERA -> startActivity(Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE))
+            VoiceCommandResult.Action.OPEN_CAMERA -> {
+                if (FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.CAMERA)) {
+                    startActivity(Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE))
+                } else {
+                    showVoiceResult("Camera OFF — আগে Camera ON করুন।")
+                    speakResponse("বস, Camera এখন বন্ধ আছে।")
+                }
+            }
+            VoiceCommandResult.Action.SET_VOICE_COMMAND -> {
+                val wantsOff = spoken.lowercase(Locale.ROOT).contains("বন্ধ") ||
+                    spoken.lowercase(Locale.ROOT).contains("off") ||
+                    spoken.lowercase(Locale.ROOT).contains("disable") ||
+                    spoken.lowercase(Locale.ROOT).contains("बंद")
+                FeatureToggleRegistry.setEnabled(prefs, FeatureToggleRegistry.VOICE_COMMAND, !wantsOff)
+                val msg = if (wantsOff) "Voice Command OFF — সাধারণ voice command বন্ধ করা হয়েছে।" else "Voice Command ON — voice command চালু হয়েছে।"
+                showVoiceResult(msg)
+                speakResponse(msg)
+                return
+            }
+            VoiceCommandResult.Action.SET_CAMERA -> {
+                val lower = spoken.lowercase(Locale.ROOT)
+                val wantsOff = lower.contains("বন্ধ") || lower.contains("off") || lower.contains("disable") || lower.contains("बंद")
+                FeatureToggleRegistry.setEnabled(prefs, FeatureToggleRegistry.CAMERA, !wantsOff)
+                val msg = if (wantsOff) "Camera OFF — সাধারণ camera command বন্ধ।" else "Camera ON — সাধারণ camera command চালু।"
+                showVoiceResult(msg)
+                speakResponse(msg)
+                return
+            }
+            VoiceCommandResult.Action.SET_INCOMING_CALL_ASSISTANT -> {
+                val lower = spoken.lowercase(Locale.ROOT)
+                val wantsOff = lower.contains("বন্ধ") || lower.contains("off") || lower.contains("disable") || lower.contains("बंद")
+                FeatureToggleRegistry.setEnabled(prefs, FeatureToggleRegistry.INCOMING_CALL_ASSISTANT, !wantsOff)
+                val msg = if (wantsOff) "Incoming Call Assistant OFF।" else "Incoming Call Assistant ON — Android-supported call workflow-এর জন্য প্রস্তুত।"
+                showVoiceResult(msg)
+                speakResponse(msg)
+                return
+            }
             VoiceCommandResult.Action.PAIR_COMPUTER -> {
                 showModule("Phone ↔ Computer Pairing", "এখনো Windows agent ইনস্টল/সংযোগ করা হয়নি।\n\nপরবর্তী ধাপ:\n1. Windows কম্পিউটারে Mayra Windows agent তৈরি ও চালু করতে হবে।\n2. দুই ডিভাইসে অনুমোদিত pairing code দিয়ে সংযোগ করতে হবে।\n3. তারপরেই কম্পিউটারে command পাঠানো যাবে।\n\nএই মুহূর্তে কোনো কম্পিউটার command পাঠানো হয়নি।")
                 speakResponse("বস, ফোন-কম্পিউটার pairing-এর জন্য Windows agent দরকার।")
