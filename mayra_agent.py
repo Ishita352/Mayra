@@ -16,7 +16,18 @@ PAIRING_TTL_SECONDS = 300
 SESSION_TTL_SECONDS = 3600
 
 # Remote control is capability-scoped. Never add shell/exec here.
-ALLOWED = {"PING", "OPEN_NOTEPAD", "OPEN_CALCULATOR"}
+ALLOWED = {
+    "PING",
+    "OPEN_NOTEPAD",
+    "OPEN_CALCULATOR",
+    "OPEN_WINDOWS_SETTINGS",
+    "OPEN_NETWORK_SETTINGS",
+    "OPEN_DISPLAY_SETTINGS",
+    "OPEN_SOUND_SETTINGS",
+    "GET_PC_STATUS",
+    "GET_SECURITY_STATUS",
+    "REVOKE_SESSION",
+}
 
 _state_lock = threading.Lock()
 _pairing_code = None
@@ -116,13 +127,39 @@ $fw = (Get-NetFirewallProfile | Where-Object {$_.Enabled -eq $true}).Count -gt 0
         return {"ok": False, "error": "Windows security provider status unavailable"}
 
 
+def pc_status():
+    return {
+        "ok": True,
+        "platform": platform.system(),
+        "release": platform.release(),
+        "version": platform.version(),
+        "hostname": socket.gethostname(),
+    }
+
+
 def execute(command: str):
     if not isinstance(command, str) or command not in ALLOWED:
         return {"ok": False, "error": "Command not allowed"}
     if command == "PING":
         return {"ok": True, "message": "Mayra Windows Agent is online"}
+    if command == "GET_PC_STATUS":
+        return pc_status()
+    if command == "GET_SECURITY_STATUS":
+        return security_status()
+    if command == "REVOKE_SESSION":
+        revoke_session()
+        return {"ok": True, "message": "Session revoked"}
     if platform.system() != "Windows":
         return {"ok": False, "error": "This action is Windows-only"}
+    settings_uris = {
+        "OPEN_WINDOWS_SETTINGS": "ms-settings:",
+        "OPEN_NETWORK_SETTINGS": "ms-settings:network-status",
+        "OPEN_DISPLAY_SETTINGS": "ms-settings:display",
+        "OPEN_SOUND_SETTINGS": "ms-settings:sound",
+    }
+    if command in settings_uris:
+        os.startfile(settings_uris[command])
+        return {"ok": True, "message": "Windows Settings opened"}
     if command == "OPEN_NOTEPAD":
         subprocess.Popen(["notepad.exe"])
         return {"ok": True, "message": "Notepad opened"}
