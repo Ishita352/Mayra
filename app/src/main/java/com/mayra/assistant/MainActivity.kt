@@ -79,6 +79,26 @@ class MainActivity : FragmentActivity() {
         }
     }
 
+    private val txtConvertPicker = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri == null) {
+            showVoiceResult("কোনো TXT source নির্বাচন করা হয়নি।")
+            return@registerForActivityResult
+        }
+        if (contentResolver.getType(uri) != "text/plain") {
+            showVoiceResult("Conversion-এর source হিসেবে শুধু TXT document নির্বাচন করুন।")
+            return@registerForActivityResult
+        }
+        val result = DocumentTextReader.read(contentResolver, uri)
+        if (!result.success) {
+            showVoiceResult(result.message)
+            return@registerForActivityResult
+        }
+        pendingPdfText = result.text
+        pdfCreatePicker.launch("Mayra-document.pdf")
+    }
+
     private val pdfCreatePicker = registerForActivityResult(
         ActivityResultContracts.CreateDocument("application/pdf")
     ) { uri ->
