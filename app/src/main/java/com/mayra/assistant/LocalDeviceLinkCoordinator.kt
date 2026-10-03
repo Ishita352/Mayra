@@ -44,9 +44,11 @@ class LocalDeviceLinkCoordinator(
         code: String,
         capabilities: Set<NetworkDeviceControlPolicy.Capability>,
         risk: DevicePreConnectionSecurityPolicy.Risk = DevicePreConnectionSecurityPolicy.Risk.UNKNOWN,
-        ownerApproved: Boolean = false
+        ownerApproved: Boolean = false,
+        securityScan: DevicePreConnectionScan? = null
     ): Session? {
-        if (risk != DevicePreConnectionSecurityPolicy.Risk.CLEAN || !ownerApproved) return null
+        val scan = securityScan ?: return null
+        if (scan.risk != risk || !scan.isConnectionEligible() || !ownerApproved) return null
         val invite = pending[deviceId] ?: return null
         if (clockMs() >= invite.expiresAtMs || invite.code != code) {
             pending.remove(deviceId)
