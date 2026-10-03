@@ -29,6 +29,7 @@ class MainActivity : FragmentActivity() {
     private var masterSwitch: Switch? = null
     private var pendingPdfText: String? = null
     private var pendingDocxText: String? = null
+    private var pendingDocxEditText: String? = null
 
     private val documentPicker = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -98,6 +99,37 @@ class MainActivity : FragmentActivity() {
         }
         pendingPdfText = result.text
         pdfCreatePicker.launch("Mayra-document.pdf")
+    }
+
+    private val docxOpenPicker = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri == null) {
+            showVoiceResult("কোনো DOCX নির্বাচন করা হয়নি।")
+            return@registerForActivityResult
+        }
+        if (contentResolver.getType(uri) != "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+            showVoiceResult("শুধু DOCX document নির্বাচন করুন।")
+            return@registerForActivityResult
+        }
+        val result = DocumentDocxReader.read(contentResolver, uri)
+        if (!result.success) {
+            showVoiceResult(result.message)
+            return@registerForActivityResult
+        }
+        showDocxEditor(uri, result.text)
+    }
+
+    private val docxEditPicker = registerForActivityResult(
+        ActivityResultContracts.CreateDocument("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+    ) { uri ->
+        val text = pendingDocxEditText
+        pendingDocxEditText = null
+        if (uri == null || text == null) {
+            showVoiceResult("Edited DOCX save করা হয়নি।")
+            return@registerForActivityResult
+        }
+        showVoiceResult(DocumentDocxWriter.write(contentResolver, uri, text).message)
     }
 
     private val docxCreatePicker = registerForActivityResult(
@@ -318,6 +350,9 @@ class MainActivity : FragmentActivity() {
                 "Offline-first request understanding foundation. Documents, Excel, CV/Biodata, Jobs, Income, Interview, Learning, Textile ও Security domain চিনে নিরাপদ workflow নির্বাচন করে।\n\nএটি কোনো paid API বা network call করে না; বাস্তব file/network action পরে permission gates-এর পেছনে যুক্ত হবে."
             )
         })
+        layout.addView(sectionButton("✏️ Edit DOCX") {
+            docxOpenPicker.launch(arrayOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+        })
         layout.addView(sectionButton("📝 Create DOCX") {
             showDocxCreator()
         })
@@ -342,6 +377,41 @@ class MainActivity : FragmentActivity() {
         })
         layout.addView(sectionButton("🛡️ Cybersecurity / Security Check") {
             showModule("Cybersecurity Mode", "শুধু আপনার নিজের বা স্পষ্ট অনুমতি থাকা ডিভাইস, নেটওয়ার্ক ও ওয়েবসাইটে defensive security check করা যাবে.\n\nযা থাকবে: security configuration review, port/service inventory, authorized vulnerability assessment, log ও suspicious activity analysis, malware/security hygiene checks, এবং CTF/private lab practice.\n\nপ্রতিটি কাজের আগে Owner authorization, target এবং scope যাচাই বাধ্যতামূলক. Password/OTP চুরি, authentication bypass, malware deployment বা অনুমতি ছাড়া access করা যাবে না.")
+        })
+        setContentView(ScrollView(this).apply { addView(layout) })
+    }
+
+    private fun showDocxEditor(uri: Uri, initialText: String) {
+        val layout = baseLayout()
+        layout.addView(TextView(this).apply {
+            text = "✏️ Edit DOCX"
+            textSize = 28f
+        })
+        layout.addView(TextView(this).apply {
+            text = "\nBasic text editing is supported. Formatting/complex Word structure is not preserved."
+            textSize = 16f
+        })
+        val input = EditText(this).apply {
+            setText(initialText)
+            minLines = 12
+            gravity = android.view.Gravity.TOP
+        }
+        layout.addView(input)
+        layout.addView(Button(this).apply {
+            text = "💾 Save Edited DOCX"
+            setOnClickListener {
+                val text = input.text.toString()
+                if (text.isBlank()) {
+                    showVoiceResult("DOCX content খালি রাখা যাবে না।")
+                    return@setOnClickListener
+                }
+                pendingDocxEditText = text
+                docxEditPicker.launch("Mayra-edited.docx")
+            }
+        })
+        layout.addView(Button(this).apply {
+            text = "← Mayra Home"
+            setOnClickListener { showAssistant() }
         })
         setContentView(ScrollView(this).apply { addView(layout) })
     }
