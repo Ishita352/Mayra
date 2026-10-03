@@ -34,6 +34,10 @@ class MayraBackgroundWorker(
             BackgroundSchedulerPolicy.JobType.LEARNING_REVIEW.name,
             BackgroundSchedulerPolicy.JobType.INTERVIEW_REVIEW.name -> Result.success()
 
+            BackgroundTaskPolicy.TaskType.DOCUMENT_PROCESSING.name,
+            BackgroundTaskPolicy.TaskType.KNOWLEDGE_REFRESH.name,
+            BackgroundTaskPolicy.TaskType.NOTIFICATION_PREPARATION.name -> runApprovedBackgroundTask(jobType)
+
             else -> Result.failure()
         }
     }
@@ -57,3 +61,20 @@ class MayraBackgroundWorker(
         )
     }
 }
+
+
+    private fun runApprovedBackgroundTask(jobType: String): Result {
+        val task = runCatching { BackgroundTaskPolicy.TaskType.valueOf(jobType) }
+            .getOrNull() ?: return Result.failure()
+
+        if (!BackgroundTaskPolicy.isBackgroundAllowed(task)) {
+            return Result.failure()
+        }
+
+        return Result.success(
+            workDataOf(
+                "background_task" to task.name,
+                "status" to "ALLOWED_PENDING_TASK_ADAPTER"
+            )
+        )
+    }
