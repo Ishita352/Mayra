@@ -39,8 +39,21 @@ class MayraBackgroundWorker(
     }
 
     private fun runOpportunityWatch(): Result {
+        // Every future income/work adapter must begin from the same foundational
+        // rule gate. Unknown automation permission is never treated as allowed.
+        val policy = IncomeWorkRules.evaluate(
+            humanOnly = false,
+            aiAssistanceAllowed = null,
+            automationAllowed = null
+        )
+
         // Keep the worker honest until a live public-source adapter is connected.
         // It may report that no scan was performed, but must never invent a result.
-        return Result.success(workDataOf("scan_status" to "NO_LIVE_SOURCE_ADAPTER"))
+        return Result.success(
+            workDataOf(
+                "scan_status" to "NO_LIVE_SOURCE_ADAPTER",
+                "income_work_mode" to policy.mode.name
+            )
+        )
     }
 }
