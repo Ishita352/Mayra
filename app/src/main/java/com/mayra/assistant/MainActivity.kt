@@ -192,6 +192,9 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun executeVoiceCommand(spoken: String) {
+        if (TemporaryOwnerAccessManager.isActive(this)) {
+            TemporaryOwnerAccessManager.record(this, "VOICE_COMMAND", "RECEIVED", spoken.take(300))
+        }
         val result = VoiceCommandEngine.parse(spoken)
         when (result.action) {
             VoiceCommandResult.Action.OPEN_SETTINGS -> startActivity(Intent(android.provider.Settings.ACTION_SETTINGS))
