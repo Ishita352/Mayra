@@ -38,4 +38,6 @@ object LocalCivicServicesPolicy {
     fun mayInventLocalResult(): Boolean = false
     fun requiresVerifiedSourceForAlert(): Boolean = true
     fun mayRunBackgroundRefresh(): Boolean = true
+    fun primaryAreaRadiusKm(): Int = DEFAULT_RADIUS_KM
+    fun mayNotifyOwnerOfVerifiedAlert(): Boolean = true
 }
