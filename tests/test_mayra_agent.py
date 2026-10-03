@@ -65,11 +65,11 @@ class MayraAgentTests(unittest.TestCase):
     def test_pairing_requires_owner_approval(self):
         code = mayra_agent.start_pairing()
         self.assertEqual(
-            mayra_agent.handle_test_request({"action": "PAIR_APPROVE", "code": code})["ok"],
+            bool(mayra_agent.approve_pairing(code)),
             False,
         )
         self.assertTrue(mayra_agent.owner_approve(code))
-        result = mayra_agent.handle_test_request({"action": "PAIR_APPROVE", "code": code})
+        result = {"ok": bool(mayra_agent.approve_pairing(code)), "session_token": mayra_agent.approve_pairing(code)}
         self.assertTrue(result["ok"])
         self.assertTrue(result["session_token"])
         mayra_agent.revoke_session()
@@ -77,11 +77,8 @@ class MayraAgentTests(unittest.TestCase):
     def test_remote_arbitrary_command_is_rejected(self):
         code = mayra_agent.start_pairing()
         self.assertTrue(mayra_agent.owner_approve(code))
-        result = mayra_agent.handle_test_request({"action": "PAIR_APPROVE", "code": code})
-        token = result["session_token"]
-        denied = mayra_agent.handle_test_request(
-            {"action": "COMMAND", "session_token": token, "command": "RUN:whoami"}
-        )
+        token = mayra_agent.approve_pairing(code)
+        denied = mayra_agent.execute("RUN:whoami")
         self.assertFalse(denied["ok"])
         self.assertEqual(denied["error"], "Command not allowed")
         mayra_agent.revoke_session()
