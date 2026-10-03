@@ -21,7 +21,10 @@ object DeviceSecurityGate {
     }
 
     fun mayExecuteUserCommand(context: Context, prefs: android.content.SharedPreferences): Boolean {
-        if (!isDeviceLocked(context)) return true
-        return LockModePolicy.isEnabled(prefs)
+        // Locked Phone Mode is only a stored owner preference until the
+        // dedicated, security-reviewed locked-device execution path exists.
+        // Never let the preference itself bypass the physical lock gate.
+        if (isDeviceLocked(context)) return false
+        return true
     }
 }
