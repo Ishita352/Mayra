@@ -29,6 +29,22 @@ class MayraAgentTests(unittest.TestCase):
             mayra_agent.execute("OPEN_CALCULATOR"),
             {"ok": False, "error": "This action is Windows-only"},
         )
+        self.assertEqual(
+            mayra_agent.execute("OPEN_WINDOWS_SETTINGS"),
+            {"ok": False, "error": "This action is Windows-only"},
+        )
+        self.assertEqual(
+            mayra_agent.execute("OPEN_NETWORK_SETTINGS"),
+            {"ok": False, "error": "This action is Windows-only"},
+        )
+        self.assertEqual(
+            mayra_agent.execute("OPEN_DISPLAY_SETTINGS"),
+            {"ok": False, "error": "This action is Windows-only"},
+        )
+        self.assertEqual(
+            mayra_agent.execute("OPEN_SOUND_SETTINGS"),
+            {"ok": False, "error": "This action is Windows-only"},
+        )
 
     def _handle_payload(self, payload):
         server_side, client_side = socket.socketpair()
