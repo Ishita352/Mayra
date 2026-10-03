@@ -25,42 +25,14 @@ class MainActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (!prefs.getBoolean("paired", false)) showSetup() else showOwnerLock()
-    }
-
-    private fun todayCode(): String =
-        "MAYRA-" + SimpleDateFormat("ddMMyyyy", Locale.US).format(Date())
-
-    private fun showSetup() {
-        val layout = baseLayout()
-        layout.addView(TextView(this).apply { text = "মায়রা — প্রথম Setup"; textSize = 28f })
-        layout.addView(TextView(this).apply {
-            text = "\nপ্রথমবার এই ডিভাইস pair করতে আজকের installation-date code দিন.\n\nCode format: MAYRA-ddMMyyyy"
-            textSize = 17f
-        })
-        val input = EditText(this).apply { hint = "যেমন: MAYRA-02102026"; setSingleLine(true) }
-        layout.addView(input)
-        layout.addView(Button(this).apply {
-            text = "Owner — Pair করুন"
-            setOnClickListener {
-                if (input.text.toString().trim().uppercase(Locale.US) == todayCode()) {
-                    prefs.edit().putBoolean("paired", true).apply()
-                    showOwnerLock()
-                } else Toast.makeText(this@MainActivity, "Setup code সঠিক নয়।", Toast.LENGTH_SHORT).show()
-            }
-        })
-        layout.addView(TextView(this).apply {
-            text = "\nনোট: এই test build-এ date-based setup code ব্যবহার করা হয়েছে। production build-এ secure device-key pairing থাকবে."
-            textSize = 14f
-        })
-        setContentView(layout)
+        showOwnerLock()
     }
 
     private fun showOwnerLock() {
         val layout = baseLayout()
         layout.addView(TextView(this).apply { text = "মায়রা"; textSize = 32f })
         layout.addView(TextView(this).apply {
-            text = "\nOwner authentication required.\nOwner verify না হলে privileged কাজ বন্ধ থাকবে."
+            text = "\nকোনো installation password বা date-based setup code নেই।\nOwner authentication-এর মাধ্যমে Mayra চালু হবে.\nOwner verify না হলে privileged কাজ বন্ধ থাকবে."
             textSize = 17f
         })
         layout.addView(Button(this).apply { text = "Owner Verify"; setOnClickListener { authenticateOwner() } })
