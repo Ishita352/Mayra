@@ -30,6 +30,8 @@ class MainActivity : FragmentActivity() {
     private var pendingPdfText: String? = null
     private var pendingDocxText: String? = null
     private var pendingDocxEditText: String? = null
+    private var pendingPdfEditText: String? = null
+    private var pendingDocxPdfText: String? = null
 
     private val documentPicker = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -144,16 +146,43 @@ class MainActivity : FragmentActivity() {
         showVoiceResult(DocumentDocxWriter.write(contentResolver, uri, text).message)
     }
 
+    private val docxPdfOpenPicker = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri == null) { showVoiceResult("কোনো DOCX নির্বাচন করা হয়নি।"); return@registerForActivityResult }
+        if (contentResolver.getType(uri) != "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+            showVoiceResult("শুধু DOCX document নির্বাচন করুন।"); return@registerForActivityResult
+        }
+        val result = DocumentDocxReader.read(contentResolver, uri)
+        if (!result.success) { showVoiceResult(result.message); return@registerForActivityResult }
+        pendingDocxPdfText = result.text
+        pdfCreatePicker.launch("Mayra-docx-converted.pdf")
+    }
+
+    private val pdfEditOpenPicker = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri == null) { showVoiceResult("কোনো PDF নির্বাচন করা হয়নি।"); return@registerForActivityResult }
+        if (contentResolver.getType(uri) != "application/pdf") {
+            showVoiceResult("শুধু PDF document নির্বাচন করুন।"); return@registerForActivityResult
+        }
+        val result = DocumentPdfReader.read(contentResolver, uri, this)
+        if (!result.success) { showVoiceResult(result.message); return@registerForActivityResult }
+        showPdfEditor(result.text)
+    }
+
     private val pdfCreatePicker = registerForActivityResult(
         ActivityResultContracts.CreateDocument("application/pdf")
     ) { uri ->
-        val text = pendingPdfText
+        val text = pendingDocxPdfText ?: pendingPdfEditText ?: pendingPdfText
+        pendingDocxPdfText = null
+        pendingPdfEditText = null
         pendingPdfText = null
         if (uri == null || text == null) {
             showVoiceResult("PDF output তৈরি করা হয়নি।")
             return@registerForActivityResult
         }
-        val result = DocumentTxtToPdfConverter.write(contentResolver, uri, text)
+        val result = DocumentConversionEngine.convertTextToPdf(contentResolver, uri, text)
         showVoiceResult(result.message)
     }
 
@@ -356,6 +385,15 @@ class MainActivity : FragmentActivity() {
         layout.addView(sectionButton("📝 Create DOCX") {
             showDocxCreator()
         })
+        layout.addView(sectionButton("🔄 Convert DOCX → PDF") {
+            docxPdfOpenPicker.launch(arrayOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+        })
+        layout.addView(sectionButton("📄 Create PDF (text-based)") {
+            showPdfCreator()
+        })
+        layout.addView(sectionButton("✏️ Edit PDF (text-based)") {
+            pdfEditOpenPicker.launch(arrayOf("application/pdf"))
+        })
         layout.addView(sectionButton("📄 Documents — PDF / DOCX / TXT") {
             documentPicker.launch(arrayOf(
                 "application/pdf",
@@ -378,6 +416,50 @@ class MainActivity : FragmentActivity() {
         layout.addView(sectionButton("🛡️ Cybersecurity / Security Check") {
             showModule("Cybersecurity Mode", "শুধু আপনার নিজের বা স্পষ্ট অনুমতি থাকা ডিভাইস, নেটওয়ার্ক ও ওয়েবসাইটে defensive security check করা যাবে.\n\nযা থাকবে: security configuration review, port/service inventory, authorized vulnerability assessment, log ও suspicious activity analysis, malware/security hygiene checks, এবং CTF/private lab practice.\n\nপ্রতিটি কাজের আগে Owner authorization, target এবং scope যাচাই বাধ্যতামূলক. Password/OTP চুরি, authentication bypass, malware deployment বা অনুমতি ছাড়া access করা যাবে না.")
         })
+        setContentView(ScrollView(this).apply { addView(layout) })
+    }
+
+    private fun showPdfCreator() {
+        val layout = baseLayout()
+        layout.addView(TextView(this).apply { text = "📄 Create PDF"; textSize = 28f })
+        layout.addView(TextView(this).apply {
+            text = "\nBasic text-based PDF creation. Layout/formatting is not preserved."
+            textSize = 16f
+        })
+        val input = EditText(this).apply { hint = "PDF-এর text লিখুন..."; minLines = 10; gravity = android.view.Gravity.TOP }
+        layout.addView(input)
+        layout.addView(Button(this).apply {
+            text = "💾 Save as PDF"
+            setOnClickListener {
+                val text = input.text.toString()
+                if (text.isBlank()) { showVoiceResult("PDF content খালি রাখা যাবে না।"); return@setOnClickListener }
+                pendingPdfText = text
+                pdfCreatePicker.launch("Mayra-document.pdf")
+            }
+        })
+        layout.addView(Button(this).apply { text = "← Mayra Home"; setOnClickListener { showAssistant() } })
+        setContentView(ScrollView(this).apply { addView(layout) })
+    }
+
+    private fun showPdfEditor(initialText: String) {
+        val layout = baseLayout()
+        layout.addView(TextView(this).apply { text = "✏️ Edit PDF"; textSize = 28f })
+        layout.addView(TextView(this).apply {
+            text = "\nPDF text extraction করে edit করা হবে। Original layout/images/fonts/formatting preserve হবে না."
+            textSize = 16f
+        })
+        val input = EditText(this).apply { setText(initialText); minLines = 12; gravity = android.view.Gravity.TOP }
+        layout.addView(input)
+        layout.addView(Button(this).apply {
+            text = "💾 Save Edited PDF"
+            setOnClickListener {
+                val text = input.text.toString()
+                if (text.isBlank()) { showVoiceResult("PDF content খালি রাখা যাবে না।"); return@setOnClickListener }
+                pendingPdfEditText = text
+                pdfCreatePicker.launch("Mayra-edited.pdf")
+            }
+        })
+        layout.addView(Button(this).apply { text = "← Mayra Home"; setOnClickListener { showAssistant() } })
         setContentView(ScrollView(this).apply { addView(layout) })
     }
 
