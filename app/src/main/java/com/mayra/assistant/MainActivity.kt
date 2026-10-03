@@ -22,6 +22,7 @@ class MainActivity : FragmentActivity() {
     private val prefs by lazy { getSharedPreferences("mayra_secure", MODE_PRIVATE) }
     private val voiceRequestCode = 7001
     private var responseTts: TextToSpeech? = null
+    private var masterSwitch: Switch? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +54,6 @@ class MainActivity : FragmentActivity() {
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 super.onAuthenticationSucceeded(result)
                 prefs.edit().putBoolean("owner_verified", true).apply()
-                startLockedVoiceMode()
                 showAssistant()
                 speakResponse("স্বাগতম বস। মায়রা প্রস্তুত আছে।")
             }
@@ -107,6 +107,20 @@ class MainActivity : FragmentActivity() {
     private fun showAssistant() {
         val layout = baseLayout()
         layout.addView(TextView(this).apply { text = "মায়রা প্রস্তুত ✓"; textSize = 30f })
+        layout.addView(Switch(this).apply {
+            text = "🔘 Mayra Master ON/OFF"
+            isChecked = prefs.getBoolean("master_on", true)
+            masterSwitch = this
+            setOnCheckedChangeListener { _, checked ->
+                prefs.edit().putBoolean("master_on", checked).apply()
+                if (!checked) {
+                    stopService(Intent(this@MainActivity, LockedVoiceService::class.java))
+                    showVoiceResult("Mayra Master OFF — সব কাজ ও background activity বন্ধ। কোনো memory বা saved progress মুছবে না।")
+                } else {
+                    showVoiceResult("Mayra Master ON — saved state রেখে কাজ আবার চালু হয়েছে।")
+                }
+            }
+        })
         layout.addView(TextView(this).apply {
             text = "\nOwner: গোপাল বসাক\n\nআমি আপনার ব্যক্তিগত AI assistant-এর Android test build.\nআপনি আমাকে বাংলা, English বা हिन्दी-তে কমান্ড দিতে পারেন."
             textSize = 17f
@@ -114,7 +128,7 @@ class MainActivity : FragmentActivity() {
         layout.addView(Button(this).apply { text = "🎙️ Voice Command"; setOnClickListener { startVoiceCommand() } })
         layout.addView(Button(this).apply { text = "👑 Temporary Owner Mode (24h)"; setOnClickListener { authenticateTemporaryOwner() } })
         layout.addView(TextView(this).apply {
-            text = "\n🔒 Locked Voice Mode: ON\nলক অবস্থায় শুধু “মায়রা, কাহাঁপে হো?” এবং একই অর্থের বাংলা/English/Hindi নির্দিষ্ট wake phrase-এ উত্তর দেবে। অন্য কোনো কাজ করবে না এবং ফোন unlock করতে পারবে না."
+            text = "\n🔒 Locked Phone Safety: ON\nফোন locked থাকলে Mayra কোনো কাজ, voice command বা background task চালাবে না। ফোন unlock করার পরেই Mayra কাজ করতে পারবে।"
             textSize = 15f
         })
         layout.addView(TextView(this).apply {
@@ -130,8 +144,11 @@ class MainActivity : FragmentActivity() {
         layout.addView(sectionButton("আমার Biodata / Career Profile") {
             showModule("Biodata & Career Profile", "এখানে আপনার আসল biodata, education, experience, skills, certificates এবং career preferences রাখা হবে.\n\nএখনো আপনার প্রকৃত biodata এখানে যোগ করা হয়নি.")
         })
+        layout.addView(sectionButton("💰 Active + Passive Income Watcher") {
+            showModule("Income Engine", IncomeOpportunityPolicy.summary())
+        })
         layout.addView(sectionButton("Job Watcher") {
-            showModule("Job Watcher", "পরবর্তী ধাপে আপনার career profile অনুযায়ী job/freelancing opportunity search, duplicate filtering এবং notification যুক্ত হবে.")
+            showModule("Job Watcher", "Remote/work-from-home/freelance opportunity scan হবে। USD income প্রথম অগ্রাধিকার; INR পাশাপাশি। কম সময়ে তুলনামূলক বেশি legitimate earning potential এবং hourly/repeatable work আগে দেখা হবে.")
         })
         layout.addView(sectionButton("📝 Online Test Participation") {
             showOnlineTestModule()
@@ -145,6 +162,9 @@ class MainActivity : FragmentActivity() {
         })
         layout.addView(sectionButton("Excel / Data Analysis") {
             showModule("Excel / Data Analysis", "পরবর্তী ধাপে Excel formulas, data cleaning, lookup, Pivot Table, charts, dashboards এবং analysis workflow যুক্ত হবে.")
+        })
+        layout.addView(sectionButton("🤖 AI Training & Skill Engine") {
+            showModule("AI Training & Skill Development", "English↔Hindi/Bengali voice, video dubbing/subtitles, speech-to-text, translation, text-to-speech, GPS/mapping workflows, remote-work tools, Excel/data analysis, textile/design tools এবং নতুন AI/model/tool শেখার জন্য Discover → Research → Cross-check → Sandbox Test → Verify → Save Knowledge → Apply workflow থাকবে. Free/open-source first.")
         })
         layout.addView(sectionButton("Self-Learning / Teaching") {
             showModule("Self-Learning", "Mayra নতুন knowledge discover → cross-check → test → আপনাকে জানাবে → আপনার অনুমতি পেলে knowledge base-এ যোগ করবে.")
@@ -246,6 +266,11 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun executeVoiceCommand(spoken: String) {
+        if (!prefs.getBoolean("master_on", true)) {
+            showVoiceResult("Mayra Master OFF — কমান্ড চালানো যাবে না।")
+            return
+        }
+        if (isFinishing) return
         if (TemporaryOwnerAccessManager.isActive(this)) {
             TemporaryOwnerAccessManager.record(this, "VOICE_COMMAND", "RECEIVED", spoken.take(300))
         }
