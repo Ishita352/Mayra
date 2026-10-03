@@ -20,6 +20,8 @@ object BackgroundWorkCoordinator {
     private const val PASSIVE_INCOME_ENGINE = "mayra_passive_income_engine"
     private const val LEARNING_REVIEW = "mayra_learning_review"
     private const val INTERVIEW_REVIEW = "mayra_interview_review"
+    private const val GOVERNMENT_UPDATE_WATCH = "mayra_government_update_watch"
+    private const val LOCAL_CIVIC_WATCH = "mayra_local_civic_watch"
 
     fun scheduleDefaults(context: Context) {
         BackgroundSchedulerPolicy.defaultSchedules().forEach { schedule ->
@@ -33,6 +35,8 @@ object BackgroundWorkCoordinator {
         WorkManager.getInstance(context).cancelUniqueWork(PASSIVE_INCOME_ENGINE)
         WorkManager.getInstance(context).cancelUniqueWork(LEARNING_REVIEW)
         WorkManager.getInstance(context).cancelUniqueWork(INTERVIEW_REVIEW)
+        WorkManager.getInstance(context).cancelUniqueWork(GOVERNMENT_UPDATE_WATCH)
+        WorkManager.getInstance(context).cancelUniqueWork(LOCAL_CIVIC_WATCH)
     }
 
     private fun enqueue(context: Context, schedule: BackgroundSchedulerPolicy.Schedule) {
@@ -67,5 +71,7 @@ object BackgroundWorkCoordinator {
             BackgroundSchedulerPolicy.JobType.PASSIVE_INCOME_ENGINE -> PASSIVE_INCOME_ENGINE
             BackgroundSchedulerPolicy.JobType.LEARNING_REVIEW -> LEARNING_REVIEW
             BackgroundSchedulerPolicy.JobType.INTERVIEW_REVIEW -> INTERVIEW_REVIEW
+            BackgroundSchedulerPolicy.JobType.GOVERNMENT_UPDATE_WATCH -> GOVERNMENT_UPDATE_WATCH
+            BackgroundSchedulerPolicy.JobType.LOCAL_CIVIC_WATCH -> LOCAL_CIVIC_WATCH
         }
 }
