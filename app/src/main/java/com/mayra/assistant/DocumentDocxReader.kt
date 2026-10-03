@@ -73,12 +73,10 @@ object DocumentDocxReader {
                                     }
                                 }
                             }
-                            if (paragraphText.isNotEmpty()) {
-                                if (out.isNotEmpty()) out.append('\n')
-                                out.append(paragraphText)
-                            }
+                            if (i > 0 && out.length < MAX_TEXT_CHARS) out.append('\n')
+                            appendCapped(out, paragraphText.toString(), MAX_TEXT_CHARS)
                         }
-                        return Result(true, out.toString().trim(), "DOCX successfully read হয়েছে। Basic text extraction সম্পন্ন হয়েছে; original structure অপরিবর্তিত।")
+                        return Result(true, out.toString(), "DOCX successfully read হয়েছে। Basic text extraction সম্পন্ন হয়েছে; visual layout/advanced formatting অপরিবর্তিত রাখা হয়নি।")
                     }
                     entry = zip.nextEntry
                 }
