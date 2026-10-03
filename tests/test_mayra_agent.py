@@ -1,3 +1,5 @@
+import json
+import socket
 import unittest
 from unittest.mock import patch
 
@@ -6,7 +8,7 @@ import mayra_agent
 
 class MayraAgentTests(unittest.TestCase):
     def test_today_code_has_expected_date_format(self):
-        self.assertRegex(mayra_agent.today_code(), r"^MAYRA-\d{8}$")
+        self.assertRegex(mayra_agent.today_code(), r"^MAYRA-\\d{8}$")
 
     def test_ping_is_allowed(self):
         result = mayra_agent.execute("PING")
@@ -29,6 +31,35 @@ class MayraAgentTests(unittest.TestCase):
         self.assertEqual(
             mayra_agent.execute("OPEN_CALCULATOR"),
             {"ok": False, "error": "This action is Windows-only"},
+        )
+
+    def _handle_payload(self, payload):
+        server_side, client_side = socket.socketpair()
+        try:
+            client_side.sendall(payload)
+            mayra_agent.handle_connection(server_side)
+            response = client_side.recv(4096)
+            return json.loads(response.decode("utf-8"))
+        finally:
+            server_side.close()
+            client_side.close()
+
+    def test_invalid_json_is_rejected(self):
+        self.assertEqual(
+            self._handle_payload(b"{not-json"),
+            {"ok": False, "error": "Invalid request"},
+        )
+
+    def test_non_object_json_is_rejected(self):
+        self.assertEqual(
+            self._handle_payload(b'["PING"]'),
+            {"ok": False, "error": "Invalid request"},
+        )
+
+    def test_oversized_request_is_rejected(self):
+        self.assertEqual(
+            self._handle_payload(b"x" * (mayra_agent.MAX_REQUEST_BYTES + 1)),
+            {"ok": False, "error": "Request too large"},
         )
 
 
