@@ -3,13 +3,12 @@ package com.mayra.assistant
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import java.security.MessageDigest
 
 /**
  * Safe execution boundary for scheduled Mayra checks.
  *
- * Concrete network/source scanners are added separately. Until then this worker
- * performs no privileged action and never handles payments or private accounts.
+ * Live source adapters are connected separately. Until then this worker does
+ * not invent opportunities or claim that a live scan occurred.
  */
 class MayraBackgroundWorker(
     appContext: Context,
@@ -19,49 +18,27 @@ class MayraBackgroundWorker(
     override suspend fun doWork(): Result {
         val jobType = inputData.getString("job_type") ?: return Result.failure()
         val prefs = applicationContext.getSharedPreferences("mayra_secure", Context.MODE_PRIVATE)
-        if (!prefs.getBoolean("owner_verified", false) || !prefs.getBoolean("master_on", true)) {
+
+        if (!prefs.getBoolean("owner_verified", false) ||
+            !prefs.getBoolean("master_on", true)
+        ) {
             return Result.success()
         }
 
         return when (jobType) {
             BackgroundSchedulerPolicy.JobType.JOB_WATCHER.name,
             BackgroundSchedulerPolicy.JobType.INCOME_WATCHER.name -> runOpportunityWatch()
+
             BackgroundSchedulerPolicy.JobType.LEARNING_REVIEW.name,
             BackgroundSchedulerPolicy.JobType.INTERVIEW_REVIEW.name -> Result.success()
+
             else -> Result.failure()
         }
     }
 
     private fun runOpportunityWatch(): Result {
-        // Public-source adapters will be connected separately. Until then,
-        // do not invent opportunities or claim that a live scan occurred.
+        // Public-source adapters will be connected in the next integration step.
+        // No fabricated result or financial action is allowed.
         return Result.success()
     }
-
-    private fun notifyPublicChange(
-        title: String,
-        message: String,
-        important: Boolean,
-        notificationId: Int
-    ) {
-        MayraNotificationCenter.notifyOwner(
-            applicationContext,
-            NotificationSchedulePolicy.Event(
-                type = NotificationSchedulePolicy.EventType.GENERAL,
-                title = title,
-                message = message,
-                important = important
-            ),
-            notificationId
-        )
-
-    private fun runPublicWatch(stateKey: String, fingerprint: String, event: NotificationSchedulePolicy.Event): Result {
-        val previous = BackgroundWatchState.previousFingerprint(applicationContext, stateKey)
-        if (previous != null && previous != fingerprint) MayraNotificationCenter.notifyOwner(applicationContext, event, stateKey.hashCode())
-        BackgroundWatchState.saveFingerprint(applicationContext, stateKey, fingerprint)
-        return Result.success()
-    }
-
-    private fun stableFingerprint(value: String): String = MessageDigest.getInstance("SHA-256").digest(value.toByteArray()).joinToString("") { "%02x".format(it) }
 }
-
