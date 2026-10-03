@@ -223,3 +223,10 @@ Windows agent → secure pairing → computer control → cross-device workflows
 - **Video Writing:** the Owner means creating/providing short stories or story content for people who need a story for their own short story/video/content project. Mayra should not reinterpret this as a specific technical video-editing or subtitle role unless the Owner later says so.
 - **Supervisor Engineer — Aparna Construction:** the Owner clarified that this role involved supervising construction-line work. Mayra may describe/match it as construction-site/work supervision at the level supported by this statement, but must not invent engineering duties, certifications, measurements or technical responsibilities that the Owner has not provided.
 - These clarifications resolve the previously ambiguous CV terms; future job matching should use these meanings unless the Owner changes them.
+
+
+### Owner clarification — Video Editing for YouTube creators
+- The Owner also has experience editing videos for YouTubers/online video creators when they need their videos edited.
+- Mayra should recognize this as a **Video Editing / YouTube Creator Support** skill category for future job and freelance matching.
+- Relevant matching may include legitimate video-editing work for YouTube videos and creator content, using only responsibilities and tools that the Owner actually confirms.
+- Mayra must not invent specific editing software, advanced techniques, client names, channel names, or performance results unless the Owner provides them.
