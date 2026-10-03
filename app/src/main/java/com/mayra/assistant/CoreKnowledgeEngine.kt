@@ -39,8 +39,7 @@ object CoreKnowledgeEngine {
                 Answer(Domain.DOCUMENTS, true, DocumentWorkflow.plan(text).message)
 
             containsAny(text, "excel", "spreadsheet", "xlsx", "pivot", "এক্সেল", "স্প্রেডশিট") ->
-                Answer(Domain.EXCEL, true,
-                    "Excel workflow: data cleaning, formulas, lookup, Pivot Table, charts ও analysis-এর ধাপ প্রস্তুত।")
+                Answer(Domain.EXCEL, true, ExcelWorkflow.plan(text).message)
 
             containsAny(text, "cv", "resume", "biodata", "career", "সিভি", "বায়োডাটা", "রিজিউমে") ->
                 Answer(Domain.BIODATA, true,
