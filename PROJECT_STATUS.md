@@ -124,14 +124,14 @@ Windows agent → secure pairing → computer control → cross-device workflows
 - Departure details: show the exact departure station, bus terminal/pickup point, airport, port/jetty or other published boarding location; include arrival location and intermediate stops where available.
 - Timetable: show departure time, arrival time, duration, operating days, service/train/flight/bus number or name, and important connection/waiting times.
 - Ticket information: show current published fare/price, applicable taxes/fees when available, booking conditions, cancellation/refund rules and baggage/luggage rules where available.
-- Availability: for reservable services, show the latest available seat/ticket inventory by **class/category/quota/cabin** where the source exposes it (for example railway classes/quotas, bus seat categories, flight cabin classes, or ship/ferry seating/cabin categories).
+- Availability: for reservable services, show the latest available seat/ticket inventory by **class/category/quota/cabin** where the source exposes it.
 - Seat/cabin detail: when an official or reliable booking source exposes a seat map or remaining-seat count, Mayra should present it with the source timestamp; if exact inventory is unavailable, clearly say so instead of estimating.
 - Live-data rule: ticket availability, price, delays and cancellations can change quickly. Mayra must refresh/check the relevant official or reliable source close to the user's requested departure time and clearly show the information's date/time.
 - Advance preparation: when the user gives a future trip, Mayra may collect the published schedule, route, likely options, booking-window information and destination transport details ahead of time, then refresh dynamic fare/availability before the user acts.
 - Alternatives: compare practical alternatives by departure time, arrival time, duration, number of changes, fare and available class/category without making the booking decision for the user.
 - Source policy: prefer official railway, transport-operator, airline, airport, port/ferry and government sources; use other public sources only when necessary and label them appropriately.
 - Booking boundary: Mayra may prepare the booking information and guide the user, but because of the permanent Financial Lock it must **not purchase tickets, enter/execute payment, use banking/UPI/wallet transactions, or enable paid services**. The user remains responsible for the final booking and payment.
-- Ticket history: when the user has legally authorized access to their own booking/account records or provides the relevant booking history, Mayra may **view, organize, search, summarize and analyze ticket purchase, cancellation, refund and travel history**. It may show dates, routes, service numbers, classes/categories, fares and status where the source provides them.
+- Ticket history: when the user has legally authorized access to their own booking/account records or provides the relevant booking history, Mayra may **view, organize, search, summarize and analyze ticket purchase, cancellation, refund and travel history**.
 - Ticket-history boundary: viewing/history analysis is read-only. Mayra must not buy, sell, cancel, modify, refund, transfer, reschedule or otherwise execute any ticket transaction, and must not enter/submit payment or financial credentials.
 
 ## New scope — Accommodation & Food Price/Availability Research (Read-only)
@@ -151,7 +151,7 @@ Windows agent → secure pairing → computer control → cross-device workflows
 - Home-screen option: **Locked Phone Mode ON/OFF**.
 - Default state: **OFF** for safety. If OFF, Mayra must not execute work while the phone is locked.
 - If the Owner explicitly turns it **ON**, Mayra may use the future locked-device execution path for explicitly permitted tasks while the phone is locked.
-- This setting does **not** override the permanent Financial Lock: Mayra must never spend, purchase, subscribe, transfer, withdraw, or execute financial transactions, whether the phone is locked or unlocked.
+- This setting does **not** override the permanent Financial Lock.
 - Master OFF still overrides all Mayra work.
 - Locked-device work must remain within explicitly permitted, security-reviewed capabilities; no covert access or unauthorized device control.
 - Current implementation: owner-facing switch, persistent preference and deny/allow gate foundation are present. Full Android locked-device background execution and final device/security testing are still pending before the final APK.
@@ -161,9 +161,8 @@ Windows agent → secure pairing → computer control → cross-device workflows
 - Coverage should include major Bengali observances such as Durga Puja/Mahalaya, Lakshmi Puja, Kali Puja, Saraswati Puja, Jagaddhatri Puja, Vishwakarma Puja, Shivaratri, Janmashtami, Rathayatra, Dol/Holi, Snan/Yoga-related observances, Ekadashi and other relevant tithi-based observances, while allowing the knowledge base to expand.
 - For a requested date or festival, Mayra should report the Gregorian date, Bengali date/month, weekday, paksha, tithi and its start/end time, nakshatra and relevant other Panchang elements when available.
 - Puja-specific information should include relevant puja/vrat timing, auspicious period, required observance window and the applicable location, with a clear distinction between general festival dates and exact ritual timing.
-- Location matters: Panchang/tithi times must be calculated or sourced for the user's selected place (for example, West Bengal/Kolkata or another specified town), because sunrise and local astronomical timings can change the calendar result. citeturn0search0turn0search1
-- West Bengal government/public holiday dates should be kept separate from religious Panchang dates; official government holiday lists can be used as an additional verification source. citeturn0search3turn0search5
-- For major West Bengal pujas, official public sources such as the West Bengal SAHAJ Puja Permission Portal may be used to cross-check published festival dates and public puja information. citeturn0search4
+- Location matters: Panchang/tithi times must be calculated or sourced for the user's selected place because sunrise and local astronomical timings can change the calendar result.
+- West Bengal government/public holiday dates should be kept separate from religious Panchang dates.
 - Current/future dates and timings must be refreshed from reliable sources; Mayra should show source/date/location and flag differences between Panchang traditions or sources instead of silently choosing one.
 - Cost policy: religious-calendar knowledge and public information must use free/public sources; no paid Panchang subscription or API.
 
@@ -177,18 +176,29 @@ Windows agent → secure pairing → computer control → cross-device workflows
 
 ## New scope — Maps, App/Data Research & Micro-Earning Intelligence
 - Mayra should have built-in knowledge of legitimate work and income processes involving Google Maps/local-data research, business-data collection, data verification, map/search relevance evaluation, data annotation, app/product data research, spreadsheet/data-entry work, web research, and other small remote/microtask workflows.
-- Google Maps income distinction: Google Local Guides contributions earn points, levels and possible benefits; they are not to be presented as guaranteed cash income. citeturn0search0turn0search1
-- Paid Maps-related opportunities may include legitimate freelance business-data collection/verification, local research, map/search relevance rating and similar projects when an actual client/platform offers paid work. Current examples show Google Maps business-data research/data-entry jobs and India-based Maps relevance-rater work. citeturn0search6turn0search10
+- Google Maps income distinction: Google Local Guides contributions earn points, levels and possible benefits; they are not to be presented as guaranteed cash income.
+- Paid Maps-related opportunities may include legitimate freelance business-data collection/verification, local research, map/search relevance rating and similar projects when an actual client/platform offers paid work.
 - App/data opportunities should include lawful app testing, app-data research, catalog/product data entry, data annotation/labeling, transcription, web research, spreadsheet work, QA/relevance evaluation and other small tasks when the platform/client legitimately pays for them.
 - Opportunity discovery should prioritize: USD-paying opportunities first, INR opportunities in parallel; remote/freelance; zero-upfront-cost; short-duration/hourly work; repeatable work; legitimate passive/semi-passive possibilities; and tasks matching the owner's actual skills.
 - Every opportunity must pass a verification and scam-risk workflow before being recommended: client/platform identity, task legitimacy, payment terms, required skills, location/eligibility, upfront-fee check, suspicious deposit/withdrawal requests, credential/OTP requests, fake-review or fake-engagement requirements, and policy compliance.
 - Mayra must never treat “easy money”, guaranteed income, paid-to-unlock tasks, forced deposits, money-forwarding, fake reviews, fabricated data, copied/stolen content, or account abuse as legitimate opportunities.
-- Maps contributions must follow Google Maps policies: contributions should be authentic, based on real experiences/information, and not fabricated, copied or misleading. citeturn0search3
+- Maps contributions must follow Google Maps policies: contributions should be authentic, based on real experiences/information, and not fabricated, copied or misleading.
 - Built-in earning intelligence: Mayra should understand the workflow **Find → Verify → Match → Estimate effort/time → Estimate realistic earning → Risk check → Notify Owner → Owner approval → Prepare work → User submits → Track result → Learn**.
 - No-income-guarantee rule: Mayra may estimate or report published compensation, but must clearly label it as posted/estimated and never guarantee earnings.
 - Self-improvement engine: Mayra may continuously expand this knowledge from reliable public documentation, current job listings, platform rules, tutorials and owner-approved learning resources using **Discover → Research → Cross-check → Sandbox/Test → Verify → Backup → Update Knowledge → Re-test → Notify Owner**.
 - Self-improvement must not change core security, Financial Lock, permissions or safety rules. New earning methods become eligible for use only after verification and owner-approved configuration where required.
 - Cost policy: all research and learning for this module must use free/public resources where possible; no paid data/API/subscription may be introduced under the permanent ₹0 rule.
+
+## New scope — Hotel/Restaurant Review Work & Mystery Shopping
+- Mayra must distinguish genuine Google Maps contributions from paid customer-experience/mystery-shopping work and from prohibited paid/fake public reviews.
+- Google Maps reviews must be based on a genuine experience and be genuine and unbiased. Paid/incentivized reviews, rating manipulation, fake engagement, copied reviews, multiple-account review campaigns and reviews posted without a real experience must not be recommended.
+- Legitimate mystery-shopping/customer-experience work can involve visiting a hotel, restaurant or other business, following an evaluation checklist, observing service/cleanliness/waiting time/staff interaction/availability, collecting permitted evidence such as receipts or photos, and submitting a factual report to the client/platform.
+- The paid deliverable in such work is the research/report, **not a fabricated public Google review**.
+- Opportunity searches should include mystery shopping, secret shopper, customer-experience research, restaurant audit, hotel guest-experience audit, service-quality evaluation, local-business data verification and map/search relevance evaluation.
+- Scam checks must include company identity, task terms, upfront fees, deposits, money-forwarding, fake-cheque/payment schemes, crypto demands, OTP/password/banking-PIN requests and guaranteed-income claims.
+- Mayra must reject as legitimate earning opportunities any task requiring fake hotel/restaurant experiences, fixed positive ratings, copied review text, multiple accounts, paid Google ratings/reviews, deposits or money forwarding.
+- Mayra must not make or execute financial payments for any task. Any real-world visit or purchase required by a legitimate assignment remains the owner's decision and action.
+- A detailed durable knowledge reference is stored in **KNOWLEDGE_MAPS_REVIEW_AND_MYSTERY_SHOPPING.md**.
 
 ## Cross-device source of truth
 This file and the GitHub repository are the durable project record for resuming work from mobile or computer. Future development should update this status when major milestones change.
