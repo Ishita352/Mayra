@@ -26,6 +26,25 @@ ALLOWED = {
     "OPEN_SOUND_SETTINGS",
     "GET_PC_STATUS",
     "GET_SECURITY_STATUS",
+    "LIST_SHARED_FILES",
+    "OPEN_SHARED_FILE",
+    "SEND_FILE_TO_PC",
+    "RECEIVE_FILE_FROM_PC",
+    "READ_CLIPBOARD",
+    "WRITE_CLIPBOARD",
+    "OPEN_BROWSER",
+    "BROWSER_AUTOMATION",
+    "MEDIA_PLAY_PAUSE",
+    "MEDIA_NEXT",
+    "MEDIA_PREVIOUS",
+    "SET_VOLUME",
+    "SCREEN_VIEW",
+    "SCREEN_CONTROL",
+    "PHONE_CAMERA_FRONT",
+    "PHONE_CAMERA_BACK",
+    "PHONE_MICROPHONE",
+    "PHONE_SPEAKER",
+    "PHONE_RECOVERY_STATUS",
     "REVOKE_SESSION",
 }
 
@@ -149,6 +168,17 @@ def execute(command: str):
     if command == "REVOKE_SESSION":
         revoke_session()
         return {"ok": True, "message": "Session revoked"}
+    if command == "PHONE_RECOVERY_STATUS":
+        return {"ok": True, "message": "Recovery status must be supplied by the authenticated Android recovery module"}
+    if command in {
+        "LIST_SHARED_FILES", "OPEN_SHARED_FILE", "SEND_FILE_TO_PC",
+        "RECEIVE_FILE_FROM_PC", "READ_CLIPBOARD", "WRITE_CLIPBOARD",
+        "OPEN_BROWSER", "BROWSER_AUTOMATION", "MEDIA_PLAY_PAUSE",
+        "MEDIA_NEXT", "MEDIA_PREVIOUS", "SET_VOLUME", "SCREEN_VIEW",
+        "SCREEN_CONTROL", "PHONE_CAMERA_FRONT", "PHONE_CAMERA_BACK",
+        "PHONE_MICROPHONE", "PHONE_SPEAKER"
+    }:
+        return {"ok": False, "error": "Capability is published but its transport/module is not enabled yet"}
     if platform.system() != "Windows":
         return {"ok": False, "error": "This action is Windows-only"}
     settings_uris = {
