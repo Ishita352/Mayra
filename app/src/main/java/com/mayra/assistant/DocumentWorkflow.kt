@@ -40,7 +40,7 @@ object DocumentWorkflow {
         val message = when {
             !recognized -> help()
             Action.PRESERVE_STRUCTURE in actions ->
-                "Document plan প্রস্তুত, কিন্তু structure-preserving editing/conversion এখনো সক্রিয় নয়; basic text workflow ব্যবহার করতে হবে।"
+                "Document plan প্রস্তুত: basic structure-preserving text workflow সক্রিয়; paragraphs, line breaks ও tabs রাখা হবে। Original visual layout, images, fonts ও advanced formatting preserve করা হবে না."
             else ->
                 "Document plan প্রস্তুত: file type ও requested action শনাক্ত হয়েছে; বাস্তব file access permission/Owner gate-এর পেছনে চলবে।"
         }
