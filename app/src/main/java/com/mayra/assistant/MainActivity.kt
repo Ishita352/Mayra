@@ -2,6 +2,7 @@ package com.mayra.assistant
 
 import android.Manifest
 import android.content.Intent
+import android.provider.OpenableColumns
 import android.app.KeyguardManager
 import android.net.Uri
 import android.content.pm.PackageManager
@@ -14,6 +15,7 @@ import androidx.biometric.BiometricPrompt
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import androidx.activity.result.contract.ActivityResultContracts
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -25,6 +27,25 @@ class MainActivity : FragmentActivity() {
     private val notificationRequestCode = 7002
     private var responseTts: TextToSpeech? = null
     private var masterSwitch: Switch? = null
+
+    private val documentPicker = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri == null) {
+            showVoiceResult("কোনো document নির্বাচন করা হয়নি।")
+            return@registerForActivityResult
+        }
+        try {
+            contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        } catch (_: SecurityException) { }
+        val name = contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
+            ?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0) else null }
+            ?: uri.lastPathSegment ?: "Selected document"
+        showModule(
+            "Document Selected",
+            "ফাইল: $name\n\nMayra নিরাপদভাবে document-এর read permission পেয়েছে। PDF/DOCX parsing ও editing engine পরবর্তী ধাপে যুক্ত হবে; এই পর্যায়ে কোনো file content পরিবর্তন করা হয়নি।"
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -218,6 +239,13 @@ class MainActivity : FragmentActivity() {
                 "Core AI & Knowledge Engine",
                 "Offline-first request understanding foundation. Documents, Excel, CV/Biodata, Jobs, Income, Interview, Learning, Textile ও Security domain চিনে নিরাপদ workflow নির্বাচন করে।\n\nএটি কোনো paid API বা network call করে না; বাস্তব file/network action পরে permission gates-এর পেছনে যুক্ত হবে."
             )
+        })
+        layout.addView(sectionButton("📄 Documents — PDF / DOCX / TXT") {
+            documentPicker.launch(arrayOf(
+                "application/pdf",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "text/plain"
+            ))
         })
         layout.addView(sectionButton("Excel / Data Analysis") {
             showModule("Excel / Data Analysis", "পরবর্তী ধাপে Excel formulas, data cleaning, lookup, Pivot Table, charts, dashboards এবং analysis workflow যুক্ত হবে.")
