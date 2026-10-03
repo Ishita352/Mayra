@@ -48,6 +48,10 @@ class MayraNotificationListenerService : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         if (sbn.packageName != WHATSAPP_PACKAGE) return
+        val prefs = getSharedPreferences("mayra_secure", MODE_PRIVATE)
+        if (!prefs.getBoolean("master_on", true)) return
+        if (!FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.WHATSAPP_ASSISTANT)) return
+        if (!FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.SECURITY)) return
         val extras = sbn.notification.extras ?: return
         val title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()?.trim().orEmpty()
         val text = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()?.trim().orEmpty()
