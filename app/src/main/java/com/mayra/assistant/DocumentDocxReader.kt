@@ -20,13 +20,13 @@ object DocumentDocxReader {
                     var entry = zip.nextEntry
                     while (entry != null) {
                         if (entry.name == "word/document.xml") {
-                            val xml = zip.readBytesLimited(MAX_BYTES)
-                            val factory = DocumentBuilderFactory.newInstance().apply { isNamespaceAware = true }
+                            val xml = readEntryBytesLimited(zip, MAX_BYTES)
+                            val factory = DocumentBuilderFactory.newInstance().apply { isNamespaceAware = false }
                             try { factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true) } catch (_: Exception) {}
                             try { factory.setFeature("http://xml.org/sax/features/external-general-entities", false) } catch (_: Exception) {}
                             try { factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false) } catch (_: Exception) {}
                             val parsed = factory.newDocumentBuilder().parse(xml.inputStream())
-                            val nodes = parsed.getElementsByTagNameNS("*", "t")
+                            val nodes = parsed.getElementsByTagName("w:t")
                             val out = StringBuilder()
                             for (i in 0 until nodes.length) {
                                 if (out.length >= MAX_TEXT_CHARS) break
@@ -47,12 +47,12 @@ object DocumentDocxReader {
         }
     }
 
-    private fun ZipInputStream.readBytesLimited(limit: Long): ByteArray {
+    private fun readEntryBytesLimited(zip: ZipInputStream, limit: Long): ByteArray {
         val out = java.io.ByteArrayOutputStream()
         val buffer = ByteArray(8192)
         var total = 0L
         while (true) {
-            val read = read(buffer)
+            val read = zip.read(buffer)
             if (read < 0) break
             total += read
             if (total > limit) throw IOException("entry too large")
