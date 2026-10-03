@@ -56,7 +56,7 @@ object DocumentDocxWriter {
     private fun documentRels() = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>"""
 
-    private fun documentXml(text: String): String {
+    internal fun documentXml(text: String): String {
         val paragraphs = text.split("\n").joinToString("") { line ->
             "<w:p><w:r><w:t xml:space=\"preserve\">\${escapeXml(line)}</w:t></w:r></w:p>"
         }
