@@ -62,7 +62,6 @@ object VoiceCommandEngine {
         val callOn = listOf("ইনকামিং কল অ্যাসিস্ট্যান্ট চালু", "incoming call assistant on", "enable incoming call assistant", "इनकमिंग कॉल असिस्टेंट चालू")
         val callOff = listOf("ইনকামিং কল অ্যাসিস্ট্যান্ট বন্ধ", "incoming call assistant off", "disable incoming call assistant", "इनकमिंग कॉल असिस्टेंट बंद")
         val reply = listOf("reply whatsapp", "whatsapp reply", "হোয়াটসঅ্যাপ রিপ্লাই", "হোয়াটসঅ্যাপ রিপ্লাই", "রিপ্লাই দাও", "reply দাও")
-        val reply = listOf("reply whatsapp", "whatsapp reply", "হোয়াটসঅ্যাপ রিপ্লাই", "হোয়াটসঅ্যাপ রিপ্লাই", "রিপ্লাই দাও", "reply দাও")
 
         return when {
             voiceOff.any { text.contains(it) } -> VoiceCommandResult(true, VoiceCommandResult.Action.SET_VOICE_COMMAND, "বস, Voice Command বন্ধ করার নির্দেশ পেয়েছি।")
