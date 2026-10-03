@@ -8,12 +8,6 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import java.util.concurrent.TimeUnit
 
-/**
- * Registers OS-supported background checks.
- *
- * This is scheduling infrastructure only: it does not create a stealth service,
- * access private accounts, submit applications, or perform financial actions.
- */
 object BackgroundWorkCoordinator {
     private const val JOB_WATCHER = "mayra_job_watcher"
     private const val INCOME_WATCHER = "mayra_income_watcher"
@@ -22,56 +16,45 @@ object BackgroundWorkCoordinator {
     private const val INTERVIEW_REVIEW = "mayra_interview_review"
     private const val GOVERNMENT_UPDATE_WATCH = "mayra_government_update_watch"
     private const val LOCAL_CIVIC_WATCH = "mayra_local_civic_watch"
+    private const val WEATHER_TRAVEL_WATCH = "mayra_weather_travel_watch"
 
     fun scheduleDefaults(context: Context) {
-        BackgroundSchedulerPolicy.defaultSchedules().forEach { schedule ->
-            enqueue(context, schedule)
-        }
+        BackgroundSchedulerPolicy.defaultSchedules().forEach { enqueue(context, it) }
     }
 
     fun cancelAll(context: Context) {
-        WorkManager.getInstance(context).cancelUniqueWork(JOB_WATCHER)
-        WorkManager.getInstance(context).cancelUniqueWork(INCOME_WATCHER)
-        WorkManager.getInstance(context).cancelUniqueWork(PASSIVE_INCOME_ENGINE)
-        WorkManager.getInstance(context).cancelUniqueWork(LEARNING_REVIEW)
-        WorkManager.getInstance(context).cancelUniqueWork(INTERVIEW_REVIEW)
-        WorkManager.getInstance(context).cancelUniqueWork(GOVERNMENT_UPDATE_WATCH)
-        WorkManager.getInstance(context).cancelUniqueWork(LOCAL_CIVIC_WATCH)
+        val wm = WorkManager.getInstance(context)
+        listOf(
+            JOB_WATCHER, INCOME_WATCHER, PASSIVE_INCOME_ENGINE, LEARNING_REVIEW,
+            INTERVIEW_REVIEW, GOVERNMENT_UPDATE_WATCH, LOCAL_CIVIC_WATCH, WEATHER_TRAVEL_WATCH
+        ).forEach(wm::cancelUniqueWork)
     }
 
     private fun enqueue(context: Context, schedule: BackgroundSchedulerPolicy.Schedule) {
         if (!BackgroundSchedulerPolicy.isValid(schedule)) return
-
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(
                 if (schedule.networkRequired) NetworkType.CONNECTED else NetworkType.NOT_REQUIRED
             )
             .build()
-
         val request = PeriodicWorkRequestBuilder<MayraBackgroundWorker>(
             schedule.intervalHours.toLong(), TimeUnit.HOURS
-        )
-            .setConstraints(constraints)
-            .setInputData(
-                androidx.work.workDataOf("job_type" to schedule.jobType.name)
-            )
+        ).setConstraints(constraints)
+            .setInputData(androidx.work.workDataOf("job_type" to schedule.jobType.name))
             .build()
-
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-            uniqueName(schedule.jobType),
-            ExistingPeriodicWorkPolicy.UPDATE,
-            request
+            uniqueName(schedule.jobType), ExistingPeriodicWorkPolicy.UPDATE, request
         )
     }
 
-    private fun uniqueName(jobType: BackgroundSchedulerPolicy.JobType): String =
-        when (jobType) {
-            BackgroundSchedulerPolicy.JobType.JOB_WATCHER -> JOB_WATCHER
-            BackgroundSchedulerPolicy.JobType.INCOME_WATCHER -> INCOME_WATCHER
-            BackgroundSchedulerPolicy.JobType.PASSIVE_INCOME_ENGINE -> PASSIVE_INCOME_ENGINE
-            BackgroundSchedulerPolicy.JobType.LEARNING_REVIEW -> LEARNING_REVIEW
-            BackgroundSchedulerPolicy.JobType.INTERVIEW_REVIEW -> INTERVIEW_REVIEW
-            BackgroundSchedulerPolicy.JobType.GOVERNMENT_UPDATE_WATCH -> GOVERNMENT_UPDATE_WATCH
-            BackgroundSchedulerPolicy.JobType.LOCAL_CIVIC_WATCH -> LOCAL_CIVIC_WATCH
-        }
+    private fun uniqueName(jobType: BackgroundSchedulerPolicy.JobType): String = when (jobType) {
+        BackgroundSchedulerPolicy.JobType.JOB_WATCHER -> JOB_WATCHER
+        BackgroundSchedulerPolicy.JobType.INCOME_WATCHER -> INCOME_WATCHER
+        BackgroundSchedulerPolicy.JobType.PASSIVE_INCOME_ENGINE -> PASSIVE_INCOME_ENGINE
+        BackgroundSchedulerPolicy.JobType.LEARNING_REVIEW -> LEARNING_REVIEW
+        BackgroundSchedulerPolicy.JobType.INTERVIEW_REVIEW -> INTERVIEW_REVIEW
+        BackgroundSchedulerPolicy.JobType.GOVERNMENT_UPDATE_WATCH -> GOVERNMENT_UPDATE_WATCH
+        BackgroundSchedulerPolicy.JobType.LOCAL_CIVIC_WATCH -> LOCAL_CIVIC_WATCH
+        BackgroundSchedulerPolicy.JobType.WEATHER_TRAVEL_WATCH -> WEATHER_TRAVEL_WATCH
+    }
 }
