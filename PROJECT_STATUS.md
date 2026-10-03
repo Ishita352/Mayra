@@ -92,5 +92,18 @@ Windows agent → secure pairing → computer control → cross-device workflows
 - No live-call translation feature for now.
 - No unnecessary anti-noise/voice-isolation feature unless reopened.
 
+
+## New scope — Local Emergency, News & Government Services
+- Primary local service area: PIN **713405**
+- Emergency information coverage: the PIN area plus a configurable **50 km surrounding area**.
+- Emergency directory: hospitals/health services, police, fire/emergency response, ambulance, blood/emergency resources, disaster/weather alerts and other verified public emergency services.
+- Local information watch: verified local news and important public notices relevant to the configured area.
+- West Bengal Government information watch: schemes, grants/subsidies, public notices, welfare programmes, application windows, eligibility guidance and official service links.
+- Government of India information watch: schemes, grants/subsidies, welfare programmes, public notices, application windows, eligibility guidance and official service links.
+- Government document/service assistant: help users understand, prepare and complete online applications for government services and documents that are legally available through official portals.
+- Source policy: prefer official government portals and primary sources; show source/date/status where possible and flag information that may be outdated or unverified.
+- User-control policy: Mayra may monitor and organize public information automatically, but submission of applications, declarations, payments, identity verification or other legally significant actions must remain under the user's control.
+- Cost policy: use free/public/official resources only; no paid data service or subscription.
+
 ## Cross-device source of truth
 This file and the GitHub repository are the durable project record for resuming work from mobile or computer. Future development should update this status when major milestones change.
