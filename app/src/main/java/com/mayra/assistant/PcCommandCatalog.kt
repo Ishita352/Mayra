@@ -11,7 +11,20 @@ object PcCommandCatalog {
         GET_PC_STATUS, GET_SECURITY_STATUS, REVOKE_SESSION
     }
 
-    fun isAllowed(command: CommandId): Boolean = true
+    private val publishedCommands = setOf(
+        CommandId.PING,
+        CommandId.OPEN_NOTEPAD,
+        CommandId.OPEN_CALCULATOR,
+        CommandId.OPEN_WINDOWS_SETTINGS,
+        CommandId.OPEN_NETWORK_SETTINGS,
+        CommandId.OPEN_DISPLAY_SETTINGS,
+        CommandId.OPEN_SOUND_SETTINGS,
+        CommandId.GET_PC_STATUS,
+        CommandId.GET_SECURITY_STATUS,
+        CommandId.REVOKE_SESSION
+    )
+
+    fun isAllowed(command: CommandId): Boolean = command in publishedCommands
 
     fun requiresAuthenticatedSession(command: CommandId): Boolean =
         command != CommandId.PING
