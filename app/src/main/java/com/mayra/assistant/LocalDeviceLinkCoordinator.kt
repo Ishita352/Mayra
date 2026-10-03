@@ -48,8 +48,7 @@ class LocalDeviceLinkCoordinator(
             pending.remove(deviceId)
             return null
         }
-        if (capabilities.any { it == NetworkDeviceControlPolicy.Capability.SCREEN_CONTROL &&
-            !NetworkDeviceControlPolicy.requiresExplicitPairing() }) return null
+        if (capabilities.isEmpty()) return null
         val session = Session(deviceId, capabilities.toSet(), clockMs())
         sessions[deviceId] = session
         pending.remove(deviceId)
