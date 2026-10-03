@@ -98,6 +98,7 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun showAssistant() {
+        BackgroundWorkCoordinator.scheduleDefaults(this)
         val layout = baseLayout()
         layout.addView(TextView(this).apply { text = "মায়রা প্রস্তুত ✓"; textSize = 30f })
         layout.addView(Switch(this).apply {
