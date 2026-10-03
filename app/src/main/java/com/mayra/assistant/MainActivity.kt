@@ -287,7 +287,6 @@ class MainActivity : FragmentActivity() {
 
     private fun showAssistant(saveSession: Boolean = true) {
         if (saveSession) sessionState.saveHome()
-        sessionState.saveHome()
 
         MayraNotificationCenter.ensureChannel(this)
         requestNotificationPermissionIfNeeded()
