@@ -22,6 +22,7 @@ import java.util.Date
 import java.util.Locale
 
 class MainActivity : FragmentActivity() {
+    private val sessionState by lazy { MayraSessionState(prefs) }
     private val prefs by lazy { getSharedPreferences("mayra_secure", MODE_PRIVATE) }
     private val voiceRequestCode = 7001
     private val notificationRequestCode = 7002
@@ -188,7 +189,7 @@ class MainActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (prefs.getBoolean("owner_verified", false)) showAssistant() else showFirstOwnerVerification()
+        if (prefs.getBoolean("owner_verified", false)) restoreLastSession() else showFirstOwnerVerification()
     }
 
     private fun showFirstOwnerVerification() {
@@ -269,7 +270,24 @@ class MainActivity : FragmentActivity() {
             )
         }
     }
+    private fun restoreLastSession() {
+        if (!prefs.getBoolean("master_on", true)) {
+            showAssistant()
+            return
+        }
+        if (sessionState.hasResumeState()) {
+            showModule(
+                sessionState.title(),
+                sessionState.details() + "\n\nMayra restored this saved session state after restart."
+            )
+        } else {
+            showAssistant()
+        }
+    }
+
     private fun showAssistant() {
+        sessionState.saveHome()
+
         MayraNotificationCenter.ensureChannel(this)
         requestNotificationPermissionIfNeeded()
         if (prefs.getBoolean("master_on", true)) {
@@ -604,6 +622,7 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun showModule(title: String, details: String) {
+        sessionState.saveModule(title, details)
         val layout = baseLayout()
         layout.addView(TextView(this).apply { text = title; textSize = 28f })
         layout.addView(TextView(this).apply { text = "\n$details"; textSize = 17f })
