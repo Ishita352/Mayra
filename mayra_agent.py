@@ -22,6 +22,7 @@ _pairing_code = None
 _pairing_expires = 0.0
 _session_token = None
 _session_expires = 0.0
+_owner_approved_code = None
 
 
 def _new_pairing_code():
@@ -45,10 +46,23 @@ def pairing_code():
         return _pairing_code
 
 
+def owner_approve(code):
+    global _owner_approved_code
+    with _state_lock:
+        if _pairing_code is None or time.time() >= _pairing_expires:
+            return False
+        if not hmac.compare_digest(str(code), _pairing_code):
+            return False
+        _owner_approved_code = _pairing_code
+        return True
+
+
 def approve_pairing(code):
     global _session_token, _session_expires, _pairing_code
     with _state_lock:
         if _pairing_code is None or time.time() >= _pairing_expires:
+            return None
+        if _owner_approved_code != _pairing_code:
             return None
         if not hmac.compare_digest(str(code), _pairing_code):
             return None
@@ -108,8 +122,7 @@ def handle_connection(conn):
                     code = str(request.get("code", ""))
                     response = {"ok": False, "error": "Pairing rejected"}
                     if pairing_code() == code:
-                        # The PC owner must explicitly approve locally.
-                        print(f"Pairing request received for code {code}. Approve with: PAIR {code}")
+                        print(f"Pairing request received for code {code}. Approve locally with: PAIR {code}")
                         response = {"ok": True, "status": "OWNER_APPROVAL_REQUIRED"}
                 elif action == "PAIR_APPROVE":
                     token = approve_pairing(request.get("code", ""))
@@ -154,6 +167,20 @@ def main():
     print("Remote access is disabled until the PC owner approves this exact code.")
     print("Allowed remote commands:", ", ".join(sorted(ALLOWED)))
     print("To revoke the current session, restart the agent or use the REVOKE action.\n")
+
+    def owner_console():
+        while True:
+            try:
+                command = input().strip()
+            except (EOFError, KeyboardInterrupt):
+                return
+            if command.startswith("PAIR ") and owner_approve(command[5:].strip()):
+                print("Owner approval recorded. The paired device may now complete pairing.")
+            elif command == "REVOKE":
+                revoke_session()
+                print("Session revoked.")
+
+    threading.Thread(target=owner_console, daemon=True).start()
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
