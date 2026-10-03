@@ -8,7 +8,9 @@ package com.mayra.assistant
  * owner-controlled.
  */
 object GovernmentServicePolicy {
-    enum class Level { CENTRAL_GOVERNMENT, STATE_GOVERNMENT }
+    enum class Level { CENTRAL_GOVERNMENT, WEST_BENGAL_GOVERNMENT }
+
+    enum class Source { INDIA_PORTAL, MY_SCHEME, WEST_BENGAL_GOVERNMENT, DEPARTMENT_PORTAL }
 
     fun mayPrepareDocuments(): Boolean = true
     fun mayPrepareFormDraft(): Boolean = true
@@ -17,4 +19,6 @@ object GovernmentServicePolicy {
     fun mayBypassOtpCaptchaOrIdentityVerification(): Boolean = false
     fun mayInventEligibility(): Boolean = false
     fun mayInventSchemeUpdate(): Boolean = false
+    fun requiresOfficialSourceForSchemeUpdate(): Boolean = true
+    fun mayAutoSubmitWithoutOwnerApproval(): Boolean = false
 }
