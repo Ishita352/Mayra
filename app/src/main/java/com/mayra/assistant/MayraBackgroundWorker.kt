@@ -21,7 +21,8 @@ class MayraBackgroundWorker(
         val prefs = applicationContext.getSharedPreferences("mayra_secure", Context.MODE_PRIVATE)
 
         if (!prefs.getBoolean("owner_verified", false) ||
-            !prefs.getBoolean("master_on", true)
+            !prefs.getBoolean("master_on", true) ||
+            DeviceSecurityGate.isDeviceLocked(applicationContext)
         ) {
             return Result.success()
         }
