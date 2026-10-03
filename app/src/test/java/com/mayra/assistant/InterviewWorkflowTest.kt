@@ -26,11 +26,11 @@ class InterviewWorkflowTest {
         assertFalse(InterviewWorkflow.mayCovertlyAssist())
         assertFalse(InterviewWorkflow.mayBypassInterviewRules())
     }
-}
 
-
-    @Test fun aiAssistanceIsBlockedWhenBanned() {
+    @Test
+    fun aiAssistanceIsBlockedWhenBanned() {
         assertFalse(InterviewWorkflow.mayUseAi(InterviewWorkflow.AiPermission.BANNED))
         assertTrue(InterviewWorkflow.mayUseAi(InterviewWorkflow.AiPermission.ALLOWED))
         assertTrue(InterviewWorkflow.mayUseAi(InterviewWorkflow.AiPermission.NOT_PROHIBITED))
     }
+}
