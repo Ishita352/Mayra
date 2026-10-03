@@ -16,7 +16,7 @@ class LocalDeviceLinkCoordinatorTest {
             setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, true, DevicePreConnectionScan(DevicePreConnectionSecurityPolicy.Risk.CLEAN, "VerifiedScanner", 1_000L, emptyList())))
         now += 31_000L
         assertNull(c.acceptInvite("device-2", invite.code,
-            setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, true))
+            setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, true, DevicePreConnectionScan(DevicePreConnectionSecurityPolicy.Risk.CLEAN, "VerifiedScanner", 1_000L, emptyList())))
     }
 
     @Test fun wrongCodeDoesNotPair() {
