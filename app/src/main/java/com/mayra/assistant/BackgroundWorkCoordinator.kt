@@ -14,6 +14,7 @@ object BackgroundWorkCoordinator {
     private const val PASSIVE_INCOME_ENGINE = "mayra_passive_income_engine"
     private const val LEARNING_REVIEW = "mayra_learning_review"
     private const val INTERVIEW_REVIEW = "mayra_interview_review"
+    private const val ONEFORMA_PROJECT_WATCH = "mayra_oneforma_project_watch"
     private const val GOVERNMENT_UPDATE_WATCH = "mayra_government_update_watch"
     private const val LOCAL_CIVIC_WATCH = "mayra_local_civic_watch"
     private const val WEATHER_TRAVEL_WATCH = "mayra_weather_travel_watch"
@@ -26,7 +27,7 @@ object BackgroundWorkCoordinator {
         val wm = WorkManager.getInstance(context)
         listOf(
             JOB_WATCHER, INCOME_WATCHER, PASSIVE_INCOME_ENGINE, LEARNING_REVIEW,
-            INTERVIEW_REVIEW, GOVERNMENT_UPDATE_WATCH, LOCAL_CIVIC_WATCH, WEATHER_TRAVEL_WATCH
+            INTERVIEW_REVIEW, ONEFORMA_PROJECT_WATCH, GOVERNMENT_UPDATE_WATCH, LOCAL_CIVIC_WATCH, WEATHER_TRAVEL_WATCH
         ).forEach(wm::cancelUniqueWork)
     }
 
@@ -53,6 +54,7 @@ object BackgroundWorkCoordinator {
         BackgroundSchedulerPolicy.JobType.PASSIVE_INCOME_ENGINE -> PASSIVE_INCOME_ENGINE
         BackgroundSchedulerPolicy.JobType.LEARNING_REVIEW -> LEARNING_REVIEW
         BackgroundSchedulerPolicy.JobType.INTERVIEW_REVIEW -> INTERVIEW_REVIEW
+        BackgroundSchedulerPolicy.JobType.ONEFORMA_PROJECT_WATCH -> ONEFORMA_PROJECT_WATCH
         BackgroundSchedulerPolicy.JobType.GOVERNMENT_UPDATE_WATCH -> GOVERNMENT_UPDATE_WATCH
         BackgroundSchedulerPolicy.JobType.LOCAL_CIVIC_WATCH -> LOCAL_CIVIC_WATCH
         BackgroundSchedulerPolicy.JobType.WEATHER_TRAVEL_WATCH -> WEATHER_TRAVEL_WATCH
