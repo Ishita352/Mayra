@@ -15,13 +15,15 @@ object DocumentDocxReader {
         return try {
             val size = resolver.openAssetFileDescriptor(uri, "r")?.use { it.length } ?: -1L
             if (size > MAX_BYTES) return Result(false, message = "DOCX 10 MB-এর বেশি; নিরাপত্তার জন্য Mayra এটি এখন পড়বে না।")
-            resolver.openInputStream(uri)?.use { input ->
-                ZipInputStream(input).use { zip ->
+            val input = resolver.openInputStream(uri) ?: return Result(false, message = "DOCX fileটি পড়া যায়নি।")
+            input.use { stream ->
+                ZipInputStream(stream).use { zip ->
                     var entry = zip.nextEntry
                     while (entry != null) {
                         if (entry.name == "word/document.xml") {
                             val xml = readEntryBytesLimited(zip, MAX_BYTES)
-                            val factory = DocumentBuilderFactory.newInstance().apply { isNamespaceAware = false }
+                            val factory = DocumentBuilderFactory.newInstance()
+                            factory.isNamespaceAware = false
                             try { factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true) } catch (_: Exception) {}
                             try { factory.setFeature("http://xml.org/sax/features/external-general-entities", false) } catch (_: Exception) {}
                             try { factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false) } catch (_: Exception) {}
@@ -37,7 +39,8 @@ object DocumentDocxReader {
                         entry = zip.nextEntry
                     }
                 }
-            } ?: Result(false, message = "DOCX fileটি পড়া যায়নি।")
+            }
+            Result(false, message = "DOCX document.xml পাওয়া যায়নি।")
         } catch (_: IOException) {
             Result(false, message = "DOCX পড়ার সময় সমস্যা হয়েছে বা fileটি valid DOCX নয়।")
         } catch (_: SecurityException) {
