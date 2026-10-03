@@ -421,6 +421,9 @@ class MainActivity : FragmentActivity() {
         layout.addView(sectionButton("Self-Learning / Teaching") {
             showModule("Self-Learning", "Mayra নতুন knowledge discover → cross-check → test → আপনাকে জানাবে → আপনার অনুমতি পেলে knowledge base-এ যোগ করবে.")
         })
+        layout.addView(sectionButton("💻 PC Control") {
+            showModule("Mayra PC Control", "Windows 10 PC Companion-এর জন্য authenticated local control interface প্রস্তুত করা হয়েছে।\n\nএখনকার published capabilities allowlisted এবং security-gated; প্রকৃত Phone ↔ PC transport চালু হওয়ার আগে pairing দরকার।\n\nপরবর্তী transport ধাপে: secure pairing → trusted session → capability check → PC command → result ফেরত।\n\nকোনো arbitrary shell/PowerShell command বা Windows security bypass অনুমোদিত নয়.")
+        })
         layout.addView(sectionButton("Phone → Computer Pair") {
             showModule("Phone → Computer Pair", "Windows agent তৈরি হলে secure pairing-এর মাধ্যমে ফোন থেকে কম্পিউটারে command পাঠানো যাবে.\n\nপ্রধান সংযোগ: Wi-Fi/Internet; Bluetooth optional.")
         })
@@ -638,6 +641,10 @@ class MainActivity : FragmentActivity() {
         }
         if (!FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.VOICE_COMMAND)) {
             showVoiceResult("Voice Command OFF — এই voice command চালানো যাবে না।")
+            return
+        }
+        if (!FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.SECURITY)) {
+            showVoiceResult("Security Control OFF — নিরাপত্তা checks সক্রিয় না থাকায় এই command চালানো যাবে না।");
             return
         }
         // Defense-in-depth: re-check the physical device lock immediately before execution.
