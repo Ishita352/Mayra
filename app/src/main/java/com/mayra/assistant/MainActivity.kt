@@ -319,6 +319,17 @@ class MainActivity : FragmentActivity() {
             }
         })
         layout.addView(Switch(this).apply {
+            text = "🛡️ Safety / Security Control ON/OFF"
+            isChecked = FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.SECURITY)
+            setOnCheckedChangeListener { _, checked ->
+                FeatureToggleRegistry.setEnabled(prefs, FeatureToggleRegistry.SECURITY, checked)
+                showVoiceResult(
+                    if (checked) "Security Control ON — Mayra-এর নিরাপত্তা ও অনুমতি checks সক্রিয়।"
+                    else "Security Control OFF — নিরাপত্তা-সংবেদনশীল action Mayra অনুমোদন করবে না।"
+                )
+            }
+        })
+        layout.addView(Switch(this).apply {
             text = "🔐 Locked Phone Mode — ভবিষ্যৎ locked-device execution"
             isChecked = LockModePolicy.isEnabled(prefs)
             setOnCheckedChangeListener { _, checked ->
