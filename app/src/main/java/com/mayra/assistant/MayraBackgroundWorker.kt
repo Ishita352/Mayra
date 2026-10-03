@@ -3,6 +3,7 @@ package com.mayra.assistant
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 
 /**
  * Safe execution boundary for scheduled Mayra checks.
@@ -37,8 +38,8 @@ class MayraBackgroundWorker(
     }
 
     private fun runOpportunityWatch(): Result {
-        // Public-source adapters will be connected in the next integration step.
-        // No fabricated result or financial action is allowed.
-        return Result.success()
+        // Keep the worker honest until a live public-source adapter is connected.
+        // It may report that no scan was performed, but must never invent a result.
+        return Result.success(workDataOf("scan_status" to "NO_LIVE_SOURCE_ADAPTER"))
     }
 }
