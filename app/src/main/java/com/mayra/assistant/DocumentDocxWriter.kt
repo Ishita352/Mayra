@@ -58,7 +58,7 @@ object DocumentDocxWriter {
 
     internal fun documentXml(text: String): String {
         val paragraphs = text.split("\n").joinToString("") { line ->
-            "<w:p><w:r><w:t xml:space=\"preserve\">\${escapeXml(line)}</w:t></w:r></w:p>"
+            "<w:p><w:r><w:t xml:space=\"preserve\">${escapeXml(line)}</w:t></w:r></w:p>"
         }
         return """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
