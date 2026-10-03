@@ -10,7 +10,7 @@ object DocumentDocxReader {
     const val MAX_BYTES = 10L * 1024L * 1024L
     const val MAX_TEXT_CHARS = 500_000
     data class Result(val success: Boolean, val text: String = "", val message: String)
-    fun read(resolver: ContentResolver, uri: Uri): Result = try {
+    fun read(resolver: ContentResolver, uri: Uri): Result {\n        return try {
         val size = resolver.openAssetFileDescriptor(uri, "r")?.use { it.length } ?: -1L
         if (size > MAX_BYTES) return Result(false, message = "DOCX 10 MB-এর বেশি; নিরাপত্তার জন্য Mayra এটি এখন পড়বে না।")
         resolver.openInputStream(uri)?.use { input -> ZipInputStream(input).use { zip ->
