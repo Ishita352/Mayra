@@ -18,6 +18,10 @@ class DocumentDocxReaderTest {
         val xml = DocumentDocxWriter.documentXml("প্রথম <লাইন>\nদ্বিতীয় & লাইন")
         assertTrue(xml.contains("<w:p><w:r><w:t xml:space=\"preserve\">প্রথম &lt;লাইন&gt;</w:t></w:r></w:p>"))
         assertTrue(xml.contains("<w:p><w:r><w:t xml:space=\"preserve\">দ্বিতীয় &amp; লাইন</w:t></w:r></w:p>"))
-        assertTrue(xml.contains("<w:tab/>"))
+    }
+
+    @Test fun writerPreservesTabs() {
+        val xml = DocumentDocxWriter.documentXml("প্রথম\tট্যাব")
+        assertTrue(xml.contains("<w:r><w:t xml:space=\"preserve\">প্রথম</w:t></w:r><w:r><w:tab/></w:r><w:r><w:t xml:space=\"preserve\">ট্যাব</w:t></w:r>"))
     }
 }
