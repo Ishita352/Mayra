@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit
 object BackgroundWorkCoordinator {
     private const val JOB_WATCHER = "mayra_job_watcher"
     private const val INCOME_WATCHER = "mayra_income_watcher"
+    private const val PASSIVE_INCOME_ENGINE = "mayra_passive_income_engine"
     private const val LEARNING_REVIEW = "mayra_learning_review"
     private const val INTERVIEW_REVIEW = "mayra_interview_review"
 
@@ -29,6 +30,7 @@ object BackgroundWorkCoordinator {
     fun cancelAll(context: Context) {
         WorkManager.getInstance(context).cancelUniqueWork(JOB_WATCHER)
         WorkManager.getInstance(context).cancelUniqueWork(INCOME_WATCHER)
+        WorkManager.getInstance(context).cancelUniqueWork(PASSIVE_INCOME_ENGINE)
         WorkManager.getInstance(context).cancelUniqueWork(LEARNING_REVIEW)
         WorkManager.getInstance(context).cancelUniqueWork(INTERVIEW_REVIEW)
     }
@@ -62,6 +64,7 @@ object BackgroundWorkCoordinator {
         when (jobType) {
             BackgroundSchedulerPolicy.JobType.JOB_WATCHER -> JOB_WATCHER
             BackgroundSchedulerPolicy.JobType.INCOME_WATCHER -> INCOME_WATCHER
+            BackgroundSchedulerPolicy.JobType.PASSIVE_INCOME_ENGINE -> PASSIVE_INCOME_ENGINE
             BackgroundSchedulerPolicy.JobType.LEARNING_REVIEW -> LEARNING_REVIEW
             BackgroundSchedulerPolicy.JobType.INTERVIEW_REVIEW -> INTERVIEW_REVIEW
         }
