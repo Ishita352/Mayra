@@ -1,8 +1,8 @@
 package com.mayra.assistant
 
 /**
- * Curated, offline-safe knowledge map for Mayra's earning/work workflows.
- * This is a foundation; current platform rules must be refreshed before action.
+ * Structured knowledge map for Mayra's earning/work workflows.
+ * Current platform rules must be refreshed before any real action.
  */
 object IncomeKnowledgeBase {
     data class Topic(val name: String, val skills: List<String>)
@@ -19,12 +19,32 @@ object IncomeKnowledgeBase {
         Topic("AI-assisted services", listOf("research", "drafting", "analysis", "automation only where permitted"))
     )
 
+    val computerWorkTopics = listOf(
+        "Web research and information collection",
+        "Remote/freelance platform work",
+        "Browser-based job applications with Owner permission",
+        "Email/document drafting and organization",
+        "PDF/document reading, conversion and preparation",
+        "Excel/data entry, cleaning, formulas and analysis",
+        "Reports, charts and dashboard preparation",
+        "Presentation/document preparation",
+        "Textile and digital design workflows",
+        "File search and organization",
+        "Opening approved Windows applications",
+        "Computer status and secure phone-to-Windows command workflows",
+        "Future approved browser/file actions after authenticated pairing",
+        "Interview preparation and authorized interview assistance",
+        "Learning software documentation and tutorials"
+    )
+
     fun summary(): String = buildString {
-        append("Mayra Income Knowledge Base\n\n")
-        append("জানা/শেখার ক্ষেত্র:\n")
+        append("Mayra Income & Computer Work Knowledge Base\n\n")
+        append("Income/work skills:\n")
         topics.forEach { topic -> append("• " + topic.name + ": " + topic.skills.joinToString(", ") + "\n") }
-        append("\nপ্রতিটি নতুন platform-এর current Terms, payout rules, eligibility এবং AI/automation policy যাচাই করতে হবে.")
-        append("\n\nWorkflow: Discover → Verify → Match → Risk check → Owner permission → Work → Report → Owner handles payment/withdrawal.")
-        append("\n\n₹0 rule: upfront cost, paid subscription, paid trial বা financial transaction Mayra করবে না.")
+        append("\nComputer work knowledge:\n")
+        computerWorkTopics.forEach { item -> append("• " + item + "\n") }
+        append("\nWorkflow: Discover → Verify → Match → Risk check → Owner permission → Work → Report → Owner handles payment/withdrawal.")
+        append("\n₹0 rule: no upfront cost, paid subscription, paid trial or financial transaction by Mayra.")
+        append("\nSecurity: computer control stays allowlisted and authorized; no stealth or unauthorized access.")
     }
 }
