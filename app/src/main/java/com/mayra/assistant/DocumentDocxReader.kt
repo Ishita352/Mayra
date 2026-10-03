@@ -93,6 +93,12 @@ object DocumentDocxReader {
         }
     }
 
+    private fun appendCapped(out: StringBuilder, text: String, limit: Int) {
+        if (out.length >= limit || text.isEmpty()) return
+        val remaining = limit - out.length
+        out.append(if (text.length <= remaining) text else text.substring(0, remaining))
+    }
+
     private fun readEntryBytesLimited(zip: ZipInputStream, limit: Long): ByteArray {
         val out = java.io.ByteArrayOutputStream()
         val buffer = ByteArray(8192)
