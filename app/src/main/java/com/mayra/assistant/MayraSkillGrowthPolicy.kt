@@ -34,4 +34,17 @@ object MayraSkillGrowthPolicy {
     fun mayChangeSecurityOrFinancialRules(): Boolean = false
     fun mayBypassWebsiteRestrictions(): Boolean = false
     fun maySubmitExternalWorkWithoutOwnerApproval(): Boolean = false
+
+    /**
+     * Learning records and legitimate evidence may feed the Owner skill profile,
+     * but external credentials must never be fabricated.
+     */
+    fun mayRecordVerifiedOwnerSkill(skillVerified: Boolean, evidenceAvailable: Boolean): Boolean =
+        SkillCertificatePolicy.mayAddVerifiedSkillToOwnerBiodata(
+            skillVerified = skillVerified,
+            evidenceAvailable = evidenceAvailable
+        )
+
+    fun mayCreateInternalLearningRecord(): Boolean = true
+
 }
