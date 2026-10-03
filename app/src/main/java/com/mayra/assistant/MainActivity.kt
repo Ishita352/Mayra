@@ -2,8 +2,10 @@ package com.mayra.assistant
 
 import android.Manifest
 import android.content.Intent
+import android.net.Uri
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.speech.RecognizerIntent
 import android.widget.*
 import androidx.biometric.BiometricManager
@@ -12,12 +14,14 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
 class MainActivity : FragmentActivity() {
     private val prefs by lazy { getSharedPreferences("mayra_secure", MODE_PRIVATE) }
     private val voiceRequestCode = 7001
+    private var responseTts: TextToSpeech? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -179,10 +183,58 @@ class MainActivity : FragmentActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == voiceRequestCode && resultCode == RESULT_OK) {
             val spoken = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()
-            if (!spoken.isNullOrBlank()) Toast.makeText(this, "আপনি বলেছেন: $spoken", Toast.LENGTH_LONG).show()
+            if (!spoken.isNullOrBlank()) executeVoiceCommand(spoken)
         }
     }
 
+    private fun executeVoiceCommand(spoken: String) {
+        val result = VoiceCommandEngine.parse(spoken)
+        when (result.action) {
+            VoiceCommandResult.Action.OPEN_SETTINGS -> startActivity(Intent(android.provider.Settings.ACTION_SETTINGS))
+            VoiceCommandResult.Action.OPEN_BROWSER -> startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com")))
+            VoiceCommandResult.Action.OPEN_CAMERA -> startActivity(Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE))
+            VoiceCommandResult.Action.SHOW_TIME -> {
+                val time = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Calendar.getInstance().time)
+                showVoiceResult(result.response + "\nএখন সময়: " + time)
+                speakResponse(result.response + " এখন সময় " + time)
+                return
+            }
+            VoiceCommandResult.Action.SHOW_HELP, VoiceCommandResult.Action.NONE -> {
+                showVoiceResult(result.response)
+                speakResponse(result.response)
+                return
+            }
+        }
+        showVoiceResult(result.response)
+        speakResponse(result.response)
+    }
+
+    private fun showVoiceResult(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    private fun speakResponse(message: String) {
+        responseTts?.shutdown()
+        responseTts = TextToSpeech(this) { status ->
+            if (status == TextToSpeech.SUCCESS) {
+                val locale = when {
+                    message.contains(Regex("[\\u0980-\\u09FF]")) -> Locale("bn", "IN")
+                    message.contains(Regex("[\\u0900-\\u097F]")) -> Locale("hi", "IN")
+                    else -> Locale.US
+                }
+                val r = responseTts?.setLanguage(locale)
+                if (r != TextToSpeech.LANG_MISSING_DATA && r != TextToSpeech.LANG_NOT_SUPPORTED) {
+                    responseTts?.speak(message, TextToSpeech.QUEUE_FLUSH, null, "mayra_command_response")
+                }
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        responseTts?.shutdown()
+        responseTts = null
+        super.onDestroy()
+    }
     private fun baseLayout() = LinearLayout(this).apply {
         orientation = LinearLayout.VERTICAL
         setPadding(48, 64, 48, 48)
