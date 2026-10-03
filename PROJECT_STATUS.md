@@ -189,28 +189,14 @@ Windows agent → secure pairing → computer control → cross-device workflows
 - Self-improvement must not change core security, Financial Lock, permissions or safety rules. New earning methods become eligible for use only after verification and owner-approved configuration where required.
 - Cost policy: all research and learning for this module must use free/public resources where possible; no paid data/API/subscription may be introduced under the permanent ₹0 rule.
 
-## New scope — Owner-command Auto Research Mode for Hotel/Restaurant Work
-- This category is owner-command controlled: the Owner retains final authority over every review, report, submission and platform action.
-- Mayra may run automatic research/opportunity discovery for this category without waiting for a command for each search step.
-- In auto mode, Mayra may find legitimate mystery-shopping/customer-experience opportunities, inspect public/official hotel and restaurant websites, collect factual published information, compare task requirements, verify platform rules, perform scam checks, estimate effort and published compensation, and prepare drafts/checklists/reports.
-- Website research is research only. It does not grant permission to publish a public review.
-- Mayra may prepare a review/report draft from the Owner's real first-hand experience and explicitly supplied observations, photos or notes; it must not invent missing experience or facts.
-- No public review, client report, survey, rating, platform submission or other final external action may be made without an explicit Owner command for that specific action.
-- Auto mode therefore follows: **Find → Research → Verify → Analyze → Prepare → Notify Owner**.
-- After the Owner commands a specific permitted step, Mayra performs only that step. Financial actions remain permanently blocked.
-- The Owner's long travel experience may be used as first-hand source material when the Owner supplies the relevant experience for the specific place/visit.
-- Permanent Google Maps/platform rules, safety rules and Financial Lock cannot be overridden by Owner commands.
-
-## New scope — Hotel/Restaurant Review Work & Mystery Shopping
-- Mayra must distinguish genuine Google Maps contributions from paid customer-experience/mystery-shopping work and from prohibited paid/fake public reviews.
-- Google Maps reviews must be based on a genuine experience and be genuine and unbiased. Paid/incentivized reviews, rating manipulation, fake engagement, copied reviews, multiple-account review campaigns and reviews posted without a real experience must not be recommended.
-- Legitimate mystery-shopping/customer-experience work can involve visiting a hotel, restaurant or other business, following an evaluation checklist, observing service/cleanliness/waiting time/staff interaction/availability, collecting permitted evidence such as receipts or photos, and submitting a factual report to the client/platform.
-- The paid deliverable in such work is the research/report, **not a fabricated public Google review**.
-- Opportunity searches should include mystery shopping, secret shopper, customer-experience research, restaurant audit, hotel guest-experience audit, service-quality evaluation, local-business data verification and map/search relevance evaluation.
-- Scam checks must include company identity, task terms, upfront fees, deposits, money-forwarding, fake-cheque/payment schemes, crypto demands, OTP/password/banking-PIN requests and guaranteed-income claims.
-- Mayra must reject as legitimate earning opportunities any task requiring fake hotel/restaurant experiences, fixed positive ratings, copied review text, multiple accounts, paid Google ratings/reviews, deposits or money forwarding.
-- Mayra must not make or execute financial payments for any task. Any real-world visit or purchase required by a legitimate assignment remains the owner's decision and action.
-- A detailed durable knowledge reference is stored in **KNOWLEDGE_MAPS_REVIEW_AND_MYSTERY_SHOPPING.md**.
-
-## Cross-device source of truth
-This file and the GitHub repository are the durable project record for resuming work from mobile or computer. Future development should update this status when major milestones change.
+## New scope — Google Maps Exact Pin / Address & Geo-data Work
+- Mayra should treat **exact map pin placement, address-point correction and geo-data quality work** as a distinct skill/work category within Maps/local-data research.
+- Owner-reported CV experience: the Owner has approximately **3–4 years of experience** with Google Maps-related work involving exact customer/address pin-point marking and related address/location data tasks. This is an owner-provided CV fact and must not be expanded into unverified claims.
+- Relevant task vocabulary to recognize: exact pin placement, address-point correction, customer address verification, location/address matching, geocoding quality checks, map-point accuracy, building/entrance location confirmation, address-component verification, map data validation and local geo-data quality assurance.
+- Mayra should match legitimate jobs/projects containing these requirements against the Owner's stated experience when the task actually fits.
+- Research workflow may include comparing the written address with map position, checking whether the point corresponds to the real-world location, identifying missing/inconsistent address components, and flagging uncertain or approximate matches for human review.
+- Where official/public imagery or mapping tools are legally available, Mayra may use them as contextual evidence, but it must not claim an image is live or fabricate an exact coordinate when the source does not support that precision.
+- Google documentation distinguishes precise rooftop geocodes from interpolated or approximate results; therefore Mayra should preserve the source's confidence/precision rather than silently treating every geocode as an exact customer location.
+- Public Google Maps editing and Business Profile guidance requires accurate, precise addresses and allows a pin to be adjusted when the address cannot be accurately represented; Mayra should use those rules as a policy reference for map-quality work.
+- Paid work must be legitimate geo-data/research/quality-assurance work, not paid manipulation of Google Maps, fake locations, fabricated customer addresses or misleading edits.
+- Permanent Financial Lock and owner-command rules remain unchanged: Mayra can find, research, match and prepare work, but cannot perform financial transactions or make final external submissions without the required owner command.
