@@ -2,6 +2,7 @@ package com.mayra.assistant
 
 import android.content.Context
 import androidx.work.CoroutineWorker
+import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 
@@ -16,15 +17,15 @@ class MayraBackgroundWorker(
     workerParams: WorkerParameters
 ) : CoroutineWorker(appContext, workerParams) {
 
-    override suspend fun doWork(): Result {
-        val jobType = inputData.getString("job_type") ?: return Result.failure()
+    override suspend fun doWork(): ListenableWorker.Result {
+        val jobType = inputData.getString("job_type") ?: return ListenableWorker.Result.failure()
         val prefs = applicationContext.getSharedPreferences("mayra_secure", Context.MODE_PRIVATE)
 
         if (!prefs.getBoolean("owner_verified", false) ||
             !prefs.getBoolean("master_on", true) ||
             DeviceSecurityGate.isDeviceLocked(applicationContext)
         ) {
-            return Result.success()
+            return ListenableWorker.Result.success()
         }
 
         return when (jobType) {
@@ -33,17 +34,17 @@ class MayraBackgroundWorker(
             BackgroundSchedulerPolicy.JobType.PASSIVE_INCOME_ENGINE.name -> runIncomeBackgroundCycle()
 
             BackgroundSchedulerPolicy.JobType.LEARNING_REVIEW.name,
-            BackgroundSchedulerPolicy.JobType.INTERVIEW_REVIEW.name -> Result.success()
+            BackgroundSchedulerPolicy.JobType.INTERVIEW_REVIEW.name -> ListenableWorker.Result.success()
 
             BackgroundTaskPolicy.TaskType.DOCUMENT_PROCESSING.name,
             BackgroundTaskPolicy.TaskType.KNOWLEDGE_REFRESH.name,
             BackgroundTaskPolicy.TaskType.NOTIFICATION_PREPARATION.name -> runApprovedBackgroundTask(jobType)
 
-            else -> Result.failure()
+            else -> ListenableWorker.Result.failure()
         }
     }
 
-    private fun runOpportunityWatch(): Result {
+    private fun runOpportunityWatch(): ListenableWorker.Result {
         // Every future income/work adapter must begin from the same foundational
         // rule gate. Unknown automation permission is never treated as allowed.
         val policy = IncomeWorkRules.evaluate(
@@ -54,25 +55,23 @@ class MayraBackgroundWorker(
 
         // Keep the worker honest until a live public-source adapter is connected.
         // It may report that no scan was performed, but must never invent a result.
-        return Result.success(
+        return ListenableWorker.Result.success(
             workDataOf(
                 "scan_status" to "NO_LIVE_SOURCE_ADAPTER",
                 "income_work_mode" to policy.mode.name
             )
         )
     }
-}
 
-
-    private fun runApprovedBackgroundTask(jobType: String): Result {
+    private fun runApprovedBackgroundTask(jobType: String): ListenableWorker.Result {
         val task = runCatching { BackgroundTaskPolicy.TaskType.valueOf(jobType) }
-            .getOrNull() ?: return Result.failure()
+            .getOrNull() ?: return ListenableWorker.Result.failure()
 
         if (!BackgroundTaskPolicy.isBackgroundAllowed(task)) {
-            return Result.failure()
+            return ListenableWorker.Result.failure()
         }
 
-        return Result.success(
+        return ListenableWorker.Result.success(
             workDataOf(
                 "background_task" to task.name,
                 "status" to "ALLOWED_PENDING_TASK_ADAPTER"
@@ -80,9 +79,9 @@ class MayraBackgroundWorker(
         )
     }
 
-    private fun runIncomeBackgroundCycle(): Result {
+    private fun runIncomeBackgroundCycle(): ListenableWorker.Result {
         val policy = IncomeBackgroundEnginePolicy
-        return Result.success(
+        return ListenableWorker.Result.success(
             workDataOf(
                 "income_background" to "ACTIVE",
                 "passive_income_objective" to policy.PASSIVE_INCOME_PRIMARY_OBJECTIVE,
