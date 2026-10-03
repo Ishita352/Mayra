@@ -16,7 +16,8 @@ object IncomeKnowledgeBase {
         Topic("Design & textile services", listOf("digital assets", "saree/textile design", "templates", "licensing")),
         Topic("Digital products", listOf("templates", "spreadsheets", "design assets", "educational materials")),
         Topic("Passive / semi-passive", listOf("licensing", "royalties", "reusable products", "content-based models")),
-        Topic("AI-assisted services", listOf("research", "drafting", "analysis", "automation only where permitted"))
+        Topic("AI-assisted services", listOf("research", "drafting", "analysis", "automation only where permitted")),
+        Topic("Owner CV skill services", listOf("data entry", "Excel", "Tally", "web research", "Google Maps verification", "customer support", "translation", "content", "transcription", "video editing", "AI training QA", "practical project creation"))
     )
 
     val computerWorkTopics = listOf(
