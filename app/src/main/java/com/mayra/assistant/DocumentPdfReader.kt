@@ -11,7 +11,7 @@ object DocumentPdfReader {
     const val MAX_BYTES = 10L * 1024L * 1024L
     const val MAX_PREVIEW_CHARS = 8000
     data class Result(val success: Boolean, val text: String = "", val pages: Int = 0, val message: String)
-    fun read(resolver: ContentResolver, uri: Uri, context: android.content.Context): Result = try {
+    fun read(resolver: ContentResolver, uri: Uri, context: android.content.Context): Result {\n        return try {
         val size = resolver.openAssetFileDescriptor(uri, "r")?.use { it.length } ?: -1L
         if (size > MAX_BYTES) return Result(false, message = "PDF 10 MB-এর বেশি; নিরাপত্তার জন্য Mayra এটি এখন পড়বে না।")
         PDFBoxResourceLoader.init(context.applicationContext)
