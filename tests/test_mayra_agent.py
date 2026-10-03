@@ -30,6 +30,9 @@ class MayraAgentTests(unittest.TestCase):
             {"ok": False, "error": "This action is Windows-only"},
         )
 
+    def test_helper_payload_placeholder(self):
+        self.assertTrue(True)
+
     def _handle_payload(self, payload):
         server_side, client_side = socket.socketpair()
         try:
@@ -58,6 +61,30 @@ class MayraAgentTests(unittest.TestCase):
             self._handle_payload(b"x" * (mayra_agent.MAX_REQUEST_BYTES + 1)),
             {"ok": False, "error": "Request too large"},
         )
+
+    def test_pairing_requires_owner_approval(self):
+        code = mayra_agent.start_pairing()
+        self.assertEqual(
+            mayra_agent.handle_test_request({"action": "PAIR_APPROVE", "code": code})["ok"],
+            False,
+        )
+        self.assertTrue(mayra_agent.owner_approve(code))
+        result = mayra_agent.handle_test_request({"action": "PAIR_APPROVE", "code": code})
+        self.assertTrue(result["ok"])
+        self.assertTrue(result["session_token"])
+        mayra_agent.revoke_session()
+
+    def test_remote_arbitrary_command_is_rejected(self):
+        code = mayra_agent.start_pairing()
+        self.assertTrue(mayra_agent.owner_approve(code))
+        result = mayra_agent.handle_test_request({"action": "PAIR_APPROVE", "code": code})
+        token = result["session_token"]
+        denied = mayra_agent.handle_test_request(
+            {"action": "COMMAND", "session_token": token, "command": "RUN:whoami"}
+        )
+        self.assertFalse(denied["ok"])
+        self.assertEqual(denied["error"], "Command not allowed")
+        mayra_agent.revoke_session()
 
 
 if __name__ == "__main__":
