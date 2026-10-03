@@ -13,7 +13,7 @@ class LocalDeviceLinkCoordinatorTest {
         assertNotNull(c.acceptInvite("device-2", invite.code,
             setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, true, DevicePreConnectionScan(DevicePreConnectionSecurityPolicy.Risk.CLEAN, "VerifiedScanner", 1_000L, emptyList())))
         assertNull(c.acceptInvite("device-2", invite.code,
-            setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, true))
+            setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, true, DevicePreConnectionScan(DevicePreConnectionSecurityPolicy.Risk.CLEAN, "VerifiedScanner", 1_000L, emptyList())))
         now += 31_000L
         assertNull(c.acceptInvite("device-2", invite.code,
             setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, true))
@@ -48,7 +48,7 @@ class LocalDeviceLinkCoordinatorTest {
         val c = LocalDeviceLinkCoordinator(clockMs = { 1_000L })
         val invite = c.createInvite("device-2")
         c.acceptInvite("device-2", invite.code,
-            setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, true)
+            setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, true, DevicePreConnectionScan(DevicePreConnectionSecurityPolicy.Risk.CLEAN, "VerifiedScanner", 1_000L, emptyList()))
         assertTrue(c.mayUse("device-2", NetworkDeviceControlPolicy.Capability.DEVICE_INFO))
         c.revoke("device-2")
         assertFalse(c.mayUse("device-2", NetworkDeviceControlPolicy.Capability.DEVICE_INFO))
