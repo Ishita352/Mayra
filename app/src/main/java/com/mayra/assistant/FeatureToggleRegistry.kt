@@ -6,6 +6,7 @@ object FeatureToggleRegistry {
     const val VOICE_COMMAND = "voice_command_enabled"
     const val CAMERA = "camera_enabled"
     const val INCOMING_CALL_ASSISTANT = "incoming_call_assistant_enabled"
+    const val SECURITY = "security_control_enabled"
 
     fun isEnabled(prefs: SharedPreferences, key: String): Boolean =
         prefs.getBoolean(key, defaultFor(key))
@@ -18,6 +19,7 @@ object FeatureToggleRegistry {
         VOICE_COMMAND -> true
         CAMERA -> true
         INCOMING_CALL_ASSISTANT -> false
+        SECURITY -> true
         else -> false
     }
 }
