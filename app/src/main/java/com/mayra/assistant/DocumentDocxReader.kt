@@ -43,11 +43,31 @@ object DocumentDocxReader {
                         try { factory.setFeature("http://xml.org/sax/features/external-general-entities", false) } catch (_: Exception) {}
                         try { factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false) } catch (_: Exception) {}
                         val parsed = factory.newDocumentBuilder().parse(xml.inputStream())
-                        val nodes = parsed.getElementsByTagName("w:t")
+                        val paragraphs = parsed.getElementsByTagName("w:p")
                         val out = StringBuilder()
-                        for (i in 0 until nodes.length) {
+                        for (i in 0 until paragraphs.length) {
                             if (out.length >= MAX_TEXT_CHARS) break
-                            out.append(nodes.item(i).textContent).append(' ')
+                            val paragraph = paragraphs.item(i)
+                            val textNodes = paragraph.childNodes
+                            val paragraphText = StringBuilder()
+                            for (j in 0 until textNodes.length) {
+                                val node = textNodes.item(j)
+                                if (node.nodeName == "w:r") {
+                                    val runChildren = node.childNodes
+                                    for (k in 0 until runChildren.length) {
+                                        val child = runChildren.item(k)
+                                        when (child.nodeName) {
+                                            "w:t" -> paragraphText.append(child.textContent)
+                                            "w:tab" -> paragraphText.append('\t')
+                                            "w:br" -> paragraphText.append('\n')
+                                        }
+                                    }
+                                }
+                            }
+                            if (paragraphText.isNotEmpty()) {
+                                if (out.isNotEmpty()) out.append('\n')
+                                out.append(paragraphText)
+                            }
                         }
                         return Result(true, out.toString().trim(), "DOCX successfully read হয়েছে। Basic text extraction সম্পন্ন হয়েছে; original structure অপরিবর্তিত।")
                     }
