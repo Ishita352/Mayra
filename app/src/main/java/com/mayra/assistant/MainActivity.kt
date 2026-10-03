@@ -339,15 +339,19 @@ class MainActivity : FragmentActivity() {
                 showVoiceResult(if (checked) "Incoming Call Assistant ON — Android-supported call workflow-এর জন্য প্রস্তুত।" else "Incoming Call Assistant OFF।")
             }
         })
-        layout.addView(Button(this).apply {
-            text = "💬 WhatsApp Read & Voice Reply"
-            setOnClickListener {
-                try {
-                    startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"))
-                } catch (_: Exception) {
-                    startActivity(Intent(Settings.ACTION_SETTINGS))
+        layout.addView(Switch(this).apply {
+            text = "💬 WhatsApp Read & Voice Reply ON/OFF"
+            isChecked = FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.WHATSAPP_ASSISTANT)
+            setOnCheckedChangeListener { _, checked ->
+                FeatureToggleRegistry.setEnabled(prefs, FeatureToggleRegistry.WHATSAPP_ASSISTANT, checked)
+                if (checked) {
+                    try {
+                        startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+                    } catch (_: Exception) { startActivity(Intent(Settings.ACTION_SETTINGS)) }
+                    showVoiceResult("WhatsApp Assistant ON। Android Notification Access-এ Mayra-কে ON করুন।")
+                } else {
+                    showVoiceResult("WhatsApp Assistant OFF — message reading ও voice reply বন্ধ।")
                 }
-                showVoiceResult("Android Notification Access-এ Mayra-কে ON করুন। এরপর WhatsApp notification Mayra পড়ে শোনাবে এবং আপনার voice command দিয়ে reply পাঠাতে পারবে।")
             }
         })
         layout.addView(Button(this).apply {
