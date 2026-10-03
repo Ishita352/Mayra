@@ -25,6 +25,8 @@ object OwnerSkillKnowledge {
         Skill("video_editing", "YouTube/creator video editing", listOf("video editing", "youtube editing", "ভিডিও এডিটিং", "youtube"), "Organize → cut → sequence → audio → graphics → QA → export"),
         Skill("photo", "Photo editing & digital content", listOf("photo editing", "image editing", "ফটো এডিটিং"), "Select → edit → quality-check → export"),
         Skill("ai_training", "AI training & content validation", listOf("ai training", "prompt", "content validation"), "Read rubric → evaluate → label → QA → report"),
+        Skill("mturk", "Amazon Mechanical Turk microtask experience (Owner-reported, ~2 years)", listOf("mturk", "mechanical turk", "microtask", "human intelligence task", "hit"), "Apply prior Owner experience → read task rules → complete accurately → QA → submit"),
+
         Skill("content_review", "Content/photo quality review", listOf("content review", "photo selection", "quality review"), "Criteria → inspect → classify → consistency-check"),
         Skill("construction", "Construction-site/work supervision", listOf("construction", "site supervision", "construction supervisor"), "Observe → coordinate → follow work plan → report"),
         Skill("production", "Production supervision", listOf("production supervisor", "production supervision"), "Use only Owner-confirmed duties; ask before expanding scope")
