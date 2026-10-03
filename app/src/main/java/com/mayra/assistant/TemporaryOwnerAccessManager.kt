@@ -14,6 +14,7 @@ object TemporaryOwnerAccessManager {
     private const val KEY_ACTIVE = "temporary_owner_active"
     private const val KEY_STARTED = "temporary_owner_started_at"
     private const val KEY_EXPIRES = "temporary_owner_expires_at"
+    private const val KEY_LAST_CHECK = "temporary_owner_last_checked_at"
     private const val KEY_AUDIT = "temporary_owner_audit"
 
     const val MAX_DURATION_MS = 24L * 60L * 60L * 1000L
@@ -26,6 +27,7 @@ object TemporaryOwnerAccessManager {
             .putBoolean(KEY_ACTIVE, true)
             .putLong(KEY_STARTED, now)
             .putLong(KEY_EXPIRES, expires)
+            .putLong(KEY_LAST_CHECK, now)
             .apply()
         appendAudit(context, "TEMP_OWNER_SESSION", "STARTED", "Temporary Owner Mode started; maximum duration 24 hours.")
         return true
@@ -35,11 +37,17 @@ object TemporaryOwnerAccessManager {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val active = prefs.getBoolean(KEY_ACTIVE, false)
         val expires = prefs.getLong(KEY_EXPIRES, 0L)
+        val lastCheck = prefs.getLong(KEY_LAST_CHECK, 0L)
         if (!active) return false
+        if (System.currentTimeMillis() < lastCheck || expires <= lastCheck || expires - lastCheck > MAX_DURATION_MS) {
+            expire(context)
+            return false
+        }
         if (System.currentTimeMillis() >= expires) {
             expire(context)
             return false
         }
+        prefs.edit().putLong(KEY_LAST_CHECK, System.currentTimeMillis()).apply()
         return true
     }
 
