@@ -31,12 +31,14 @@ def _new_pairing_code():
 
 
 def start_pairing():
-    global _pairing_code, _pairing_expires, _session_token
+    global _pairing_code, _pairing_expires, _session_token, _owner_approved_code
     with _state_lock:
         _pairing_code = _new_pairing_code()
         _pairing_expires = time.time() + PAIRING_TTL_SECONDS
         _session_token = None
         _session_expires = 0.0
+        _owner_approved_code = None
+        _owner_approved_code = None
         return _pairing_code
 
 
@@ -85,7 +87,7 @@ def approve_pairing(code):
 
 
 def revoke_session():
-    global _session_token, _session_expires
+    global _session_token, _session_expires, _owner_approved_code
     with _state_lock:
         _session_token = None
         _session_expires = 0.0
