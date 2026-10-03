@@ -41,5 +41,5 @@ object OneFormaWorkPolicy {
     fun requiresOwnerControlForNdaAndLegalAgreement(): Boolean = true
     fun requiresRuleCheckBeforeExecution(): Boolean = true
     fun mayTrackPublicJobListings(): Boolean = true
-    fun mayPrepareNon-submissionalNotesOrChecklists(): Boolean = true
+    fun mayPrepareNonSubmissionalNotesOrChecklists(): Boolean = true
 }
