@@ -200,6 +200,22 @@ class MainActivity : FragmentActivity() {
             VoiceCommandResult.Action.OPEN_SETTINGS -> startActivity(Intent(android.provider.Settings.ACTION_SETTINGS))
             VoiceCommandResult.Action.OPEN_BROWSER -> startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com")))
             VoiceCommandResult.Action.OPEN_CAMERA -> startActivity(Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE))
+            VoiceCommandResult.Action.PAIR_COMPUTER -> {
+                showModule("Phone ↔ Computer Pairing", "এখনো Windows agent ইনস্টল/সংযোগ করা হয়নি।\n\nপরবর্তী ধাপ:\n1. Windows কম্পিউটারে Mayra Windows agent তৈরি ও চালু করতে হবে।\n2. দুই ডিভাইসে অনুমোদিত pairing code দিয়ে সংযোগ করতে হবে।\n3. তারপরেই কম্পিউটারে command পাঠানো যাবে।\n\nএই মুহূর্তে কোনো কম্পিউটার command পাঠানো হয়নি।")
+                speakResponse("বস, ফোন-কম্পিউটার pairing-এর জন্য Windows agent দরকার।")
+                return
+            }
+            VoiceCommandResult.Action.COMPUTER_STATUS -> {
+                showVoiceResult("কম্পিউটার: এখনো paired নয়। Windows agent ও secure pairing এখনও বাকি।")
+                speakResponse("বস, কম্পিউটার এখনও paired নয়।")
+                return
+            }
+            VoiceCommandResult.Action.COMPUTER_OPEN_BROWSER,
+            VoiceCommandResult.Action.COMPUTER_FIND_FILE -> {
+                showVoiceResult("এই কমান্ডটি বুঝেছি, কিন্তু কম্পিউটারে চালাইনি। Windows agent pairing এখনও বাকি।")
+                speakResponse("বস, কম্পিউটার সংযোগ এখনও তৈরি হয়নি।")
+                return
+            }
             VoiceCommandResult.Action.SHOW_TIME -> {
                 val time = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Calendar.getInstance().time)
                 showVoiceResult(result.response + "\nএখন সময়: " + time)
