@@ -7,6 +7,9 @@ package com.mayra.assistant
  * authorize bypassing platform rules or financial transactions.
  */
 object IncomeBackgroundEnginePolicy {
+    const val PASSIVE_INCOME_PRIMARY_OBJECTIVE =
+        "Generate legitimate passive income opportunities and pursue only rule-compliant, owner-authorized execution."
+
     enum class IncomeMode {
         PASSIVE_INCOME_DISCOVERY,
         ACTIVE_INCOME_DISCOVERY,
