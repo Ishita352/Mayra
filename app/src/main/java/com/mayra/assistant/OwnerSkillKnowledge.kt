@@ -26,6 +26,7 @@ object OwnerSkillKnowledge {
         Skill("photo", "Photo editing & digital content", listOf("photo editing", "image editing", "ফটো এডিটিং"), "Select → edit → quality-check → export"),
         Skill("ai_training", "AI training & content validation", listOf("ai training", "prompt", "content validation"), "Read rubric → evaluate → label → QA → report"),
         Skill("mturk", "Amazon Mechanical Turk microtask experience (Owner-reported, ~2 years)", listOf("mturk", "mechanical turk", "microtask", "human intelligence task", "hit"), "Apply prior Owner experience → read task rules → complete accurately → QA → submit"),
+        Skill("microtask_transfer", "Transferable MTurk-style task skills", listOf("microtask", "data labeling", "data collection", "image labeling", "text classification", "entity matching", "deduplication", "transcription", "ai evaluation", "human-in-the-loop"), "Map proven Owner microtask experience to legitimate platforms → verify task rules → compare pay/time → QA → Owner approval"),
 
         Skill("content_review", "Content/photo quality review", listOf("content review", "photo selection", "quality review"), "Criteria → inspect → classify → consistency-check"),
         Skill("construction", "Construction-site/work supervision", listOf("construction", "site supervision", "construction supervisor"), "Observe → coordinate → follow work plan → report"),
