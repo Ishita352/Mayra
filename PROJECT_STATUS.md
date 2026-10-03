@@ -129,6 +129,8 @@ Windows agent → secure pairing → computer control → cross-device workflows
 - Alternatives: compare practical alternatives by departure time, arrival time, duration, number of changes, fare and available class/category without making the booking decision for the user.
 - Source policy: prefer official railway, transport-operator, airline, airport, port/ferry and government sources; use other public sources only when necessary and label them appropriately.
 - Booking boundary: Mayra may prepare the booking information and guide the user, but because of the permanent Financial Lock it must **not purchase tickets, enter/execute payment, use banking/UPI/wallet transactions, or enable paid services**. The user remains responsible for the final booking and payment.
+- Ticket history: when the user has legally authorized access to their own booking/account records or provides the relevant booking history, Mayra may **view, organize, search, summarize and analyze ticket purchase, cancellation, refund and travel history**. It may show dates, routes, service numbers, classes/categories, fares and status where the source provides them.
+- Ticket-history boundary: viewing/history analysis is read-only. Mayra must not buy, sell, cancel, modify, refund, transfer, reschedule or otherwise execute any ticket transaction, and must not enter/submit payment or financial credentials.
 - Cost policy: use free/public/official timetable and availability sources wherever technically possible; no paid travel-data subscription or API may be introduced.
 
 ## Cross-device source of truth
