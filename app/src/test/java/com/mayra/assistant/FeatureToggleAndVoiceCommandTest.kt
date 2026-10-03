@@ -11,6 +11,7 @@ class FeatureToggleAndVoiceCommandTest {
         assertTrue(FeatureToggleRegistry.defaultFor(FeatureToggleRegistry.VOICE_COMMAND))
         assertTrue(FeatureToggleRegistry.defaultFor(FeatureToggleRegistry.CAMERA))
         assertFalse(FeatureToggleRegistry.defaultFor(FeatureToggleRegistry.INCOMING_CALL_ASSISTANT))
+        assertTrue(FeatureToggleRegistry.defaultFor(FeatureToggleRegistry.SECURITY))
         assertFalse(FeatureToggleRegistry.defaultFor("unknown_key"))
     }
 
