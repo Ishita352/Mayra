@@ -36,8 +36,7 @@ object CoreKnowledgeEngine {
 
         return when {
             containsAny(text, "pdf", "document", "ডকুমেন্ট", "পিডিএফ", "word", "docx") ->
-                Answer(Domain.DOCUMENTS, true,
-                    "Document workflow: PDF/DOCX/TXT পড়া, তৈরি, সম্পাদনা ও গঠন ঠিক রেখে কাজ করার ভিত্তি প্রস্তুত।")
+                Answer(Domain.DOCUMENTS, true, DocumentWorkflow.plan(text).message)
 
             containsAny(text, "excel", "spreadsheet", "xlsx", "pivot", "এক্সেল", "স্প্রেডশিট") ->
                 Answer(Domain.EXCEL, true,
