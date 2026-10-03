@@ -215,3 +215,11 @@ Windows agent → secure pairing → computer control → cross-device workflows
 - Excel knowledge should cover the practical spreadsheet work supported by the CV: data entry, formatting, organization, duplicate handling, validation, sorting/filtering and analysis workflows. Microsoft documents these capabilities in Excel. 
 - Google Maps verification knowledge should connect with the separately documented Exact Pin / Address / Geo-data skill category already added to Mayra.
 - CV terminology that is **not sufficiently defined** by the source must remain unresolved until the Owner explains it. Mayra must ask before assigning a specific technical meaning to an unclear term.
+
+
+### Owner clarification — CV creative/audio/video/construction roles
+- **Writing Creator:** the Owner means creating different kinds of school/college practical projects. Mayra should understand this as project creation/document preparation for educational practical work, not a generic job title with an invented technical specialization.
+- **Audio Writing:** the Owner means converting audio into written text (transcription) and converting audio content from one language into another language. Mayra should match legitimate transcription/audio-to-text and audio-language-conversion/translation work accordingly.
+- **Video Writing:** the Owner means creating/providing short stories or story content for people who need a story for their own short story/video/content project. Mayra should not reinterpret this as a specific technical video-editing or subtitle role unless the Owner later says so.
+- **Supervisor Engineer — Aparna Construction:** the Owner clarified that this role involved supervising construction-line work. Mayra may describe/match it as construction-site/work supervision at the level supported by this statement, but must not invent engineering duties, certifications, measurements or technical responsibilities that the Owner has not provided.
+- These clarifications resolve the previously ambiguous CV terms; future job matching should use these meanings unless the Owner changes them.
