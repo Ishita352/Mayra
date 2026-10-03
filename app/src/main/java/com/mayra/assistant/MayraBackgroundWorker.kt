@@ -17,6 +17,10 @@ class MayraBackgroundWorker(
 
     override suspend fun doWork(): Result {
         val jobType = inputData.getString("job_type") ?: return Result.failure()
+        val prefs = applicationContext.getSharedPreferences("mayra_secure", Context.MODE_PRIVATE)
+        if (!prefs.getBoolean("owner_verified", false) || !prefs.getBoolean("master_on", true)) {
+            return Result.success()
+        }
 
         return when (jobType) {
             BackgroundSchedulerPolicy.JobType.JOB_WATCHER.name,
