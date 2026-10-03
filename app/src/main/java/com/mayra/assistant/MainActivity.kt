@@ -25,26 +25,27 @@ class MainActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        showOwnerLock()
+        if (prefs.getBoolean("owner_verified", false)) showAssistant() else showFirstOwnerVerification()
     }
 
-    private fun showOwnerLock() {
+    private fun showFirstOwnerVerification() {
         val layout = baseLayout()
         layout.addView(TextView(this).apply { text = "মায়রা"; textSize = 32f })
         layout.addView(TextView(this).apply {
-            text = "\nকোনো installation password বা date-based setup code নেই।\nOwner authentication-এর মাধ্যমে Mayra চালু হবে.\nOwner verify না হলে privileged কাজ বন্ধ থাকবে."
+            text = "\\nএটি একবারের Owner verification। Face/Fingerprint biometric দিয়ে Owner হিসেবে যাচাই করুন।\\n\\nPattern/PIN/Password fallback থাকবে না। সফল হলে পরবর্তীতে Mayra আর authentication চাইবে না."
             textSize = 17f
         })
-        layout.addView(Button(this).apply { text = "Owner Verify"; setOnClickListener { authenticateOwner() } })
+        layout.addView(Button(this).apply {
+            text = "Face / Fingerprint দিয়ে শুরু করুন"
+            setOnClickListener { authenticateOwnerOnce() }
+        })
         setContentView(layout)
     }
 
-    private fun authenticateOwner() {
+    private fun authenticateOwnerOnce() {
         val manager = BiometricManager.from(this)
-        if (manager.canAuthenticate(
-                BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL
-            ) != BiometricManager.BIOMETRIC_SUCCESS) {
-            Toast.makeText(this, "এই ডিভাইসে biometric/device authentication প্রস্তুত নেই.", Toast.LENGTH_LONG).show()
+        if (manager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) != BiometricManager.BIOMETRIC_SUCCESS) {
+            Toast.makeText(this, "এই ফোনে supported strong biometric (Face/Fingerprint) সেটআপ নেই। ফোনের biometric settings-এ এটি আগে চালু করুন.", Toast.LENGTH_LONG).show()
             return
         }
         val executor = ContextCompat.getMainExecutor(this)
@@ -54,17 +55,17 @@ class MainActivity : FragmentActivity() {
                 prefs.edit().putBoolean("owner_verified", true).apply()
                 startLockedVoiceMode()
                 showAssistant()
+                speakResponse("স্বাগতম বস। মায়রা প্রস্তুত আছে।")
             }
         })
         val info = BiometricPrompt.PromptInfo.Builder()
             .setTitle("Mayra Owner Verification")
-            .setSubtitle("Fingerprint/face/device credential দিয়ে Owner যাচাই করুন")
-            .setAllowedAuthenticators(
-                BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL
-            ).build()
+            .setSubtitle("Face অথবা Fingerprint দিয়ে একবার Owner যাচাই করুন")
+            .setNegativeButtonText("Cancel")
+            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+            .build()
         prompt.authenticate(info)
     }
-
     private fun startLockedVoiceMode() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), voiceRequestCode)
