@@ -23,7 +23,9 @@ object DocumentPdfReader {
             if (size > MAX_BYTES) return Result(false, message = "PDF 10 MB-এর বেশি; নিরাপত্তার জন্য Mayra এটি এখন পড়বে না।")
             PDFBoxResourceLoader.init(context.applicationContext)
             resolver.openInputStream(uri)?.use { input ->
-                PDDocument.load(input).use { document ->
+                val bounded = readBounded(input, MAX_BYTES)
+                    ?: return Result(false, message = "PDF 10 MB-এর বেশি; নিরাপত্তার জন্য Mayra এটি এখন পড়বে না।")
+                PDDocument.load(bounded.inputStream()).use { document ->
                     val pages = document.numberOfPages
                     if (pages > MAX_PAGES) {
                         return Result(false, pages = pages, message = "PDF-এ 500-এর বেশি page আছে; নিরাপত্তার জন্য Mayra এটি এখন সম্পূর্ণ read করবে না।")
@@ -41,6 +43,20 @@ object DocumentPdfReader {
         } catch (_: Exception) {
             Result(false, message = "PDF processing নিরাপদভাবে সম্পন্ন করা যায়নি।")
         }
+    }
+
+    private fun readBounded(input: java.io.InputStream, limit: Long): ByteArray? {
+        val out = java.io.ByteArrayOutputStream()
+        val buffer = ByteArray(8192)
+        var total = 0L
+        while (true) {
+            val count = input.read(buffer)
+            if (count < 0) break
+            total += count
+            if (total > limit) return null
+            out.write(buffer, 0, count)
+        }
+        return out.toByteArray()
     }
 
     fun preview(text: String): String =
