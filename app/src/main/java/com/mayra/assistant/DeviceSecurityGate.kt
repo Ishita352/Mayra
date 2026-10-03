@@ -20,6 +20,8 @@ object DeviceSecurityGate {
         }
     }
 
-    fun mayExecuteUserCommand(context: Context): Boolean =
-        !isDeviceLocked(context)
+    fun mayExecuteUserCommand(context: Context, prefs: android.content.SharedPreferences): Boolean {
+        if (!isDeviceLocked(context)) return true
+        return LockModePolicy.isEnabled(prefs)
+    }
 }
