@@ -27,6 +27,9 @@ class MayraBackgroundWorker(
             BackgroundSchedulerPolicy.JobType.LEARNING_REVIEW.name,
             BackgroundSchedulerPolicy.JobType.INTERVIEW_REVIEW.name -> ListenableWorker.Result.success()
 
+            BackgroundSchedulerPolicy.JobType.ONEFORMA_PROJECT_WATCH.name ->
+                runOneFormaWatchCycle()
+
             BackgroundSchedulerPolicy.JobType.GOVERNMENT_UPDATE_WATCH.name,
             BackgroundSchedulerPolicy.JobType.LOCAL_CIVIC_WATCH.name,
             BackgroundSchedulerPolicy.JobType.WEATHER_TRAVEL_WATCH.name ->
@@ -49,6 +52,20 @@ class MayraBackgroundWorker(
             workDataOf("background_task" to task.name, "status" to "ALLOWED_PENDING_TASK_ADAPTER")
         )
     }
+
+    private fun runOneFormaWatchCycle(): ListenableWorker.Result =
+        ListenableWorker.Result.success(
+            workDataOf(
+                "platform" to OneFormaPlatformKnowledge.PLATFORM_NAME,
+                "source_adapter" to "PENDING",
+                "project_rules_required" to OneFormaPlatformKnowledge.requiresProjectSpecificRuleCheckBeforeWork(),
+                "live_rules_override_baseline" to OneFormaPlatformKnowledge.liveProjectRulesOverrideBaseline(),
+                "unauthorized_automation_allowed" to OneFormaPlatformKnowledge.unauthorizedAutomationAllowed(),
+                "vpn_proxy_bypass_allowed" to OneFormaPlatformKnowledge.vpnOrProxyBypassAllowed(),
+                "owner_control_required" to OneFormaPlatformKnowledge.requiresOwnerControlForNdaAndIdentity(),
+                "execution_status" to "PUBLIC_PROJECT_READER_PENDING"
+            )
+        )
 
     private fun runInformationRefreshCycle(jobType: String): ListenableWorker.Result =
         ListenableWorker.Result.success(
