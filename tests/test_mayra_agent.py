@@ -30,9 +30,6 @@ class MayraAgentTests(unittest.TestCase):
             {"ok": False, "error": "This action is Windows-only"},
         )
 
-    def test_helper_payload_placeholder(self):
-        self.assertTrue(True)
-
     def _handle_payload(self, payload):
         server_side, client_side = socket.socketpair()
         try:
@@ -69,15 +66,15 @@ class MayraAgentTests(unittest.TestCase):
             False,
         )
         self.assertTrue(mayra_agent.owner_approve(code))
-        result = {"ok": bool(mayra_agent.approve_pairing(code)), "session_token": mayra_agent.approve_pairing(code)}
-        self.assertTrue(result["ok"])
-        self.assertTrue(result["session_token"])
+        token = mayra_agent.approve_pairing(code)
+        self.assertTrue(token)
         mayra_agent.revoke_session()
 
     def test_remote_arbitrary_command_is_rejected(self):
         code = mayra_agent.start_pairing()
         self.assertTrue(mayra_agent.owner_approve(code))
         token = mayra_agent.approve_pairing(code)
+        self.assertTrue(token)
         denied = mayra_agent.execute("RUN:whoami")
         self.assertFalse(denied["ok"])
         self.assertEqual(denied["error"], "Command not allowed")
