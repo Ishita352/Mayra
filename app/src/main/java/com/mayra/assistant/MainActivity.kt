@@ -5,6 +5,7 @@ import android.content.Intent
 import android.provider.OpenableColumns
 import android.app.KeyguardManager
 import android.net.Uri
+import android.provider.Settings
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
@@ -33,6 +34,7 @@ class MainActivity : FragmentActivity() {
     private var pendingDocxEditText: String? = null
     private var pendingPdfEditText: String? = null
     private var pendingDocxPdfText: String? = null
+    private var capturingWhatsAppReply = false
 
     private val documentPicker = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -336,6 +338,21 @@ class MainActivity : FragmentActivity() {
                 FeatureToggleRegistry.setEnabled(prefs, FeatureToggleRegistry.INCOMING_CALL_ASSISTANT, checked)
                 showVoiceResult(if (checked) "Incoming Call Assistant ON — Android-supported call workflow-এর জন্য প্রস্তুত।" else "Incoming Call Assistant OFF।")
             }
+        })
+        layout.addView(Button(this).apply {
+            text = "💬 WhatsApp Read & Voice Reply"
+            setOnClickListener {
+                try {
+                    startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"))
+                } catch (_: Exception) {
+                    startActivity(Intent(Settings.ACTION_SETTINGS))
+                }
+                showVoiceResult("Android Notification Access-এ Mayra-কে ON করুন। এরপর WhatsApp notification Mayra পড়ে শোনাবে এবং আপনার voice command দিয়ে reply পাঠাতে পারবে।")
+            }
+        })
+        layout.addView(Button(this).apply {
+            text = "🔎 Public WhatsApp / Telegram Info"
+            setOnClickListener { showPublicInfoLookup() }
         })
         layout.addView(Switch(this).apply {
             text = "🛡️ Safety / Security Control ON/OFF"
@@ -650,7 +667,14 @@ class MainActivity : FragmentActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == voiceRequestCode && resultCode == RESULT_OK) {
             val spoken = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()
-            if (!spoken.isNullOrBlank()) executeVoiceCommand(spoken)
+            if (!spoken.isNullOrBlank()) {
+                if (capturingWhatsAppReply) {
+                    capturingWhatsAppReply = false
+                    sendWhatsAppReply(spoken)
+                } else {
+                    executeVoiceCommand(spoken)
+                }
+            }
         }
     }
 
@@ -713,6 +737,13 @@ class MainActivity : FragmentActivity() {
                 speakResponse(msg)
                 return
             }
+            VoiceCommandResult.Action.REPLY_WHATSAPP -> {
+                capturingWhatsAppReply = true
+                showVoiceResult("WhatsApp reply-এর text বলুন।")
+                speakResponse("বস, কী reply পাঠাব?")
+                startVoiceCommand()
+                return
+            }
             VoiceCommandResult.Action.SET_INCOMING_CALL_ASSISTANT -> {
                 val lower = spoken.lowercase(Locale.ROOT)
                 val wantsOff = lower.contains("বন্ধ") || lower.contains("off") || lower.contains("disable") || lower.contains("बंद")
@@ -759,6 +790,50 @@ class MainActivity : FragmentActivity() {
         }
         showVoiceResult(result.response)
         speakResponse(result.response)
+    }
+
+    private fun sendWhatsAppReply(text: String) {
+        if (!prefs.getBoolean("master_on", true) || !prefs.getBoolean("owner_verified", false)) {
+            showVoiceResult("Mayra এখন reply পাঠানোর জন্য প্রস্তুত নয়.")
+            return
+        }
+        if (!FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.SECURITY)) {
+            showVoiceResult("Security Control OFF — WhatsApp reply blocked.")
+            return
+        }
+        val sent = MayraNotificationListenerService.replyFromOwnerCommand(this, text)
+        val msg = if (sent) "WhatsApp reply পাঠানো হয়েছে।" else "WhatsApp-এর reply action পাওয়া যায়নি। আগে WhatsApp notification access ON করুন এবং একটি reply-capable notification আসতে দিন।"
+        showVoiceResult(msg)
+        speakResponse(msg)
+    }
+
+    private fun showPublicInfoLookup() {
+        val layout = baseLayout()
+        layout.addView(TextView(this).apply { text = "🔎 Public Information Lookup"; textSize = 28f })
+        layout.addView(TextView(this).apply {
+            text = "\nMayra শুধু publicly available information খুঁজবে। Private identity, private address, live location বা hidden Telegram admin details বের করবে না."
+            textSize = 16f
+        })
+        val number = EditText(this).apply { hint = "WhatsApp number (country code সহ)" }
+        layout.addView(number)
+        layout.addView(Button(this).apply {
+            text = "Search public WhatsApp information"
+            setOnClickListener {
+                if (number.text.toString().isBlank()) showVoiceResult("WhatsApp number দিন।")
+                else MayraPublicInfoLookup.openWhatsAppNumberPublicSearch(this@MainActivity, number.text.toString())
+            }
+        })
+        val channel = EditText(this).apply { hint = "Telegram channel @name বা public name" }
+        layout.addView(channel)
+        layout.addView(Button(this).apply {
+            text = "Search public Telegram channel information"
+            setOnClickListener {
+                if (channel.text.toString().isBlank()) showVoiceResult("Telegram channel name দিন।")
+                else MayraPublicInfoLookup.openTelegramChannelPublicSearch(this@MainActivity, channel.text.toString())
+            }
+        })
+        layout.addView(Button(this).apply { text = "← Mayra Home"; setOnClickListener { showAssistant() } })
+        setContentView(ScrollView(this).apply { addView(layout) })
     }
 
     private fun showVoiceResult(message: String) {
