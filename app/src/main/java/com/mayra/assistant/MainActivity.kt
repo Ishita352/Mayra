@@ -189,6 +189,7 @@ class MainActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MayraMemoryStore.initialize(this)
         if (prefs.getBoolean("owner_verified", false)) restoreLastSession() else showFirstOwnerVerification()
     }
 
