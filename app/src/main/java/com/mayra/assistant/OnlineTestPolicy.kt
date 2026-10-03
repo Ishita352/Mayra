@@ -33,6 +33,17 @@ object OnlineTestPolicy {
         }
     }
 
+    fun requiresOwnerPermission(): Boolean = true
+
+    fun reminderMessage(testName: String): String =
+        "বস, কাজ পাওয়ার জন্য \"$testName\" টেস্টটি দিতে হবে। আপনার অনুমতি নিয়ে আপনার সঙ্গে থেকে Mayra টেস্টের প্রস্তুতি ও অনুমোদিত অংশে সাহায্য করবে।"
+
+    fun canProvideLiveAnswer(mode: Mode): Boolean =
+        mode == Mode.AUTHORIZED_ASSISTANCE
+
+    fun canReadAndExplainScreen(mode: Mode): Boolean =
+        mode != Mode.HUMAN_ONLY
+
     fun description(mode: Mode): String = when (mode) {
         Mode.PREPARATION ->
             "নিয়ম স্পষ্ট নয়। নিরাপদভাবে preparation/mock-test mode ব্যবহার করুন; live answer assistance চালু হবে না।"
