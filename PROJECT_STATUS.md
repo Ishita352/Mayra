@@ -92,7 +92,6 @@ Windows agent → secure pairing → computer control → cross-device workflows
 - No live-call translation feature for now.
 - No unnecessary anti-noise/voice-isolation feature unless reopened.
 
-
 ## New scope — Local Emergency, News & Government Services
 - Primary local service area: PIN **713405**
 - Emergency information coverage: the PIN area plus a configurable **50 km surrounding area**.
@@ -105,7 +104,6 @@ Windows agent → secure pairing → computer control → cross-device workflows
 - User-control policy: Mayra may monitor and organize public information automatically, but submission of applications, declarations, payments, identity verification or other legally significant actions must remain under the user's control.
 - Cost policy: use free/public/official resources only; no paid data service or subscription.
 
-
 ## New scope — Travel Planner & Destination Information
 - Trip planning: destination, travel date, duration and preferences can be used to prepare a trip briefing.
 - Weather briefing: current/forecast weather for the destination when reliable free/public data is available, with date/time clearly shown.
@@ -117,6 +115,21 @@ Windows agent → secure pairing → computer control → cross-device workflows
 - Satellite/map information: use publicly available map/satellite imagery for route, terrain and landmark context where legally and technically available; imagery is not treated as live surveillance and Mayra must not claim it can continuously capture or monitor people/vehicles.
 - Emergency access: destination briefings should include nearby emergency contacts/services when reliable information is available.
 - Cost policy: use free/public/official resources only; no paid map, weather or travel subscription.
+
+## New scope — Comprehensive Transport Schedule & Ticket Information
+- Transport modes: Mayra should prepare travel information for **trains, buses, flights/air travel and water/ship/ferry services** whenever reliable public or official data is available.
+- Search inputs: origin, destination, travel date, preferred departure/arrival time, passenger count and relevant preferences can be used to build the transport shortlist.
+- Departure details: show the exact departure station, bus terminal/pickup point, airport, port/jetty or other published boarding location; include arrival location and intermediate stops where available.
+- Timetable: show departure time, arrival time, duration, operating days, service/train/flight/bus number or name, and important connection/waiting times.
+- Ticket information: show current published fare/price, applicable taxes/fees when available, booking conditions, cancellation/refund rules and baggage/luggage rules where available.
+- Availability: for reservable services, show the latest available seat/ticket inventory by **class/category/quota/cabin** where the source exposes it (for example railway classes/quotas, bus seat categories, flight cabin classes, or ship/ferry seating/cabin categories).
+- Seat/cabin detail: when an official or reliable booking source exposes a seat map or remaining-seat count, Mayra should present it with the source timestamp; if exact inventory is unavailable, clearly say so instead of estimating.
+- Live-data rule: ticket availability, price, delays and cancellations can change quickly. Mayra must refresh/check the relevant official or reliable source close to the user's requested departure time and clearly show the information's date/time.
+- Advance preparation: when the user gives a future trip, Mayra may collect the published schedule, route, likely options, booking-window information and destination transport details ahead of time, then refresh dynamic fare/availability before the user acts.
+- Alternatives: compare practical alternatives by departure time, arrival time, duration, number of changes, fare and available class/category without making the booking decision for the user.
+- Source policy: prefer official railway, transport-operator, airline, airport, port/ferry and government sources; use other public sources only when necessary and label them appropriately.
+- Booking boundary: Mayra may prepare the booking information and guide the user, but because of the permanent Financial Lock it must **not purchase tickets, enter/execute payment, use banking/UPI/wallet transactions, or enable paid services**. The user remains responsible for the final booking and payment.
+- Cost policy: use free/public/official timetable and availability sources wherever technically possible; no paid travel-data subscription or API may be introduced.
 
 ## Cross-device source of truth
 This file and the GitHub repository are the durable project record for resuming work from mobile or computer. Future development should update this status when major milestones change.
