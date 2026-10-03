@@ -20,6 +20,7 @@ object CoreKnowledgeEngine {
         LEARNING,
         TEXTILE,
         SECURITY,
+        OWNER_SKILLS,
         GENERAL
     }
 
@@ -69,6 +70,10 @@ object CoreKnowledgeEngine {
             containsAny(text, "security", "cyber", "নিরাপত্তা", "সাইবার") ->
                 Answer(Domain.SECURITY, true,
                     "Security workflow: শুধু authorized target-এ configuration review, inventory, defensive checks ও logs; unauthorized access নয়।")
+
+            OwnerSkillKnowledge.findMatches(text).isNotEmpty() ->
+                Answer(Domain.OWNER_SKILLS, true,
+                    "Owner Skill workflow: matching CV skill → workflow → quality check → practice → legitimate job matching.")
 
             else -> Answer(Domain.GENERAL, false, help())
         }
