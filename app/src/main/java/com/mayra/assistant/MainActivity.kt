@@ -49,23 +49,32 @@ class MainActivity : FragmentActivity() {
         val name = contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
             ?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0) else null }
             ?: uri.lastPathSegment ?: "Selected document"
-        if (mimeType == "text/plain") {
-            val result = DocumentTextReader.read(contentResolver, uri)
-            if (result.success) {
-                showModule(
-                    "TXT Document Read",
-                    "ফাইল: $name\n\n" + result.message + "\n\n--- Preview ---\n" +
+        when (mimeType) {
+            "text/plain" -> {
+                val result = DocumentTextReader.read(contentResolver, uri)
+                if (result.success) {
+                    showModule("TXT Document Read", "ফাইল: $name\n\n" + result.message + "\n\n--- Preview ---\n" +
                         DocumentTextReader.preview(result.text) +
-                        "\n\nএই ধাপে file read-only ছিল; Mayra file-এর কোনো content পরিবর্তন করেনি।"
-                )
-            } else {
-                showVoiceResult(result.message)
+                        "\n\nএই ধাপে file read-only ছিল; Mayra file-এর কোনো content পরিবর্তন করেনি.")
+                } else showVoiceResult(result.message)
             }
-        } else {
-            showModule(
-                "Document Selected",
-                "ফাইল: $name\n\nMayra নিরাপদভাবে document-এর read permission পেয়েছে। PDF/DOCX parsing ও editing engine পরবর্তী ধাপে যুক্ত হবে; এই পর্যায়ে কোনো file content পরিবর্তন করা হয়নি।"
-            )
+            "application/pdf" -> {
+                val result = DocumentPdfReader.read(contentResolver, uri, this)
+                if (result.success) {
+                    showModule("PDF Document Read", "ফাইল: $name\n\n" + result.message + "\n\n--- Preview ---\n" +
+                        DocumentPdfReader.preview(result.text) +
+                        "\n\nএই ধাপে PDF read-only ছিল; original file পরিবর্তন করা হয়নি.")
+                } else showVoiceResult(result.message)
+            }
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> {
+                val result = DocumentDocxReader.read(contentResolver, uri)
+                if (result.success) {
+                    showModule("DOCX Document Read", "ফাইল: $name\n\n" + result.message + "\n\n--- Text Preview ---\n" +
+                        DocumentTextReader.preview(result.text) +
+                        "\n\nএই ধাপে DOCX read-only ছিল; original structure/file পরিবর্তন করা হয়নি.")
+                } else showVoiceResult(result.message)
+            }
+            else -> showVoiceResult("এই document type Mayra এখনো গ্রহণ করছে না।")
         }
     }
 
