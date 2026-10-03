@@ -131,7 +131,19 @@ Windows agent → secure pairing → computer control → cross-device workflows
 - Booking boundary: Mayra may prepare the booking information and guide the user, but because of the permanent Financial Lock it must **not purchase tickets, enter/execute payment, use banking/UPI/wallet transactions, or enable paid services**. The user remains responsible for the final booking and payment.
 - Ticket history: when the user has legally authorized access to their own booking/account records or provides the relevant booking history, Mayra may **view, organize, search, summarize and analyze ticket purchase, cancellation, refund and travel history**. It may show dates, routes, service numbers, classes/categories, fares and status where the source provides them.
 - Ticket-history boundary: viewing/history analysis is read-only. Mayra must not buy, sell, cancel, modify, refund, transfer, reschedule or otherwise execute any ticket transaction, and must not enter/submit payment or financial credentials.
-- Cost policy: use free/public/official timetable and availability sources wherever technically possible; no paid travel-data subscription or API may be introduced.
+
+## New scope — Accommodation & Food Price/Availability Research (Read-only)
+- Accommodation coverage: Mayra should research **hotels, guest houses, lodges, dharmashalas, yatri nivas and other publicly listed lawful places to stay** relevant to the trip.
+- Food coverage: Mayra should research nearby restaurants, food stalls/food services where reliable public information is available, meal options, approximate/current listed prices and opening hours where available.
+- Current-price check: for future trips, Mayra should check the latest publicly available price/rate information close to the travel date and clearly show the **source and timestamp/date** because prices can change.
+- Stay details: where available, show room type, occupancy, facilities, location, check-in/check-out time, published tariff, taxes/fees, cancellation policy and availability status.
+- Dharmashala details: where publicly listed, show location, contact/public information, accommodation type, published donation/tariff rules, facilities and availability information.
+- Food details: show cuisine/meal type, listed prices or price range, meal timing, distance from the planned route/stay and relevant dietary information when publicly available.
+- Trip-budget view: Mayra may prepare an estimated travel budget covering transport, stay, food and other publicly listed trip costs. Estimates must be clearly labelled as estimates and never presented as guaranteed prices.
+- Comparison: Mayra may organize alternatives by price, location, facilities, travel time and other factual attributes, without making a booking decision for the user.
+- Booking/cancellation lock: Mayra may **view and report** publicly available availability and pricing, but it must **never book, reserve, pay for, cancel, modify, refund, transfer or otherwise execute** hotel, dharmashala, restaurant, meal, lodging or other travel-service transactions.
+- User action: the user remains responsible for final reservation, cancellation and payment actions.
+- Cost policy: use free/public/official sources wherever technically possible; no paid booking-data subscription or API may be introduced.
 
 ## Cross-device source of truth
 This file and the GitHub repository are the durable project record for resuming work from mobile or computer. Future development should update this status when major milestones change.
