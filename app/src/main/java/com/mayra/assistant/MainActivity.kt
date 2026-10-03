@@ -96,14 +96,6 @@ class MainActivity : FragmentActivity() {
         prompt.authenticate(info)
     }
 
-    private fun startLockedVoiceMode() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), voiceRequestCode)
-            return
-        }
-        ContextCompat.startForegroundService(this, Intent(this, LockedVoiceService::class.java))
-    }
-
     private fun showAssistant() {
         val layout = baseLayout()
         layout.addView(TextView(this).apply { text = "মায়রা প্রস্তুত ✓"; textSize = 30f })
@@ -114,7 +106,6 @@ class MainActivity : FragmentActivity() {
             setOnCheckedChangeListener { _, checked ->
                 prefs.edit().putBoolean("master_on", checked).apply()
                 if (!checked) {
-                    stopService(Intent(this@MainActivity, LockedVoiceService::class.java))
                     showVoiceResult("Mayra Master OFF — সব কাজ ও background activity বন্ধ। কোনো memory বা saved progress মুছবে না।")
                 } else {
                     showVoiceResult("Mayra Master ON — saved state রেখে কাজ আবার চালু হয়েছে।")
