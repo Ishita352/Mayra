@@ -105,5 +105,18 @@ Windows agent → secure pairing → computer control → cross-device workflows
 - User-control policy: Mayra may monitor and organize public information automatically, but submission of applications, declarations, payments, identity verification or other legally significant actions must remain under the user's control.
 - Cost policy: use free/public/official resources only; no paid data service or subscription.
 
+
+## New scope — Travel Planner & Destination Information
+- Trip planning: destination, travel date, duration and preferences can be used to prepare a trip briefing.
+- Weather briefing: current/forecast weather for the destination when reliable free/public data is available, with date/time clearly shown.
+- Route guidance: compare practical routes, road conditions, closures, major hazards and travel-time information from available free/public sources.
+- Destination briefing: important temples/religious sites, accommodation options, dharmashalas where publicly listed, food options, fuel/rest stops and emergency services.
+- Pre-trip collection: Mayra may gather and organize relevant public information before the trip so the user can request it later.
+- Safety alerts: road closures, severe weather, accidents, public advisories, official traffic restrictions and other lawful safety information.
+- Police/traffic information: Mayra may report official/publicly available traffic advisories, checkpoints or enforcement notices when presented as safety/legal information, but it must not provide real-time or precise police-enforcement locations for the purpose of avoiding checks, fines or law enforcement.
+- Satellite/map information: use publicly available map/satellite imagery for route, terrain and landmark context where legally and technically available; imagery is not treated as live surveillance and Mayra must not claim it can continuously capture or monitor people/vehicles.
+- Emergency access: destination briefings should include nearby emergency contacts/services when reliable information is available.
+- Cost policy: use free/public/official resources only; no paid map, weather or travel subscription.
+
 ## Cross-device source of truth
 This file and the GitHub repository are the durable project record for resuming work from mobile or computer. Future development should update this status when major milestones change.
