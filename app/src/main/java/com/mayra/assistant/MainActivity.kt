@@ -113,6 +113,18 @@ class MainActivity : FragmentActivity() {
                 }
             }
         })
+        layout.addView(Switch(this).apply {
+            text = "🔐 Locked Phone Mode — লক অবস্থায় Mayra কাজ করতে পারবে"
+            isChecked = LockModePolicy.isEnabled(prefs)
+            setOnCheckedChangeListener { _, checked ->
+                LockModePolicy.setEnabled(prefs, checked)
+                if (checked) {
+                    showVoiceResult("Locked Phone Mode ON — ফোন locked থাকলেও অনুমোদিত Mayra কাজের জন্য প্রস্তুত থাকবে।")
+                } else {
+                    showVoiceResult("Locked Phone Mode OFF — ফোন locked থাকলে Mayra কাজ করবে না।")
+                }
+            }
+        })
         layout.addView(TextView(this).apply {
             text = "\nOwner: গোপাল বসাক\n\nআমি আপনার ব্যক্তিগত AI assistant-এর Android test build.\nআপনি আমাকে বাংলা, English বা हिन्दी-তে কমান্ড দিতে পারেন."
             textSize = 17f
@@ -120,7 +132,11 @@ class MainActivity : FragmentActivity() {
         layout.addView(Button(this).apply { text = "🎙️ Voice Command"; setOnClickListener { startVoiceCommand() } })
         layout.addView(Button(this).apply { text = "👑 Temporary Owner Mode (24h)"; setOnClickListener { authenticateTemporaryOwner() } })
         layout.addView(TextView(this).apply {
-            text = "\n🔒 Locked Phone Safety: ON\nফোন locked থাকলে Mayra কোনো কাজ, voice command বা background task চালাবে না। ফোন unlock করার পরেই Mayra কাজ করতে পারবে।"
+            text = if (LockModePolicy.isEnabled(prefs)) {
+                "\n🔐 Locked Phone Mode: ON\nআপনার অনুমতি অনুযায়ী ফোন locked থাকলেও Mayra-এর অনুমোদিত কাজ চালানোর mode সক্রিয়।"
+            } else {
+                "\n🔒 Locked Phone Mode: OFF\nফোন locked থাকলে Mayra কাজ করবে না। কাজের জন্য ফোন unlock করতে হবে।"
+            }
             textSize = 15f
         })
         layout.addView(TextView(this).apply {
@@ -270,8 +286,12 @@ class MainActivity : FragmentActivity() {
         }
         // Defense-in-depth: re-check the physical device lock immediately before execution.
         // Voice results can return after the phone transitions between locked/unlocked states.
-        if (!DeviceSecurityGate.mayExecuteUserCommand(this)) {
-            showVoiceResult("ফোন locked — Mayra কোনো command চালাবে না। আগে ফোন unlock করুন।")
+        if (!DeviceSecurityGate.mayExecuteUserCommand(this, prefs)) {
+            showVoiceResult(if (LockModePolicy.isEnabled(prefs)) {
+                "ফোন locked — Locked Phone Mode চালু আছে, কিন্তু এই voice command-এর নিরাপদ locked-device execution path এখনো সম্পূর্ণভাবে সক্রিয় নয়।"
+            } else {
+                "ফোন locked — Mayra কোনো command চালাবে না। আগে ফোন unlock করুন।"
+            })
             return
         }
         if (isFinishing) return
