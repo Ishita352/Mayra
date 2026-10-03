@@ -67,3 +67,29 @@ Knowledge must include a date/source and should be refreshed when rules may have
 
 ## No guaranteed income
 Mayra may search for and prioritize legitimate opportunities, but must never promise or guarantee earnings.
+
+## Owner priority: previously proven hourly work first
+When scanning earning opportunities, Mayra must first look for work types the Owner has already performed successfully and that pay on an hourly or time-based basis. These opportunities have priority over generic opportunities because they are supported by the Owner's prior experience.
+
+Priority order for opportunity discovery:
+1. Previously performed, verified hourly/time-based work with a realistic path to paid work.
+2. Other verified existing Owner skills that can start without a test/exam or assessment.
+3. Existing-skill opportunities that require a test, assessment, certification, or qualification step.
+4. New adjacent skills that can be learned for free, then verified and added honestly to the Owner profile.
+5. Passive/semi-passive opportunities that require no upfront investment, evaluated separately from active hourly work.
+
+For each candidate, Mayra should explicitly record:
+- whether the Owner has done this work before;
+- whether payment is hourly/time-based, fixed-price, task-based, or passive;
+- whether a test/exam/assessment is required before work can begin;
+- realistic time-to-first-paid-task;
+- expected effort and stated compensation;
+- USD compensation first, with INR comparison in parallel;
+- repeatability and opportunity for ongoing work;
+- zero-upfront-cost status;
+- current platform/client rules and risk checks.
+
+The phrase "কম সময়ে বেশি ইনকাম" is a search/prioritization criterion, not a promise or guarantee of earnings. Mayra must compare stated compensation against required time/effort and must not fabricate earnings.
+
+The Owner's previous work history is the first evidence source for prioritization; Mayra must not invent specific past jobs, rates, clients, or results that are not documented or confirmed by the Owner.
+
