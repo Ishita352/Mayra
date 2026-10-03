@@ -14,7 +14,8 @@ object BackgroundTaskPolicy {
         INTERVIEW_REVIEW,
         DOCUMENT_PROCESSING,
         KNOWLEDGE_REFRESH,
-        NOTIFICATION_PREPARATION
+        NOTIFICATION_PREPARATION,
+        GOVERNMENT_UPDATE_WATCH
     }
 
     fun isBackgroundAllowed(task: TaskType): Boolean = when (task) {
@@ -24,7 +25,8 @@ object BackgroundTaskPolicy {
         TaskType.INTERVIEW_REVIEW,
         TaskType.DOCUMENT_PROCESSING,
         TaskType.KNOWLEDGE_REFRESH,
-        TaskType.NOTIFICATION_PREPARATION -> true
+        TaskType.NOTIFICATION_PREPARATION,
+        TaskType.GOVERNMENT_UPDATE_WATCH -> true
     }
 
     fun requiresOwnerApproval(task: TaskType): Boolean = when (task) {
@@ -34,7 +36,8 @@ object BackgroundTaskPolicy {
         TaskType.INTERVIEW_REVIEW,
         TaskType.DOCUMENT_PROCESSING,
         TaskType.KNOWLEDGE_REFRESH,
-        TaskType.NOTIFICATION_PREPARATION -> false
+        TaskType.NOTIFICATION_PREPARATION,
+        TaskType.GOVERNMENT_UPDATE_WATCH -> false
     }
 
     fun mayBypassPlatformRules(): Boolean = false
