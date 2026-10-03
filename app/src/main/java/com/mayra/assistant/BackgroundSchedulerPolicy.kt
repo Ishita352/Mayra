@@ -21,8 +21,8 @@ object BackgroundSchedulerPolicy {
             schedule.ownerVisible
 
     fun defaultSchedules(): List<Schedule> = listOf(
-        Schedule(JobType.JOB_WATCHER, 6, true, true),
-        Schedule(JobType.INCOME_WATCHER, 6, true, true),
+        Schedule(JobType.JOB_WATCHER, 12, true, true),
+        Schedule(JobType.INCOME_WATCHER, 12, true, true),
         Schedule(JobType.LEARNING_REVIEW, 24, true, true),
         Schedule(JobType.INTERVIEW_REMINDER, 24, false, true)
     )
