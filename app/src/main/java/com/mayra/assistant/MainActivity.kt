@@ -142,12 +142,12 @@ class MainActivity : FragmentActivity() {
             }
         })
         layout.addView(Switch(this).apply {
-            text = "🔐 Locked Phone Mode — লক অবস্থায় Mayra কাজ করতে পারবে"
+            text = "🔐 Locked Phone Mode — ভবিষ্যৎ locked-device execution"
             isChecked = LockModePolicy.isEnabled(prefs)
             setOnCheckedChangeListener { _, checked ->
                 LockModePolicy.setEnabled(prefs, checked)
                 if (checked) {
-                    showVoiceResult("Locked Phone Mode ON — ফোন locked থাকলেও অনুমোদিত Mayra কাজের জন্য প্রস্তুত থাকবে।")
+                    showVoiceResult("Locked Phone Mode ON — setting সংরক্ষিত। নিরাপদ locked-device execution path এখনো চালু নয়; ফোন locked থাকলে Mayra command চালাবে না।")
                 } else {
                     showVoiceResult("Locked Phone Mode OFF — ফোন locked থাকলে Mayra কাজ করবে না।")
                 }
