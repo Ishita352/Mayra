@@ -11,14 +11,12 @@ object DocumentTxtToPdfConverter {
 
     data class Result(val success: Boolean, val message: String)
 
-    fun convert(resolver: ContentResolver, sourceUri: Uri, text: String): Result {
+    fun write(resolver: ContentResolver, outputUri: Uri, text: String): Result {
         val bytes = text.toByteArray(StandardCharsets.UTF_8)
         if (bytes.size.toLong() > MAX_TEXT_BYTES) {
             return Result(false, "TXT input 5 MB-এর বেশি; PDF conversion করা হয়নি।")
         }
         return try {
-            val outputUri = createSiblingPdf(resolver, sourceUri)
-                ?: return Result(false, "PDF output file তৈরি করার জন্য writable document location পাওয়া যায়নি।")
             val document = PdfDocument()
             try {
                 val pageWidth = 595
@@ -26,10 +24,7 @@ object DocumentTxtToPdfConverter {
                 val margin = 40f
                 val lineHeight = 18f
                 val linesPerPage = ((pageHeight - margin * 2) / lineHeight).toInt().coerceAtLeast(1)
-                val lines = text.replace("
-", "
-").split("
-")
+                val lines = text.replace("\r\n", "\n").split("\n")
                 var index = 0
                 var pageNumber = 1
                 while (index < lines.size || (lines.isEmpty() && pageNumber == 1)) {
@@ -60,17 +55,5 @@ object DocumentTxtToPdfConverter {
         } catch (_: SecurityException) {
             Result(false, "PDF output write permission পাওয়া যায়নি।")
         }
-    }
-
-    private fun createSiblingPdf(resolver: ContentResolver, sourceUri: Uri): Uri? {
-        val parent = sourceUri.toString()
-        if (parent.startsWith("content://")) {
-            val documents = android.provider.DocumentsContract.buildChildDocumentsUriUsingTree(
-                sourceUri,
-                android.provider.DocumentsContract.getTreeDocumentId(sourceUri)
-            )
-            return documents
-        }
-        return null
     }
 }
