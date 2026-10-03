@@ -36,5 +36,23 @@ class MayraBackgroundWorker(
         // do not invent opportunities or claim that a live scan occurred.
         return Result.success()
     }
+
+    private fun notifyPublicChange(
+        title: String,
+        message: String,
+        important: Boolean,
+        notificationId: Int
+    ) {
+        MayraNotificationCenter.notifyOwner(
+            applicationContext,
+            NotificationSchedulePolicy.Event(
+                type = NotificationSchedulePolicy.EventType.GENERAL,
+                title = title,
+                message = message,
+                important = important
+            ),
+            notificationId
+        )
+    }
 }
 
