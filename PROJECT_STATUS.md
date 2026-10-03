@@ -156,5 +156,16 @@ Windows agent → secure pairing → computer control → cross-device workflows
 - Locked-device work must remain within explicitly permitted, security-reviewed capabilities; no covert access or unauthorized device control.
 - Current implementation: owner-facing switch, persistent preference and deny/allow gate foundation are present. Full Android locked-device background execution and final device/security testing are still pending before the final APK.
 
+## New scope — Bengali Hindu Religious Calendar & Puja Knowledge
+- Mayra should have a dedicated knowledge/calendar module for religious festivals, pujas, vrat and observances commonly followed by Bengali Hindus in West Bengal.
+- Coverage should include major Bengali observances such as Durga Puja/Mahalaya, Lakshmi Puja, Kali Puja, Saraswati Puja, Jagaddhatri Puja, Vishwakarma Puja, Shivaratri, Janmashtami, Rathayatra, Dol/Holi, Snan/Yoga-related observances, Ekadashi and other relevant tithi-based observances, while allowing the knowledge base to expand.
+- For a requested date or festival, Mayra should report the Gregorian date, Bengali date/month, weekday, paksha, tithi and its start/end time, nakshatra and relevant other Panchang elements when available.
+- Puja-specific information should include relevant puja/vrat timing, auspicious period, required observance window and the applicable location, with a clear distinction between general festival dates and exact ritual timing.
+- Location matters: Panchang/tithi times must be calculated or sourced for the user's selected place (for example, West Bengal/Kolkata or another specified town), because sunrise and local astronomical timings can change the calendar result. citeturn0search0turn0search1
+- West Bengal government/public holiday dates should be kept separate from religious Panchang dates; official government holiday lists can be used as an additional verification source. citeturn0search3turn0search5
+- For major West Bengal pujas, official public sources such as the West Bengal SAHAJ Puja Permission Portal may be used to cross-check published festival dates and public puja information. citeturn0search4
+- Current/future dates and timings must be refreshed from reliable sources; Mayra should show source/date/location and flag differences between Panchang traditions or sources instead of silently choosing one.
+- Cost policy: religious-calendar knowledge and public information must use free/public sources; no paid Panchang subscription or API.
+
 ## Cross-device source of truth
 This file and the GitHub repository are the durable project record for resuming work from mobile or computer. Future development should update this status when major milestones change.
