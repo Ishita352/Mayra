@@ -36,9 +36,13 @@ class MayraBackgroundWorker(
             BackgroundSchedulerPolicy.JobType.LEARNING_REVIEW.name,
             BackgroundSchedulerPolicy.JobType.INTERVIEW_REVIEW.name -> ListenableWorker.Result.success()
 
+            BackgroundSchedulerPolicy.JobType.GOVERNMENT_UPDATE_WATCH.name,
+            BackgroundSchedulerPolicy.JobType.LOCAL_CIVIC_WATCH.name -> runInformationRefreshCycle(jobType)
+
             BackgroundTaskPolicy.TaskType.DOCUMENT_PROCESSING.name,
             BackgroundTaskPolicy.TaskType.KNOWLEDGE_REFRESH.name,
-            BackgroundTaskPolicy.TaskType.NOTIFICATION_PREPARATION.name -> runApprovedBackgroundTask(jobType)
+            BackgroundTaskPolicy.TaskType.NOTIFICATION_PREPARATION.name,
+            BackgroundTaskPolicy.TaskType.GOVERNMENT_UPDATE_WATCH.name -> runApprovedBackgroundTask(jobType)
 
             else -> ListenableWorker.Result.failure()
         }
@@ -78,6 +82,17 @@ class MayraBackgroundWorker(
             )
         )
     }
+
+    private fun runInformationRefreshCycle(jobType: String): ListenableWorker.Result =
+        ListenableWorker.Result.success(
+            workDataOf(
+                "information_refresh" to jobType,
+                "live_source_adapter" to "PENDING",
+                "verified_source_required" to true,
+                "invented_results_allowed" to false,
+                "owner_notification_allowed" to true
+            )
+        )
 
     private fun runIncomeBackgroundCycle(): ListenableWorker.Result {
         val policy = IncomeBackgroundEnginePolicy
