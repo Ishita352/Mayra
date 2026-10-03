@@ -272,7 +272,7 @@ class MainActivity : FragmentActivity() {
     }
     private fun restoreLastSession() {
         if (!prefs.getBoolean("master_on", true)) {
-            showAssistant()
+            showAssistant(saveSession = false)
             return
         }
         if (sessionState.hasResumeState()) {
@@ -285,7 +285,8 @@ class MainActivity : FragmentActivity() {
         }
     }
 
-    private fun showAssistant() {
+    private fun showAssistant(saveSession: Boolean = true) {
+        if (saveSession) sessionState.saveHome()
         sessionState.saveHome()
 
         MayraNotificationCenter.ensureChannel(this)
