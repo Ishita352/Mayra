@@ -1,11 +1,12 @@
 package com.mayra.assistant
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
-import android.app.NotificationChannel
-import android.app.NotificationManager
 
 /**
  * Restores Mayra's persisted state after device boot.
@@ -13,8 +14,7 @@ import android.app.NotificationManager
  * Android 14+ does not allow a microphone foreground service to be launched
  * directly from BOOT_COMPLETED, so the receiver restores the Master/Voice
  * preference and posts a notification asking the owner to tap Mayra to resume
- * background microphone listening. On older Android versions, the service may
- * be resumed automatically when the required permissions are already granted.
+ * background microphone listening.
  */
 class MayraBootReceiver : BroadcastReceiver() {
     companion object {
@@ -25,7 +25,8 @@ class MayraBootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
         if (intent?.action != Intent.ACTION_BOOT_COMPLETED &&
             intent?.action != Intent.ACTION_LOCKED_BOOT_COMPLETED &&
-            intent?.action != Intent.ACTION_MY_PACKAGE_REPLACED) return
+            intent?.action != Intent.ACTION_MY_PACKAGE_REPLACED
+        ) return
 
         val prefs = context.getSharedPreferences("mayra_secure", Context.MODE_PRIVATE)
         if (!prefs.getBoolean("setup_complete", false)) return
@@ -37,8 +38,6 @@ class MayraBootReceiver : BroadcastReceiver() {
 
         if (!masterOn) return
 
-        // Android 14+ blocks microphone FGS startup from BOOT_COMPLETED.
-        // The notification gives the owner a user-visible action to resume it.
         val manager = context.getSystemService(NotificationManager::class.java)
         if (android.os.Build.VERSION.SDK_INT >= 26) {
             manager.createNotificationChannel(
@@ -50,11 +49,14 @@ class MayraBootReceiver : BroadcastReceiver() {
             )
         }
 
-        val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+        val launchIntent =
+            context.packageManager.getLaunchIntentForPackage(context.packageName)
         val pendingIntent = launchIntent?.let {
-            androidx.core.app.PendingIntentCompat.getActivity(
-                context, 9402, it,
-                androidx.core.app.PendingIntentCompat.FLAG_IMMUTABLE
+            PendingIntent.getActivity(
+                context,
+                NOTIFICATION_ID,
+                it,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         }
 
@@ -69,7 +71,9 @@ class MayraBootReceiver : BroadcastReceiver() {
             .setContentTitle("Mayra প্রস্তুত")
             .setContentText(text)
             .setAutoCancel(true)
-            .apply { if (pendingIntent != null) setContentIntent(pendingIntent) }
+            .apply {
+                if (pendingIntent != null) setContentIntent(pendingIntent)
+            }
             .build()
 
         manager.notify(NOTIFICATION_ID, notification)
