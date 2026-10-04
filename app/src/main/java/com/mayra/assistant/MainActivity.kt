@@ -505,6 +505,7 @@ class MainActivity : FragmentActivity() {
         layout.addView(sectionButton("📚 Note Selling Income Research") { showNoteIncomeWorkflow() })
         layout.addView(sectionButton("🎤 Interview Assistant") { showInterviewAssistant() })
         layout.addView(sectionButton("🧠 Self-Learning + Knowledge Base") { showLearningEngine() })
+        layout.addView(sectionButton("📈 E-commerce + Stock + Crypto Intelligence") { showIncomeMarketIntelligence() })
         layout.addView(sectionButton("💰 Active + Passive Income Watcher") {
             showModule("Income Engine", IncomeOpportunityPolicy.summary())
         })
@@ -568,7 +569,20 @@ class MainActivity : FragmentActivity() {
         setContentView(ScrollView(this).apply { addView(layout) })
     }
 
-    private fun showNoteIncomeWorkflow() {\n        val text = "Mayra can prepare a research brief for a selected study-material marketplace.\n\n" +\n            "It can organize subject, level, requirements, original-note structure and a final review checklist.\n\n" +\n            MayraNoteIncomeWorkflow.ownerUploadRule()\n        showModule("Study Material Research", text)\n    }\n\n    private fun showGovernmentJobs() {\n        val guide = MayraGovernmentJobIntelligence.prepareApplicationGuide(\n            MayraGovernmentJobIntelligence.Job(\n                "Government Job Research", "West Bengal + Central Government",\n                MayraGovernmentJobIntelligence.Scope.BOTH, "https://www.india.gov.in/",\n                eligibility = "Check latest official notification", syllabus = "Latest official syllabus"\n            )\n        )\n        showModule("🏛️ Government Jobs",\n            MayraGovernmentJobIntelligence.supportedCoverage() + "\\n\\n" +\n            "Application checklist:\\n• " + guide.formSteps.joinToString("\\n• ") + "\\n\\n" +\n            "Documents:\\n• " + guide.documentChecklist.joinToString("\\n• ") + "\\n\\n" +\n            MayraGovernmentJobIntelligence.safetyRule())\n    }\n\n    private fun showIncomeWorkflow() {
+    private fun showNoteIncomeWorkflow() {\n        val text = "Mayra can prepare a research brief for a selected study-material marketplace.\n\n" +\n            "It can organize subject, level, requirements, original-note structure and a final review checklist.\n\n" +\n            MayraNoteIncomeWorkflow.ownerUploadRule()\n        showModule("Study Material Research", text)\n    }\n\n    private fun showGovernmentJobs() {\n        val guide = MayraGovernmentJobIntelligence.prepareApplicationGuide(\n            MayraGovernmentJobIntelligence.Job(\n                "Government Job Research", "West Bengal + Central Government",\n                MayraGovernmentJobIntelligence.Scope.BOTH, "https://www.india.gov.in/",\n                eligibility = "Check latest official notification", syllabus = "Latest official syllabus"\n            )\n        )\n        showModule("🏛️ Government Jobs",\n            MayraGovernmentJobIntelligence.supportedCoverage() + "\\n\\n" +\n            "Application checklist:\\n• " + guide.formSteps.joinToString("\\n• ") + "\\n\\n" +\n            "Documents:\\n• " + guide.documentChecklist.joinToString("\\n• ") + "\\n\\n" +\n            MayraGovernmentJobIntelligence.safetyRule())\n    }\n\n    private fun showIncomeMarketIntelligence() {
+        val stock = MayraIncomeMarketIntelligence.plan(MayraIncomeMarketIntelligence.Area.STOCK_MARKET)
+        val crypto = MayraIncomeMarketIntelligence.plan(MayraIncomeMarketIntelligence.Area.CRYPTOCURRENCY)
+        val ecommerce = MayraIncomeMarketIntelligence.plan(MayraIncomeMarketIntelligence.Area.ECOMMERCE)
+        showModule("📈 Income + Market Intelligence",
+            "Income priority: USD/foreign-currency first; INR second.\\n\\n" +
+            "E-commerce / Online Selling:\\n• " + ecommerce.learningTopics.joinToString("\\n• ") +
+            "\\n\\nStock Market:\\n• " + stock.learningTopics.joinToString("\\n• ") +
+            "\\n\\nCrypto:\\n• " + crypto.learningTopics.joinToString("\\n• ") +
+            "\\n\\n" + MayraIncomeMarketIntelligence.updateRule() +
+            "\\n\\n" + MayraIncomeMarketIntelligence.safetyRule())
+    }
+
+    private fun showIncomeWorkflow() {
         val sample = listOf(
             MayraIncomeWorkflow.Opportunity("job-1","Android Developer freelance","Owner research",MayraIncomeWorkflow.Type.FREELANCE,true),
             MayraIncomeWorkflow.Opportunity("job-2","General online task","Unknown platform",MayraIncomeWorkflow.Type.ACTIVE_INCOME,false)
