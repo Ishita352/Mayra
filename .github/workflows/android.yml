@@ -31,6 +31,18 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Verify Android project structure
+        shell: bash
+        run: |
+          test -f settings.gradle.kts
+          test -f build.gradle.kts
+          test -f app/build.gradle.kts
+          test -f app/src/main/AndroidManifest.xml
+          grep -q 'namespace = "com.mayra.assistant"' app/build.gradle.kts
+          grep -q 'applicationId = "com.mayra.assistant"' app/build.gradle.kts
+          grep -q 'rootProject.name = "Mayra"' settings.gradle.kts
+          grep -q 'include(":app")' settings.gradle.kts
+
       - name: Run Android unit tests
         run: gradle test --no-daemon
 
