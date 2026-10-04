@@ -53,7 +53,8 @@ object MayraVoiceEngine {
             .getString(PREF_SELECTED_VOICE, "female_01") ?: "female_01"
 
     fun select(context: Context, profileId: String): Boolean {
-        if (profiles.none { it.id == profileId }) return false
+        val profile = profiles.firstOrNull { it.id == profileId } ?: return false
+        if (profile.isGopalMatch && !MayraGopalVoiceMatch.isReady(context)) return false
         context.getSharedPreferences("mayra_secure", Context.MODE_PRIVATE)
             .edit().putString(PREF_SELECTED_VOICE, profileId).apply()
         return true
@@ -112,7 +113,12 @@ object MayraVoiceEngine {
         pitchMultiplier: Float = 1.0f
     ) {
         val prefs = context.getSharedPreferences("mayra_secure", Context.MODE_PRIVATE)
-        val selected = profiles.firstOrNull { it.id == selectedId(context) } ?: profiles.first()
+        val storedSelected = profiles.firstOrNull { it.id == selectedId(context) }
+        val selected = if (storedSelected?.isGopalMatch == true && !MayraGopalVoiceMatch.isReady(context)) {
+            profiles.first()
+        } else {
+            storedSelected ?: profiles.first()
+        }
         val locale = when {
             text.contains(Regex("[\\u0980-\\u09FF]")) -> Locale("bn", "IN")
             text.contains(Regex("[\\u0900-\\u097F]")) -> Locale("hi", "IN")
