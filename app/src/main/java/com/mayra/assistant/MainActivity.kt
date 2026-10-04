@@ -860,6 +860,10 @@ class MainActivity : FragmentActivity() {
                 lowerSpoken.contains("computer") && (lowerSpoken.contains("display") || lowerSpoken.contains("ডিসপ্লে")) -> "OPEN_DISPLAY_SETTINGS"
                 lowerSpoken.contains("computer") && (lowerSpoken.contains("sound") || lowerSpoken.contains("সাউন্ড")) -> "OPEN_SOUND_SETTINGS"
                 lowerSpoken.contains("computer") && (lowerSpoken.contains("status") || lowerSpoken.contains("অবস্থা") || lowerSpoken.contains("স্ট্যাটাস")) -> "GET_PC_STATUS"
+                lowerSpoken.contains("computer") && (lowerSpoken.contains("browser") || lowerSpoken.contains("ব্রাউজার") || lowerSpoken.contains("ब्राउज़र")) -> "OPEN_BROWSER"
+                lowerSpoken.contains("computer") && (lowerSpoken.contains("play") || lowerSpoken.contains("pause") || lowerSpoken.contains("প্লে") || lowerSpoken.contains("পজ") || lowerSpoken.contains("चलाओ") || lowerSpoken.contains("रुको")) -> "MEDIA_PLAY_PAUSE"
+                lowerSpoken.contains("computer") && (lowerSpoken.contains("next") || lowerSpoken.contains("পরের গান") || lowerSpoken.contains("अगला")) -> "MEDIA_NEXT"
+                lowerSpoken.contains("computer") && (lowerSpoken.contains("previous") || lowerSpoken.contains("আগের গান") || lowerSpoken.contains("पिछला")) -> "MEDIA_PREVIOUS"
                 else -> null
             }
             if (windowsCommand != null) {
