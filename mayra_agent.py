@@ -145,7 +145,7 @@ def owner_approve(code):
 
 
 def approve_pairing(code):
-    global _session_token, _pairing_code
+    global _session_token, _pairing_code, _owner_approved_code
     with _state_lock:
         if _pairing_code is None or time.time() >= _pairing_expires:
             return None
