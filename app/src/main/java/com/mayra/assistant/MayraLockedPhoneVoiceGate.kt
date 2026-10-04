@@ -9,6 +9,7 @@ object MayraLockedPhoneVoiceGate {
     fun decide(
         prefs: SharedPreferences,
         ownerVerified: Boolean,
+        ownerCommandAuthorized: Boolean = ownerVerified,
         masterOn: Boolean,
         locked: Boolean,
         task: String
@@ -16,7 +17,7 @@ object MayraLockedPhoneVoiceGate {
         if (!masterOn || task.isBlank()) return Decision.BLOCK
         if (!locked) return Decision.ALLOW_LIMITED_VOICE
         if (!LockModePolicy.isEnabled(prefs)) return Decision.BLOCK
-        if (!ownerVerified) return Decision.OWNER_VERIFICATION_REQUIRED
+        if (!ownerVerified || !ownerCommandAuthorized) return Decision.OWNER_VERIFICATION_REQUIRED
 
         val t = task.lowercase()
         val sensitiveTerms = listOf(
