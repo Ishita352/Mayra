@@ -1,21 +1,25 @@
 package com.mayra.assistant
 
-import android.content.SharedPreferences
 import org.junit.Assert.*
 import org.junit.Test
 
 class MayraMoodSystemTest {
     @Test fun allRequestedMoodsExist() {
-        assertTrue(MayraMoodSystem.all().size >= 10)
-        assertNotNull(MayraMoodSystem.Mood.FUN)
-        assertNotNull(MayraMoodSystem.Mood.FRIENDLY)
-        assertNotNull(MayraMoodSystem.Mood.CALM)
+        assertEquals(10, MayraMoodSystem.all().size)
+        assertNotNull(MayraMoodSystem.Mood.NOTTY_GIRL)
+        assertNotNull(MayraMoodSystem.Mood.PROFESSIONAL)
     }
 
-    @Test fun voiceCommandsSelectMoods() {
+    @Test fun voiceCommandsSelectRequestedMoods() {
         assertEquals(MayraMoodSystem.Mood.FUN, MayraMoodSystem.commandMood("মায়রা ফান মোড চালু করো"))
+        assertEquals(MayraMoodSystem.Mood.SWEET, MayraMoodSystem.commandMood("Mayra sweet mood"))
+        assertEquals(MayraMoodSystem.Mood.NOTTY_GIRL, MayraMoodSystem.commandMood("নটি গার্ল মোড"))
         assertEquals(MayraMoodSystem.Mood.PROFESSIONAL, MayraMoodSystem.commandMood("Mayra professional mood"))
-        assertEquals(MayraMoodSystem.Mood.TEACHER, MayraMoodSystem.commandMood("মায়রা টিচার মোড"))
+    }
+
+    @Test fun everyMoodHasDistinctBodyReaction() {
+        val reactions = MayraMoodSystem.all().map { it.bodyReaction }.toSet()
+        assertEquals(10, reactions.size)
     }
 
     @Test fun moodDoesNotChangeSecurityPolicy() {
