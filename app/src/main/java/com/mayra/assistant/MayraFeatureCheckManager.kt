@@ -26,7 +26,7 @@ class MayraFeatureCheckManager(private val context: Context) {
         const val VOICE_LIGHT = "voice_light"
         const val LOCKED = "locked_phone"
         const val SILENT = "silent_mode"
-        const val COMPUTER = "computer_pairing"
+        const val COMPUTER = "computer_pairing"\n        const val QUICK_LINK = "quick_owner_link"
         const val BIODATA = "biodata_career"
         const val JOBS = "job_watcher"
         const val EXCEL = "excel_data"
@@ -45,7 +45,7 @@ class MayraFeatureCheckManager(private val context: Context) {
             FeatureSpec(VOICE_LIGHT, "Voice Light", "Speaking/ambient light indicator."),
             FeatureSpec(LOCKED, "Locked Phone Mode", "Optional listening while phone is locked."),
             FeatureSpec(SILENT, "Silent Mode Behavior", "Listen without speaking when phone is silent."),
-            FeatureSpec(COMPUTER, "Windows 10 Pairing", "Phone to computer pairing architecture."),
+            FeatureSpec(COMPUTER, "Windows 10 Pairing", "Phone to computer pairing architecture."),\n            FeatureSpec(QUICK_LINK, "Quick Owner Link", "One-time code based automatic Windows connection.")
             FeatureSpec(BIODATA, "Biodata & Career", "Career profile and CV foundation."),
             FeatureSpec(JOBS, "Job Watcher", "Job/freelance watcher foundation."),
             FeatureSpec(EXCEL, "Excel / Data Analysis", "Spreadsheet analysis foundation."),
@@ -104,7 +104,7 @@ class MayraFeatureCheckManager(private val context: Context) {
             VOICE_LIGHT -> CheckResult(true, "Voice Light state and animation hooks are available.")
             LOCKED -> CheckResult(context.getSystemService(KeyguardManager::class.java) != null, "Locked-phone state can be detected.")
             SILENT -> CheckResult(context.getSystemService(AudioManager::class.java) != null, "Phone audio state can be read.")
-            COMPUTER -> CheckResult(true, "Windows pairing session storage and command gate are available.")
+            COMPUTER -> CheckResult(true, "Windows pairing session storage and command gate are available.")\n            QUICK_LINK -> CheckResult(true, "One-time Quick Owner Link code flow is available.")
             BIODATA -> CheckResult(true, "Biodata/Career profile module is available.")
             JOBS -> CheckResult(true, "Job Watcher foundation is available.")
             EXCEL -> CheckResult(true, "Excel/Data Analysis foundation is available.")
