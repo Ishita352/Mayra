@@ -109,7 +109,12 @@ class ModernMayraHomeActivity : FragmentActivity() {
             setOnCheckedChangeListener { _, checked ->
                 prefs.edit().putBoolean("master_on", checked).apply()
                 text = if (checked) "ON" else "OFF"
-                status.text = if (checked) "Mayra is ready for Boss." else "Mayra paused — memory/state preserved."
+                if (checked && FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.VOICE_COMMAND)) {
+                    MayraBackgroundVoiceServiceStarter.start(this@ModernMayraHomeActivity)
+                } else if (!checked) {
+                    MayraBackgroundVoiceServiceStarter.stop(this@ModernMayraHomeActivity)
+                }
+                status.text = if (checked) "Mayra is ready for Boss. Background voice is active when Voice Command is ON." else "Mayra paused — memory/state preserved."
             }
         }
         header.addView(master)
@@ -314,4 +319,19 @@ class ModernMayraHomeActivity : FragmentActivity() {
             cornerRadius = radiusDp * resources.displayMetrics.density
             setStroke((1 * resources.displayMetrics.density).toInt().coerceAtLeast(1), Color.rgb(70, 95, 145))
         }
+}
+
+
+object MayraBackgroundVoiceServiceStarter {
+    fun start(context: android.content.Context) {
+        val intent = android.content.Intent(context, MayraBackgroundVoiceService::class.java)
+            .setAction(MayraBackgroundVoiceService.ACTION_START)
+        androidx.core.content.ContextCompat.startForegroundService(context, intent)
+    }
+
+    fun stop(context: android.content.Context) {
+        val intent = android.content.Intent(context, MayraBackgroundVoiceService::class.java)
+            .setAction(MayraBackgroundVoiceService.ACTION_STOP)
+        context.startService(intent)
+    }
 }
