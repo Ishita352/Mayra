@@ -90,3 +90,4 @@ object MayraNoteIncomeWorkflow {
 
     fun incomeSafetyRule(): String =
         "Only original, public-domain, properly licensed or expressly permitted material may be prepared for sale. Paid/private third-party notes must not be copied or resold."
+}
