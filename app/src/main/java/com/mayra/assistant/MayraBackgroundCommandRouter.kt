@@ -24,7 +24,7 @@ object MayraBackgroundCommandRouter {
             return Result(true, "বস, Voice Command বন্ধ করেছি।")
         }
         if (listOf("feature status", "what features", "কি কি ফিচার", "কোন কোন ফিচার", "ফিচারগুলোর অবস্থা", "फीचर स्टेटस").any { lower.contains(it) }) {
-            return Result(true, MayraFeatureCheckManager.summary(context))
+            return Result(true, featureSummary ?: "Feature status requires the Mayra app context.")
         }
 
         MayraMoodSystem.commandMood(spoken)?.let { mood ->
