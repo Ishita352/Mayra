@@ -8,6 +8,8 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.app.KeyguardManager
+import android.media.AudioManager
 import android.os.Bundle
 import android.os.IBinder
 import android.speech.RecognitionListener
@@ -77,11 +79,16 @@ class MayraBackgroundVoiceService : Service() {
         return START_STICKY
     }
 
-    private fun canRun(): Boolean =
-        prefs.getBoolean("master_on", false) &&
-            FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.VOICE_COMMAND) &&
-            prefs.getBoolean("owner_verified", false) &&
-            ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+    private fun canRun(): Boolean {
+        val baseAllowed =
+            prefs.getBoolean("master_on", false) &&
+                FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.VOICE_COMMAND) &&
+                prefs.getBoolean("owner_verified", false) &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+        if (!baseAllowed) return false
+        val locked = getSystemService(KeyguardManager::class.java)?.isKeyguardLocked == true
+        return !locked || LockModePolicy.isEnabled(prefs)
+    }
 
     private fun startListening() {
         if (!canRun() || !SpeechRecognizer.isRecognitionAvailable(this)) return
@@ -197,6 +204,24 @@ class MayraBackgroundVoiceService : Service() {
     }
 
     private fun handleCommand(spoken: String) {
+        if (!canRun()) {
+            stopListening()
+            return
+        }
+        val locked = getSystemService(KeyguardManager::class.java)?.isKeyguardLocked == true
+        if (locked) {
+            val decision = MayraLockedPhoneVoiceGate.decide(
+                prefs,
+                ownerVerified = prefs.getBoolean("owner_verified", false),
+                masterOn = prefs.getBoolean("master_on", false),
+                locked = true,
+                task = spoken
+            )
+            if (decision != MayraLockedPhoneVoiceGate.Decision.ALLOW_LIMITED_VOICE) {
+                speak("This command is not allowed while the phone is locked.")
+                return
+            }
+        }
         sendBroadcast(Intent(ACTION_COMMAND).setPackage(packageName).putExtra(EXTRA_SPOKEN, spoken))
         val result = MayraBackgroundCommandRouter.route(this, spoken)
         if (result.handled) {
@@ -209,6 +234,8 @@ class MayraBackgroundVoiceService : Service() {
     }
 
     private fun speak(message: String) {
+        val audioManager = getSystemService(AudioManager::class.java)
+        if (prefs.getBoolean("mayra_silent_mode_behavior", true) && audioManager?.ringerMode == AudioManager.RINGER_MODE_SILENT) return
         tts?.setLanguage(
             when {
                 message.any { it in '\u0980'..'\u09FF' } -> Locale("bn", "IN")
