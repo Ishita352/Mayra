@@ -117,6 +117,33 @@ class MayraAgentTests(unittest.TestCase):
         self.assertIsNone(mayra_agent.quick_pair_code())
         mayra_agent.revoke_session()
 
+    def test_persistent_login_survives_process_restart(self):
+        import os
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            old_state_file = mayra_agent.STATE_FILE
+            try:
+                mayra_agent.STATE_FILE = os.path.join(temp_dir, "windows_session.json")
+                mayra_agent.revoke_session()
+                mayra_agent.start_pairing()
+                self.assertTrue(mayra_agent.owner_approve(mayra_agent.pairing_code()))
+                token = mayra_agent.approve_pairing(mayra_agent.pairing_code() or "")
+                self.assertTrue(token)
+                self.assertTrue(mayra_agent.register_phone("192.168.1.20", 8766, token))
+
+                # Simulate a Windows shutdown/restart by clearing in-memory state,
+                # while keeping the persistent session file.
+                mayra_agent._session_token = None
+                mayra_agent._phone_endpoint = None
+                mayra_agent.load_persistent_state()
+
+                self.assertTrue(mayra_agent.authenticated(token))
+                self.assertEqual(mayra_agent.phone_endpoint(), ("192.168.1.20", 8766))
+            finally:
+                mayra_agent.revoke_session()
+                mayra_agent.STATE_FILE = old_state_file
+
     def test_quick_owner_link_rejects_wrong_code(self):
         mayra_agent.start_pairing()
         code = mayra_agent.quick_pair_code()
