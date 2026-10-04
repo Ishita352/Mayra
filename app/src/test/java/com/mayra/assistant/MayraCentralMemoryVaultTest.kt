@@ -10,35 +10,54 @@ class MayraCentralMemoryVaultTest {
         ownerApprovedForProvider = true
     )
 
-    private fun item() = MayraCentralMemoryVault.Item(
+    private fun item(
+        importance: MayraCentralMemoryVault.Importance
+    ) = MayraCentralMemoryVault.Item(
         id = "memory-1",
         dataClass = MayraCentralMemoryVault.DataClass.CORE_MEMORY,
         sizeBytes = 100,
-        important = true
+        importance = importance
     )
 
-    @Test fun everyCloudSaveRequiresSpecificOwnerApproval() {
+    @Test fun uncertainImportanceAsksOwnerBeforeAnySave() {
+        assertEquals(
+            MayraCentralMemoryVault.Decision.ASK_OWNER_IMPORTANCE,
+            MayraCentralMemoryVault.decision(
+                item(MayraCentralMemoryVault.Importance.UNCERTAIN),
+                config
+            )
+        )
+        assertTrue(MayraCentralMemoryVault.uncertainImportanceRequiresOwnerQuestion())
+    }
+
+    @Test fun notImportantDataIsNotSavedAnywhere() {
+        assertEquals(
+            MayraCentralMemoryVault.Decision.DO_NOT_SAVE,
+            MayraCentralMemoryVault.decision(
+                item(MayraCentralMemoryVault.Importance.NOT_IMPORTANT),
+                config
+            )
+        )
+        assertTrue(MayraCentralMemoryVault.localSaveAllowedOnlyWhenImportant())
+    }
+
+    @Test fun importantCloudSaveNeedsSpecificOwnerApproval() {
         assertEquals(
             MayraCentralMemoryVault.Decision.OWNER_APPROVAL_REQUIRED,
-            MayraCentralMemoryVault.decision(item(), config)
+            MayraCentralMemoryVault.decision(
+                item(MayraCentralMemoryVault.Importance.IMPORTANT),
+                config
+            )
         )
         assertEquals(
             MayraCentralMemoryVault.Decision.ELIGIBLE_FOR_SYNC,
-            MayraCentralMemoryVault.decision(item(), config, ownerApprovedForThisItem = true)
+            MayraCentralMemoryVault.decision(
+                item(MayraCentralMemoryVault.Importance.IMPORTANT),
+                config,
+                ownerApprovedForThisItem = true
+            )
         )
-        assertTrue(MayraCentralMemoryVault.requiresExplicitOwnerApprovalForEveryUpload())
-    }
-
-    @Test fun unimportantMediaStaysLocal() {
-        val item = item().copy(
-            id = "video-1",
-            dataClass = MayraCentralMemoryVault.DataClass.IMPORTANT_VIDEO,
-            important = false
-        )
-        assertEquals(
-            MayraCentralMemoryVault.Decision.KEEP_LOCAL,
-            MayraCentralMemoryVault.decision(item, config, true)
-        )
+        assertTrue(MayraCentralMemoryVault.requiresExplicitOwnerApprovalForEveryCloudUpload())
     }
 
     @Test fun providerAndAccountAreReplaceable() {
