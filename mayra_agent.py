@@ -10,6 +10,7 @@ import time
 
 HOST = os.environ.get("MAYRA_AGENT_HOST", "127.0.0.1")
 PORT = int(os.environ.get("MAYRA_AGENT_PORT", "8765"))
+ALLOW_LAN = os.environ.get("MAYRA_AGENT_ALLOW_LAN", "0") == "1"
 MAX_REQUEST_BYTES = 4096
 SOCKET_TIMEOUT_SECONDS = 8
 PAIRING_TTL_SECONDS = 300
@@ -408,13 +409,13 @@ def handle_connection(conn):
 
 
 def main():
-    if HOST not in {"127.0.0.1", "::1", "localhost"}:
-        raise SystemExit("Refusing non-loopback bind: authenticated TLS pairing is not implemented.")
+    if HOST not in {"127.0.0.1", "::1", "localhost"} and not ALLOW_LAN:
+        raise SystemExit("LAN bind is disabled by default. Set MAYRA_AGENT_ALLOW_LAN=1 only on a trusted network.")
     load_persistent_state()
     code = start_pairing()
     print("\nMayra Windows Agent — persistent owner-approved LAN login")
     print(f"Listening on {HOST}:{PORT}")
-    print("Remote/LAN mode is disabled: authenticated TLS pairing is not implemented.")
+    print("LAN mode is disabled (loopback-only)." if HOST in {"127.0.0.1", "::1", "localhost"} else "LAN mode enabled by explicit opt-in; transport is token-authenticated but not encrypted.")
     print(f"PAIRING CODE: {code} (expires in {PAIRING_TTL_SECONDS}s)")
     print(f"QUICK OWNER LINK CODE: {quick_pair_code()} (expires in {QUICK_LINK_TTL_SECONDS}s)")
     print("Existing login is preserved across Windows restart/power-off until explicit logout/revoke.")
