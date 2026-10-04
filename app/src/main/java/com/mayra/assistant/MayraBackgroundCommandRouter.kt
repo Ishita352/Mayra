@@ -24,6 +24,11 @@ object MayraBackgroundCommandRouter {
         val off = lower.contains("off") || lower.contains("বন্ধ") ||
             lower.contains("disable") || lower.contains("बंद")
 
+        if (listOf("health check", "self heal", "self-healing", "system check", "সিস্টেম চেক", "নিজে ঠিক", "स्वास्थ्य जांच").any { lower.contains(it) }) {
+            val result = MayraHealthMonitor.run(prefs, context)
+            return Result(true, MayraHealthMonitor.safeRecoveryMessage(result))
+        }
+
         if (listOf("master off", "mayra off", "মায়রা অফ", "মায়রা অফ", "मायरा बंद")
                 .any { lower.contains(it) }) {
             prefs.edit().putBoolean("master_on", false).apply()
