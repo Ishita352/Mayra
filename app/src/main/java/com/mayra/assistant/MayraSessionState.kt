@@ -5,8 +5,8 @@ import android.content.SharedPreferences
 /**
  * Persistent UI/session checkpoint for Mayra.
  *
- * This stores only resumable context, not secrets. It survives Activity
- * recreation and process restart so Master OFF/ON does not erase progress.
+ * Session state remains compatible with the existing UI store while a
+ * separate semantic-memory bridge can persist resumable task context.
  */
 class MayraSessionState(private val prefs: SharedPreferences) {
     companion object {
