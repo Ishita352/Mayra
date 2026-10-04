@@ -28,7 +28,7 @@ object MayraCapabilityRegistry {
         Capability(13, "WhatsApp/Telegram/Facebook intelligence", Status.COMPLETE),
         Capability(14, "Media verification, moods and conversation intelligence", Status.COMPLETE),
         Capability(15, "Optional 3D character and Voice Light", Status.COMPLETE),
-        Capability(16, "Local Emergency/News/Government Services", Status.PLANNED),
+        Capability(16, "Local Emergency/News/Government Services", Status.COMPLETE),
         Capability(17, "Travel Planner and destination information", Status.PLANNED),
         Capability(18, "Transport schedules and ticket read-only information", Status.PLANNED),
         Capability(19, "Accommodation and food price/availability research", Status.PLANNED),
