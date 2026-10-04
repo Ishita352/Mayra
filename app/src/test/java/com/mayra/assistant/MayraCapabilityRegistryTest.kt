@@ -7,9 +7,9 @@ import org.junit.Test
 class MayraCapabilityRegistryTest {
     @Test fun containsAllActiveFollowUpCapabilities() {
         assertEquals(39, MayraCapabilityRegistry.all().size)
-        assertEquals(29, MayraCapabilityRegistry.count(MayraCapabilityRegistry.Status.COMPLETE))
+        assertEquals(34, MayraCapabilityRegistry.count(MayraCapabilityRegistry.Status.COMPLETE))
         assertEquals(0, MayraCapabilityRegistry.count(MayraCapabilityRegistry.Status.IN_PROGRESS))
-        assertEquals(10, MayraCapabilityRegistry.count(MayraCapabilityRegistry.Status.PLANNED))
+        assertEquals(5, MayraCapabilityRegistry.count(MayraCapabilityRegistry.Status.PLANNED))
     }
 
     @Test fun idsAreUniqueAndResolvable() {
