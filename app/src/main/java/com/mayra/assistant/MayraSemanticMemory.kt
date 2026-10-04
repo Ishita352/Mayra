@@ -24,7 +24,7 @@ class MayraSemanticMemory(private val store: Store) {
         val timestampMs: Long
     )
 
-    interface Store {
+    class SharedPreferencesStore(private val context: android.content.Context) : Store {\n        override fun read(key: String): String? = MayraMemoryStore.read(context, key)\n        override fun write(key: String, value: String) = MayraMemoryStore.write(context, key, value)\n    }\n\n    interface Store {
         fun read(key: String): String?
         fun write(key: String, value: String)
     }
