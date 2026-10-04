@@ -56,7 +56,7 @@ _pairing_expires = 0.0
 _session_token = None
 _session_expires = 0.0
 _owner_approved_code = None
-_phone_endpoint = None
+_phone_endpoint = None\n_quick_owner_id = None\n_quick_code = None\n_quick_expires = 0.0
 
 
 def _new_pairing_code():
@@ -235,7 +235,7 @@ def handle_connection(conn):
                 if not isinstance(request, dict):
                     raise ValueError("JSON request must be an object")
                 action = request.get("action", "")
-                if action == "PAIR_REQUEST":
+                if action == "QUICK_PAIR":\n                    token = quick_pair(request.get("owner_id", ""), request.get("code", ""))\n                    response = {"ok": bool(token), "session_token": token, "link": "quick-owner"}\n                    if not token: response["error"] = "Quick Owner Link invalid or expired"\n                elif action == "PAIR_REQUEST":
                     code = str(request.get("code", ""))
                     response = {"ok": False, "error": "Pairing rejected"}
                     if pairing_code() == code:
@@ -318,7 +318,7 @@ def main():
     code = start_pairing()
     print("\nMayra Windows Agent — owner-approved LAN pairing")
     print(f"Listening on {HOST}:{PORT}")
-    print(f"PAIRING CODE: {code} (expires in {PAIRING_TTL_SECONDS}s)")
+    print(f"PAIRING CODE: {code} (expires in {PAIRING_TTL_SECONDS}s)")\n    print(f"QUICK OWNER LINK CODE: {quick_pair_code()} (expires in {PAIRING_TTL_SECONDS}s)")
     print("Remote access is disabled until the PC owner approves this exact code.")
     print("Allowed remote commands:", ", ".join(sorted(ALLOWED)))
     print("SECURITY_STATUS is read-only and requires an authenticated session.")
