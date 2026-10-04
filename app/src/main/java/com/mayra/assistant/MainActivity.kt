@@ -1052,37 +1052,42 @@ class MainActivity : FragmentActivity() {
             setVoiceLight(false)
             return
         }
-        val voiceLightEnabled = prefs.getBoolean("mayra_voice_light_enabled", true) &&
+        val voiceLightEnabled = prefs.getBoolean("mayra_voice_light_enabled", false) &&
             prefs.getBoolean("master_on", true)
-        if (voiceLightEnabled) setVoiceLight(true)
+        setVoiceLight(false)
         responseTts?.shutdown()
         responseTts = TextToSpeech(this) { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                responseTts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
-                    override fun onStart(utteranceId: String?) { if (voiceLightEnabled) setVoiceLight(true) }
-                    override fun onDone(utteranceId: String?) { runOnUiThread { setVoiceLight(false) } }
-                    override fun onError(utteranceId: String?) { runOnUiThread { setVoiceLight(false) } }
-                })
-                val locale = when {
-                    message.contains(Regex("[\\u0980-\\u09FF]")) -> Locale("bn", "IN")
-                    message.contains(Regex("[\\u0900-\\u097F]")) -> Locale("hi", "IN")
-                    else -> Locale.US
-                }
-                val mood = MayraMoodSystem.current(prefs)
-                MayraVoiceEngine.speak(
-                    this,
-                    responseTts!!,
-                    message,
-                    "mayra_command_response",
-                    speedMultiplier = mood.speechRate,
-                    pitchMultiplier = mood.pitch
-                )
+            if (status != TextToSpeech.SUCCESS) {
+                runOnUiThread { setVoiceLight(false) }
+                return@TextToSpeech
             }
+            responseTts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+                override fun onStart(utteranceId: String?) {
+                    if (voiceLightEnabled) runOnUiThread { setVoiceLight(true) }
+                }
+                override fun onDone(utteranceId: String?) {
+                    runOnUiThread { setVoiceLight(false) }
+                }
+                override fun onError(utteranceId: String?) {
+                    runOnUiThread { setVoiceLight(false) }
+                }
+            })
+            val mood = MayraMoodSystem.current(prefs)
+            MayraVoiceEngine.speak(
+                this,
+                responseTts!!,
+                message,
+                "mayra_command_response",
+                speedMultiplier = mood.speechRate,
+                pitchMultiplier = mood.pitch
+            )
         }
     }
 
     private fun setVoiceLight(active: Boolean) {
-        if (!prefs.getBoolean("mayra_voice_light_enabled", true)) {
+        val enabled = prefs.getBoolean("mayra_voice_light_enabled", false) &&
+            prefs.getBoolean("master_on", true)
+        if (!enabled) {
             voiceLightOverlay?.setActive(false)
             return
         }
