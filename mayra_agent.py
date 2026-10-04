@@ -261,8 +261,14 @@ def pc_status():
     }
 
 
+def _allowed_command(command: str):
+    if not isinstance(command, str):
+        return False
+    return command in ALLOWED or command.startswith("OPEN_BROWSER:") or command.startswith("WRITE_CLIPBOARD:")
+
+
 def execute(command: str):
-    if not isinstance(command, str) or command not in ALLOWED:
+    if not _allowed_command(command):
         return {"ok": False, "error": "Command not allowed"}
     if command == "PING":
         return {"ok": True, "message": "Mayra Windows Agent is online"}
@@ -294,6 +300,39 @@ def execute(command: str):
             return {"ok": True, "message": "Browser URL opened"}
         except OSError:
             return {"ok": False, "error": "Browser URL could not be opened"}
+    if command == "READ_CLIPBOARD":
+        if platform.system() != "Windows":
+            return {"ok": False, "error": "This action is Windows-only"}
+        try:
+            result = subprocess.run(
+                ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", "Get-Clipboard -Raw"],
+                capture_output=True, text=True, timeout=5, check=False,
+            )
+            if result.returncode != 0:
+                return {"ok": False, "error": "Windows clipboard could not be read"}
+            return {"ok": True, "clipboard": result.stdout}
+        except (OSError, subprocess.SubprocessError):
+            return {"ok": False, "error": "Windows clipboard could not be read"}
+    if command.startswith("WRITE_CLIPBOARD:"):
+        if platform.system() != "Windows":
+            return {"ok": False, "error": "This action is Windows-only"}
+        import base64
+        try:
+            text_value = base64.b64decode(command.split(":", 1)[1].encode("ascii"), validate=True).decode("utf-8")
+        except (ValueError, UnicodeDecodeError):
+            return {"ok": False, "error": "Clipboard payload is invalid UTF-8 base64"}
+        if len(text_value.encode("utf-8")) > 16 * 1024:
+            return {"ok": False, "error": "Clipboard payload is too large"}
+        try:
+            result = subprocess.run(
+                ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", "$input | Set-Clipboard"],
+                input=text_value, capture_output=True, text=True, timeout=5, check=False,
+            )
+            if result.returncode != 0:
+                return {"ok": False, "error": "Windows clipboard could not be written"}
+            return {"ok": True, "message": "Windows clipboard updated"}
+        except (OSError, subprocess.SubprocessError):
+            return {"ok": False, "error": "Windows clipboard could not be written"}
     if command in {"MEDIA_PLAY_PAUSE", "MEDIA_NEXT", "MEDIA_PREVIOUS"}:
         if platform.system() != "Windows":
             return {"ok": False, "error": "This action is Windows-only"}
@@ -311,7 +350,7 @@ def execute(command: str):
             return {"ok": False, "error": "Windows media control unavailable"}
     if command in {
         "LIST_SHARED_FILES", "OPEN_SHARED_FILE", "SEND_FILE_TO_PC",
-        "RECEIVE_FILE_FROM_PC", "READ_CLIPBOARD", "WRITE_CLIPBOARD",
+        "RECEIVE_FILE_FROM_PC",
         "BROWSER_AUTOMATION", "SET_VOLUME", "SCREEN_VIEW",
         "SCREEN_CONTROL", "PHONE_CAMERA_FRONT", "PHONE_CAMERA_BACK",
         "PHONE_MICROPHONE", "PHONE_SPEAKER",
