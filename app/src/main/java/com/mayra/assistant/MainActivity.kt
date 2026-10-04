@@ -210,7 +210,42 @@ class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MayraMemoryStore.initialize(this)
-        if (prefs.getBoolean("owner_verified", false)) restoreLastSession() else showFirstOwnerVerification()
+        if (!MayraInstallationBootstrapManager(this).isCompleted()) {
+            showInstallationBootstrap()
+        } else if (prefs.getBoolean("owner_verified", false)) {
+            restoreLastSession()
+        } else {
+            showFirstOwnerVerification()
+        }
+    }
+
+    private fun showInstallationBootstrap() {
+        val manager = MayraInstallationBootstrapManager(this)
+        val layout = baseLayout()
+        layout.addView(TextView(this).apply { text = "মায়রা — Installation / Pairing Setup"; textSize = 28f })
+        layout.addView(TextView(this).apply {
+            text = "\nপ্রথম installation/pairing-এর সময় Mayra একটি date-based bootstrap password চাইবে.\n\nInstallation date: " +
+                manager.installationDateLabel() +
+                "\nPassword format: MAYRA-YYYYMMDD"
+            textSize = 16f
+        })
+        val password = EditText(this).apply {
+            hint = "Bootstrap password"
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+        layout.addView(password)
+        layout.addView(Button(this).apply {
+            text = "Verify & Continue"
+            setOnClickListener {
+                if (manager.verify(password.text.toString())) {
+                    manager.markCompleted()
+                    showFirstOwnerVerification()
+                } else {
+                    showVoiceResult("Bootstrap password সঠিক নয়। Installation date অনুযায়ী password দিন।")
+                }
+            }
+        })
+        setContentView(layout)
     }
 
     private fun showFirstOwnerVerification() {
