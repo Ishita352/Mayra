@@ -230,6 +230,41 @@ class ModernMayraHomeActivity : FragmentActivity() {
         scroll.addView(root)
         setContentView(scroll)
         animateOrb()
+        restoreWindowsLink()
+    }
+
+    /**
+     * Persistent pairing is not re-created on every boot. If a trusted session
+     * exists, Mayra silently reuses its saved token/endpoint and refreshes the
+     * Android endpoint registration when the phone is online.
+     */
+    private fun restoreWindowsLink() {
+        val session = windowsPairingSession()
+        val host = session.pairedHost()
+        val token = session.sessionToken()
+        if (!session.isPaired() || host.isNullOrBlank() || token.isNullOrBlank()) return
+
+        val port = session.pairedPort()
+        Thread {
+            val phoneHost = LocalDeviceLinkCoordinator.localLanAddress()
+            val result = if (phoneHost != null) {
+                LocalDeviceLinkCoordinator().registerPhone(
+                    LocalDeviceLinkCoordinator.Endpoint(host, port),
+                    token,
+                    phoneHost,
+                    8766
+                )
+            } else {
+                LocalDeviceLinkCoordinator.TransportResult(false, "", "Local network address unavailable")
+            }
+            runOnUiThread {
+                status.text = if (result.ok) {
+                    "Windows 10 login restored ✓ — persistent connection ready."
+                } else {
+                    "Windows 10 remains logged in ✓ — waiting for network/Windows; Android stays standalone."
+                }
+            }
+        }.start()
     }
 
     private fun showComputerLinkDialog() {
