@@ -311,25 +311,25 @@ class ModernMayraHomeActivity : FragmentActivity() {
         }
         val hostInput = EditText(this).apply {
             hint = "Windows IP address (e.g. 192.168.1.20)"
-            singleLine = true
+            isSingleLine = true
         }
         val portInput = EditText(this).apply {
             hint = "Port (default 8765)"
             setText("8765")
             inputType = android.text.InputType.TYPE_CLASS_NUMBER
-            singleLine = true
+            isSingleLine = true
         }
         val codeInput = EditText(this).apply {
             hint = "6-digit Windows pairing code"
             inputType = android.text.InputType.TYPE_CLASS_NUMBER
-            singleLine = true
+            isSingleLine = true
         }
         form.addView(hostInput)
         form.addView(portInput)
         val quickCodeInput = EditText(this).apply {
             hint = "8-digit Quick Owner Link code"
             inputType = android.text.InputType.TYPE_CLASS_NUMBER
-            singleLine = true
+            isSingleLine = true
         }
         val ownerId = prefs.getString("mayra_owner_link_id", null) ?: ("gopal-owner-" +
             android.provider.Settings.Secure.getString(contentResolver, android.provider.Settings.Secure.ANDROID_ID).takeLast(6)).also {
