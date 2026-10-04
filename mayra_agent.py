@@ -1,4 +1,3 @@
-import hashlib
 import hmac
 import json
 import os
@@ -13,66 +12,109 @@ HOST = os.environ.get("MAYRA_AGENT_HOST", "0.0.0.0")
 PORT = int(os.environ.get("MAYRA_AGENT_PORT", "8765"))
 MAX_REQUEST_BYTES = 4096
 PAIRING_TTL_SECONDS = 300
-SESSION_TTL_SECONDS = 3600
+QUICK_LINK_TTL_SECONDS = 120
+
+# Persistent Windows-side login/session state.
+# The session remains valid until explicit REVOKE/logout. Power-off/restart
+# does not clear it. Override the path in tests/deployments with MAYRA_STATE_FILE.
+STATE_FILE = os.environ.get(
+    "MAYRA_STATE_FILE",
+    os.path.join(os.environ.get("LOCALAPPDATA", os.path.expanduser("~")), "Mayra", "windows_session.json"),
+)
 
 # Remote control is capability-scoped. Never add shell/exec here.
 ALLOWED = {
-    "PING",
-    "OPEN_NOTEPAD",
-    "OPEN_CALCULATOR",
-    "OPEN_WINDOWS_SETTINGS",
-    "OPEN_NETWORK_SETTINGS",
-    "OPEN_DISPLAY_SETTINGS",
-    "OPEN_SOUND_SETTINGS",
-    "GET_PC_STATUS",
-    "GET_SECURITY_STATUS",
-    "LIST_SHARED_FILES",
-    "OPEN_SHARED_FILE",
-    "SEND_FILE_TO_PC",
-    "RECEIVE_FILE_FROM_PC",
-    "READ_CLIPBOARD",
-    "WRITE_CLIPBOARD",
-    "OPEN_BROWSER",
-    "BROWSER_AUTOMATION",
-    "MEDIA_PLAY_PAUSE",
-    "MEDIA_NEXT",
-    "MEDIA_PREVIOUS",
-    "SET_VOLUME",
-    "SCREEN_VIEW",
-    "SCREEN_CONTROL",
-    "PHONE_CAMERA_FRONT",
-    "PHONE_CAMERA_BACK",
-    "PHONE_MICROPHONE",
-    "PHONE_SPEAKER",
-    "PHONE_RECOVERY_STATUS",
-    "REVOKE_SESSION",
-    "REGISTER_PHONE",
-    "PHONE_COMMAND",
+    "PING", "OPEN_NOTEPAD", "OPEN_CALCULATOR", "OPEN_WINDOWS_SETTINGS",
+    "OPEN_NETWORK_SETTINGS", "OPEN_DISPLAY_SETTINGS", "OPEN_SOUND_SETTINGS",
+    "GET_PC_STATUS", "GET_SECURITY_STATUS", "LIST_SHARED_FILES",
+    "OPEN_SHARED_FILE", "SEND_FILE_TO_PC", "RECEIVE_FILE_FROM_PC",
+    "READ_CLIPBOARD", "WRITE_CLIPBOARD", "OPEN_BROWSER", "BROWSER_AUTOMATION",
+    "MEDIA_PLAY_PAUSE", "MEDIA_NEXT", "MEDIA_PREVIOUS", "SET_VOLUME",
+    "SCREEN_VIEW", "SCREEN_CONTROL", "PHONE_CAMERA_FRONT", "PHONE_CAMERA_BACK",
+    "PHONE_MICROPHONE", "PHONE_SPEAKER", "PHONE_RECOVERY_STATUS",
+    "REVOKE_SESSION", "REGISTER_PHONE", "PHONE_COMMAND",
 }
 
 _state_lock = threading.Lock()
 _pairing_code = None
 _pairing_expires = 0.0
 _session_token = None
-_session_expires = 0.0
 _owner_approved_code = None
-_phone_endpoint = None\n_quick_owner_id = None\n_quick_code = None\n_quick_expires = 0.0
+_phone_endpoint = None
+_quick_owner_id = None
+_quick_code = None
+_quick_expires = 0.0
+
+
+def _state_payload():
+    return {
+        "session_token": _session_token,
+        "phone_endpoint": list(_phone_endpoint) if _phone_endpoint else None,
+    }
+
+
+def _persist_state_locked():
+    if _session_token is None:
+        try:
+            os.remove(STATE_FILE)
+        except FileNotFoundError:
+            pass
+        except OSError:
+            pass
+        return
+    try:
+        parent = os.path.dirname(STATE_FILE)
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+        tmp = STATE_FILE + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as handle:
+            json.dump(_state_payload(), handle)
+        os.replace(tmp, STATE_FILE)
+    except OSError:
+        # Runtime operation remains usable even if persistence is unavailable.
+        pass
+
+
+def load_persistent_state():
+    global _session_token, _phone_endpoint
+    try:
+        with open(STATE_FILE, "r", encoding="utf-8") as handle:
+            data = json.load(handle)
+        token = data.get("session_token")
+        endpoint = data.get("phone_endpoint")
+        if isinstance(token, str) and token:
+            _session_token = token
+        if (
+            isinstance(endpoint, list)
+            and len(endpoint) == 2
+            and isinstance(endpoint[0], str)
+            and isinstance(endpoint[1], int)
+            and 1 <= endpoint[1] <= 65535
+        ):
+            _phone_endpoint = (endpoint[0], endpoint[1])
+    except (OSError, ValueError, TypeError):
+        _session_token = None
+        _phone_endpoint = None
 
 
 def _new_pairing_code():
     return f"{secrets.randbelow(1_000_000):06d}"
 
 
+def _new_quick_code():
+    return f"{secrets.randbelow(100_000_000):08d}"
+
+
 def start_pairing():
-    global _pairing_code, _pairing_expires, _session_token, _session_expires, _owner_approved_code
+    global _pairing_code, _pairing_expires, _owner_approved_code
+    global _quick_owner_id, _quick_code, _quick_expires
     with _state_lock:
         _pairing_code = _new_pairing_code()
         _pairing_expires = time.time() + PAIRING_TTL_SECONDS
-        _session_token = None
-        _session_expires = 0.0
         _owner_approved_code = None
-        global _phone_endpoint
-        _phone_endpoint = None
+        _quick_owner_id = None
+        _quick_code = _new_quick_code()
+        _quick_expires = time.time() + QUICK_LINK_TTL_SECONDS
         return _pairing_code
 
 
@@ -81,6 +123,13 @@ def pairing_code():
         if _pairing_code is None or time.time() >= _pairing_expires:
             return None
         return _pairing_code
+
+
+def quick_pair_code():
+    with _state_lock:
+        if _quick_code is None or time.time() >= _quick_expires:
+            return None
+        return _quick_code
 
 
 def owner_approve(code):
@@ -95,7 +144,7 @@ def owner_approve(code):
 
 
 def approve_pairing(code):
-    global _session_token, _session_expires, _pairing_code
+    global _session_token, _pairing_code
     with _state_lock:
         if _pairing_code is None or time.time() >= _pairing_expires:
             return None
@@ -104,8 +153,26 @@ def approve_pairing(code):
         if not hmac.compare_digest(str(code), _pairing_code):
             return None
         _session_token = secrets.token_urlsafe(32)
-        _session_expires = time.time() + SESSION_TTL_SECONDS
         _pairing_code = None
+        _owner_approved_code = None
+        _persist_state_locked()
+        return _session_token
+
+
+def quick_pair(owner_id, code):
+    global _session_token, _quick_code, _quick_expires, _quick_owner_id
+    if not isinstance(owner_id, str) or not owner_id.strip():
+        return None
+    with _state_lock:
+        if _quick_code is None or time.time() >= _quick_expires:
+            return None
+        if not hmac.compare_digest(str(code), _quick_code):
+            return None
+        _session_token = secrets.token_urlsafe(32)
+        _quick_owner_id = owner_id.strip()
+        _quick_code = None
+        _quick_expires = 0.0
+        _persist_state_locked()
         return _session_token
 
 
@@ -117,6 +184,7 @@ def register_phone(host, port, token=None):
         return False
     with _state_lock:
         _phone_endpoint = (host.strip(), port)
+        _persist_state_locked()
         return True
 
 
@@ -126,23 +194,22 @@ def phone_endpoint():
 
 
 def revoke_session():
-    global _session_token, _session_expires, _owner_approved_code, _phone_endpoint
+    global _session_token, _owner_approved_code, _phone_endpoint
     with _state_lock:
         _session_token = None
-        _session_expires = 0.0
         _owner_approved_code = None
         _phone_endpoint = None
+        _persist_state_locked()
 
 
 def authenticated(token):
     with _state_lock:
-        if not token or _session_token is None or time.time() >= _session_expires:
+        if not token or _session_token is None:
             return False
         return hmac.compare_digest(str(token), _session_token)
 
 
 def security_status():
-    """Read-only Windows security-provider status; never changes security controls."""
     if platform.system() != "Windows":
         return {"ok": False, "error": "Windows-only security status"}
     script = r"""
@@ -175,6 +242,7 @@ def pc_status():
         "release": platform.release(),
         "version": platform.version(),
         "hostname": socket.gethostname(),
+        "mayra_session_persistent": True,
     }
 
 
@@ -198,7 +266,7 @@ def execute(command: str):
         "OPEN_BROWSER", "BROWSER_AUTOMATION", "MEDIA_PLAY_PAUSE",
         "MEDIA_NEXT", "MEDIA_PREVIOUS", "SET_VOLUME", "SCREEN_VIEW",
         "SCREEN_CONTROL", "PHONE_CAMERA_FRONT", "PHONE_CAMERA_BACK",
-        "PHONE_MICROPHONE", "PHONE_SPEAKER"
+        "PHONE_MICROPHONE", "PHONE_SPEAKER",
     }:
         return {"ok": False, "error": "Capability is published but its transport/module is not enabled yet"}
     if platform.system() != "Windows":
@@ -235,7 +303,12 @@ def handle_connection(conn):
                 if not isinstance(request, dict):
                     raise ValueError("JSON request must be an object")
                 action = request.get("action", "")
-                if action == "QUICK_PAIR":\n                    token = quick_pair(request.get("owner_id", ""), request.get("code", ""))\n                    response = {"ok": bool(token), "session_token": token, "link": "quick-owner"}\n                    if not token: response["error"] = "Quick Owner Link invalid or expired"\n                elif action == "PAIR_REQUEST":
+                if action == "QUICK_PAIR":
+                    token = quick_pair(request.get("owner_id", ""), request.get("code", ""))
+                    response = {"ok": bool(token), "session_token": token, "link": "quick-owner"}
+                    if not token:
+                        response["error"] = "Quick Owner Link invalid or expired"
+                elif action == "PAIR_REQUEST":
                     code = str(request.get("code", ""))
                     response = {"ok": False, "error": "Pairing rejected"}
                     if pairing_code() == code:
@@ -245,7 +318,7 @@ def handle_connection(conn):
                     token = approve_pairing(request.get("code", ""))
                     response = {"ok": bool(token), "session_token": token}
                     if not token:
-                        response["error"] = "Pairing code invalid, expired, or not owner-approved"
+                        response["error"] = "Pairing code invalid, expired, or not owner-approved"}
                 elif action == "REVOKE":
                     if authenticated(request.get("session_token")):
                         revoke_session()
@@ -261,8 +334,9 @@ def handle_connection(conn):
                             port = int(request.get("port", 8766))
                         except (TypeError, ValueError):
                             port = 0
-                        response = {"ok": register_phone(host, port), "message": "Android endpoint registered"}
-                        if not response["ok"]:
+                        ok = register_phone(host, port, request.get("session_token"))
+                        response = {"ok": ok, "message": "Android endpoint registered"}
+                        if not ok:
                             response["error"] = "Invalid Android endpoint"
                 elif action == "PHONE_COMMAND":
                     if not authenticated(request.get("session_token")):
@@ -278,7 +352,7 @@ def handle_connection(conn):
                                     payload = {
                                         "action": "PHONE_COMMAND",
                                         "session_token": request.get("session_token"),
-                                        "command": request.get("command", "")
+                                        "command": request.get("command", ""),
                                     }
                                     phone.sendall((json.dumps(payload) + "\n").encode("utf-8"))
                                     line = phone.recv(MAX_REQUEST_BYTES + 1).decode("utf-8").strip()
@@ -300,7 +374,9 @@ def handle_connection(conn):
                         "ok": True,
                         "paired": authenticated(request.get("session_token")),
                         "pairing_available": pairing_code() is not None,
+                        "quick_link_available": quick_pair_code() is not None,
                         "platform": platform.system(),
+                        "persistent_login": True,
                     }
                 else:
                     response = {"ok": False, "error": "Action not allowed"}
@@ -315,14 +391,14 @@ def handle_connection(conn):
 
 
 def main():
+    load_persistent_state()
     code = start_pairing()
-    print("\nMayra Windows Agent — owner-approved LAN pairing")
+    print("\nMayra Windows Agent — persistent owner-approved LAN login")
     print(f"Listening on {HOST}:{PORT}")
-    print(f"PAIRING CODE: {code} (expires in {PAIRING_TTL_SECONDS}s)")\n    print(f"QUICK OWNER LINK CODE: {quick_pair_code()} (expires in {PAIRING_TTL_SECONDS}s)")
-    print("Remote access is disabled until the PC owner approves this exact code.")
-    print("Allowed remote commands:", ", ".join(sorted(ALLOWED)))
-    print("SECURITY_STATUS is read-only and requires an authenticated session.")
-    print("To revoke the current session, use the REVOKE action.\n")
+    print(f"PAIRING CODE: {code} (expires in {PAIRING_TTL_SECONDS}s)")
+    print(f"QUICK OWNER LINK CODE: {quick_pair_code()} (expires in {QUICK_LINK_TTL_SECONDS}s)")
+    print("Existing login is preserved across Windows restart/power-off until explicit logout/revoke.")
+    print("Remote access remains capability-scoped; no arbitrary shell execution.")
 
     def owner_console():
         while True:
@@ -334,7 +410,7 @@ def main():
                 print("Owner approval recorded. The paired device may now complete pairing.")
             elif command == "REVOKE":
                 revoke_session()
-                print("Session revoked.")
+                print("Session revoked; both devices must pair again.")
             elif command.startswith("PHONE "):
                 endpoint = phone_endpoint()
                 if endpoint is None or not authenticated(_session_token):
@@ -346,7 +422,7 @@ def main():
                             phone.sendall((json.dumps({
                                 "action": "PHONE_COMMAND",
                                 "session_token": _session_token,
-                                "command": command[6:].strip()
+                                "command": command[6:].strip(),
                             }) + "\n").encode("utf-8"))
                             print(phone.recv(MAX_REQUEST_BYTES + 1).decode("utf-8").strip())
                     except OSError as exc:
@@ -365,4 +441,5 @@ def main():
 
 
 if __name__ == "__main__":
+    load_persistent_state()
     main()
