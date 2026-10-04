@@ -41,6 +41,7 @@ class MainActivity : FragmentActivity() {
     private val voiceRequestCode = 7001
     private val notificationRequestCode = 7002
     private var responseTts: TextToSpeech? = null
+    private var voiceLightOverlay: MayraVoiceLightOverlay? = null
     private var masterSwitch: Switch? = null
     private var pendingPdfText: String? = null
     private var pendingDocxText: String? = null
@@ -778,6 +779,16 @@ class MainActivity : FragmentActivity() {
             showVoiceResult(msg); speakResponse(msg); return
         }
 
+        if (lowerSpoken.contains("gopal voice match") || lowerSpoken.contains("গোপাল voice match") || lowerSpoken.contains("গোপাল ভয়েস ম্যাচ") || lowerSpoken.contains("গোপাল ভয়েস")) {
+            startActivity(Intent(this, MayraGopalVoiceMatchActivity::class.java))
+            val msg = "Gopal Voice Match setup খুলেছি। আপনার অনুমতি নিয়ে voice sample record করুন।"
+            showVoiceResult(msg); speakResponse(msg); return
+        }
+        if (lowerSpoken.contains("voice match status") || lowerSpoken.contains("ভয়েস ম্যাচ স্ট্যাটাস") || lowerSpoken.contains("ভয়েস ম্যাচের অবস্থা")) {
+            val s = MayraGopalVoiceMatch.status(this)
+            val msg = "Gopal Voice Match: " + if (s.sampleReady) "sample ready, quality " + s.qualityScore + " percent." else s.message
+            showVoiceResult(msg); speakResponse(msg); return
+        }
         MayraMoodSystem.commandMood(spoken)?.let { mood ->
             MayraMoodSystem.set(prefs, mood)
             val msg = "Mayra " + mood.label + " Mood চালু হয়েছে। এখন থেকে আমার voice style এই mood অনুযায়ী থাকবে।"
@@ -1071,14 +1082,12 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun setVoiceLight(active: Boolean) {
-        if (!prefs.getBoolean("mayra_voice_light_enabled", true)) return
-        val root = window.decorView
-        root.setBackgroundColor(
-            if (active) android.graphics.Color.rgb(235, 245, 255)
-            else android.graphics.Color.BLACK
-        )
-        window.statusBarColor = if (active) android.graphics.Color.rgb(80, 160, 255) else android.graphics.Color.BLACK
-        window.navigationBarColor = if (active) android.graphics.Color.rgb(80, 160, 255) else android.graphics.Color.BLACK
+        if (!prefs.getBoolean("mayra_voice_light_enabled", true)) {
+            voiceLightOverlay?.setActive(false)
+            return
+        }
+        if (voiceLightOverlay == null) voiceLightOverlay = MayraVoiceLightOverlay.attach(this)
+        voiceLightOverlay?.setActive(active)
     }
 
     override fun onDestroy() {
