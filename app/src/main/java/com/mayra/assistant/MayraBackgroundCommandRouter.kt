@@ -80,6 +80,12 @@ object MayraBackgroundCommandRouter {
                 ?: "Feature status requires the Mayra app context.")
         }
 
+        context?.let { appContext ->
+            MayraKnowledgeBase.answer(appContext, spoken)?.let { answer ->
+                return Result(true, answer)
+            }
+        }
+
         MayraMoodSystem.commandMood(spoken)?.let { mood ->
             MayraMoodSystem.set(prefs, mood)
             return Result(true, "Mayra " + mood.label + " Mood চালু হয়েছে।")
