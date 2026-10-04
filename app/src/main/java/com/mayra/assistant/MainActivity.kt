@@ -849,6 +849,50 @@ class MainActivity : FragmentActivity() {
                 return
             }
         }
+        // Android -> Windows real LAN command transport. Windows is optional;
+        // failure always falls back to standalone Android mode.
+        if (windowsPairingSession.isPaired()) {
+            val windowsCommand = when {
+                lowerSpoken.contains("computer") && (lowerSpoken.contains("notepad") || lowerSpoken.contains("নোটপ্যাড") || lowerSpoken.contains("नोटपैड")) -> "OPEN_NOTEPAD"
+                lowerSpoken.contains("computer") && (lowerSpoken.contains("calculator") || lowerSpoken.contains("ক্যালকুলেটর") || lowerSpoken.contains("कैलकुलेटर")) -> "OPEN_CALCULATOR"
+                lowerSpoken.contains("computer") && (lowerSpoken.contains("settings") || lowerSpoken.contains("সেটিংস")) -> "OPEN_WINDOWS_SETTINGS"
+                lowerSpoken.contains("computer") && (lowerSpoken.contains("network") || lowerSpoken.contains("নেটওয়ার্ক")) -> "OPEN_NETWORK_SETTINGS"
+                lowerSpoken.contains("computer") && (lowerSpoken.contains("display") || lowerSpoken.contains("ডিসপ্লে")) -> "OPEN_DISPLAY_SETTINGS"
+                lowerSpoken.contains("computer") && (lowerSpoken.contains("sound") || lowerSpoken.contains("সাউন্ড")) -> "OPEN_SOUND_SETTINGS"
+                lowerSpoken.contains("computer") && (lowerSpoken.contains("status") || lowerSpoken.contains("অবস্থা") || lowerSpoken.contains("স্ট্যাটাস")) -> "GET_PC_STATUS"
+                else -> null
+            }
+            if (windowsCommand != null) {
+                val host = windowsPairingSession.pairedHost()
+                val token = windowsPairingSession.sessionToken()
+                if (host == null || token == null) {
+                    showVoiceResult("Windows session data অসম্পূর্ণ। Android standalone mode চালু আছে।")
+                    speakResponse("বস, Windows session data অসম্পূর্ণ। Android থেকেই চলছি।")
+                    return
+                }
+                Thread {
+                    val result = LocalDeviceLinkCoordinator().command(
+                        LocalDeviceLinkCoordinator.Endpoint(host, windowsPairingSession.pairedPort()),
+                        token,
+                        windowsCommand
+                    )
+                    runOnUiThread {
+                        val message = if (result.ok) {
+                            try {
+                                val json = org.json.JSONObject(result.response)
+                                json.optString("message").ifBlank { result.response }
+                            } catch (_: Exception) { result.response }
+                        } else {
+                            "Windows command ব্যর্থ। Android standalone mode চালু আছে: " + (result.error ?: "connection unavailable")
+                        }
+                        showVoiceResult(message)
+                        speakResponse(message)
+                    }
+                }.start()
+                return
+            }
+        }
+
         val result = VoiceCommandEngine.parse(spoken)
         when (result.action) {
             VoiceCommandResult.Action.OPEN_SETTINGS -> startActivity(Intent(android.provider.Settings.ACTION_SETTINGS))
