@@ -147,6 +147,26 @@ class MayraAgentTests(unittest.TestCase):
         self.assertFalse(result["components"]["localsend"])
         self.assertEqual(result["design"]["screen_control"], "scrcpy-compatible")
 
+    @patch("mayra_agent.platform.system", return_value="Windows")
+    @patch("mayra_agent.subprocess.Popen")
+    @patch("mayra_agent.shutil.which")
+    def test_optional_bridges_start_only_from_allowlisted_paths(self, which, popen, _system):
+        def fake_which(name):
+            return {"scrcpy": "C:\\tools\\scrcpy.exe", "localsend": "C:\\tools\\localsend.exe"}.get(name)
+        which.side_effect = fake_which
+        self.assertTrue(mayra_agent.execute("BRIDGE_START_SCREEN")["ok"])
+        self.assertTrue(mayra_agent.execute("BRIDGE_START_FILE_SHARE")["ok"])
+        self.assertEqual(popen.call_count, 2)
+        self.assertEqual(popen.call_args_list[0].args[0], ["C:\\tools\\scrcpy.exe"])
+        self.assertEqual(popen.call_args_list[1].args[0], ["C:\\tools\\localsend.exe"])
+
+    @patch("mayra_agent.platform.system", return_value="Windows")
+    @patch("mayra_agent.shutil.which", return_value=None)
+    def test_optional_bridge_reports_missing_install_without_process_execution(self, which, _system):
+        result = mayra_agent.execute("BRIDGE_START_SCREEN")
+        self.assertFalse(result["ok"])
+        self.assertIn("not installed", result["error"])
+
     def test_remote_arbitrary_command_is_rejected(self):
         code = mayra_agent.start_pairing()
         self.assertTrue(mayra_agent.owner_approve(code))
