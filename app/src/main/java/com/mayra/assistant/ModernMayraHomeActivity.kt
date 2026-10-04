@@ -29,8 +29,10 @@ class ModernMayraHomeActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (!MayraInstallationBootstrapManager(this).isCompleted()) {
-            MayraInstallationBootstrapManager(this).markCompleted()
+        if (!MayraFeatureCheckManager.isSetupCompleted(this)) {
+            startActivity(Intent(this, MayraFirstRunSetupActivity::class.java))
+            finish()
+            return
         }
         if (!prefs.getBoolean("owner_verified", false)) {
             verifyOwner()
@@ -103,7 +105,7 @@ class ModernMayraHomeActivity : FragmentActivity() {
             text = "ON"
             textSize = 13f
             setTextColor(Color.WHITE)
-            isChecked = prefs.getBoolean("master_on", true)
+            isChecked = prefs.getBoolean("master_on", false)
             setOnCheckedChangeListener { _, checked ->
                 prefs.edit().putBoolean("master_on", checked).apply()
                 text = if (checked) "ON" else "OFF"
