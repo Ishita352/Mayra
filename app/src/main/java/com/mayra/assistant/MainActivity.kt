@@ -43,6 +43,28 @@ class MainActivity : FragmentActivity() {
     private var welcomePendingAfterLock = false
     private var welcomeShownForCurrentUnlock = false
 
+    private val excelPicker = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri == null) { showVoiceResult("কোনো spreadsheet নির্বাচন করা হয়নি।"); return@registerForActivityResult }
+        try {
+            val type = contentResolver.getType(uri)
+            val data = contentResolver.openInputStream(uri)?.use { input ->
+                if (type == "text/csv" || type == "text/comma-separated-values" || uri.toString().lowercase().endsWith(".csv")) {
+                    SpreadsheetDocumentEngine.readDelimited(input)
+                } else if (type == "text/tab-separated-values" || uri.toString().lowercase().endsWith(".tsv")) {
+                    SpreadsheetDocumentEngine.readDelimited(input, '\t')
+                } else {
+                    SpreadsheetDocumentEngine.readXlsx(input)
+                }
+            } ?: throw IllegalArgumentException("Spreadsheet file পড়া যায়নি।")
+            val validation = SpreadsheetDocumentEngine.validate(data)
+            showModule("Excel / Spreadsheet Validation", validation.message + "\n\n--- Preview ---\n" + SpreadsheetDocumentEngine.preview(data))
+        } catch (e: Exception) {
+            showVoiceResult("Spreadsheet validation ব্যর্থ: " + (e.message ?: "অজানা error"))
+        }
+    }
+
     private val documentPicker = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri ->
@@ -477,9 +499,7 @@ class MainActivity : FragmentActivity() {
         }
         layout.addView(language)
 
-        layout.addView(sectionButton("আমার Biodata / Career Profile") {
-            showModule("Biodata & Career Profile", "এখানে আপনার আসল biodata, education, experience, skills, certificates এবং career preferences রাখা হবে.\n\nএখনো আপনার প্রকৃত biodata এখানে যোগ করা হয়নি.")
-        })
+        layout.addView(sectionButton("আমার Biodata / Career Profile") { showCareerProfileEditor() })
         layout.addView(sectionButton("💰 Active + Passive Income Watcher") {
             showModule("Income Engine", IncomeOpportunityPolicy.summary())
         })
@@ -524,9 +544,7 @@ class MainActivity : FragmentActivity() {
                 "text/plain"
             ))
         })
-        layout.addView(sectionButton("Excel / Data Analysis") {
-            showModule("Excel / Data Analysis", "পরবর্তী ধাপে Excel formulas, data cleaning, lookup, Pivot Table, charts, dashboards এবং analysis workflow যুক্ত হবে.")
-        })
+        layout.addView(sectionButton("Excel / Data Analysis") { excelPicker.launch(arrayOf("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/csv", "text/tab-separated-values")) })
         layout.addView(sectionButton("🤖 AI Training & Skill Engine") {
             showModule("AI Training & Skill Development", "English↔Hindi/Bengali voice, video dubbing/subtitles, speech-to-text, translation, text-to-speech, GPS/mapping workflows, remote-work tools, Excel/data analysis, textile/design tools এবং নতুন AI/model/tool শেখার জন্য Discover → Research → Cross-check → Sandbox Test → Verify → Save Knowledge → Apply workflow থাকবে. Free/open-source first.")
         })
@@ -543,6 +561,44 @@ class MainActivity : FragmentActivity() {
             showModule("Cybersecurity Mode", "শুধু আপনার নিজের বা স্পষ্ট অনুমতি থাকা ডিভাইস, নেটওয়ার্ক ও ওয়েবসাইটে defensive security check করা যাবে.\n\nযা থাকবে: security configuration review, port/service inventory, authorized vulnerability assessment, log ও suspicious activity analysis, malware/security hygiene checks, এবং CTF/private lab practice.\n\nপ্রতিটি কাজের আগে Owner authorization, target এবং scope যাচাই বাধ্যতামূলক. Password/OTP চুরি, authentication bypass, malware deployment বা অনুমতি ছাড়া access করা যাবে না.")
         })
         setContentView(ScrollView(this).apply { addView(layout) })
+    }
+
+    private fun showCareerProfileEditor() {
+        val adapter = object : MayraCareerProfileStore.Store {
+            override fun read(key: String) = prefs.getString(key, null)
+            override fun write(key: String, value: String) { prefs.edit().putString(key, value).apply() }
+        }
+        val current = MayraCareerProfileStore.load(adapter) ?: MayraCareerProfile()
+        val layout = baseLayout()
+        layout.addView(TextView(this).apply { text = "👤 Biodata / Career Profile"; textSize = 28f })
+        val fields = linkedMapOf(
+            "Full name" to current.fullName, "Headline" to current.headline, "Location" to current.location,
+            "Education" to current.education, "Experience" to current.experience, "Skills" to current.skills,
+            "Certificates" to current.certificates, "Languages" to current.languages,
+            "Preferred roles" to current.preferredRoles, "Preferred work mode" to current.preferredWorkMode
+        )
+        val inputs = linkedMapOf<String, EditText>()
+        fields.forEach { (label, value) ->
+            layout.addView(TextView(this).apply { text = label; textSize = 15f })
+            val input = EditText(this).apply { setText(value); minLines = if (label in setOf("Experience","Skills","Certificates")) 3 else 1 }
+            inputs[label] = input; layout.addView(input)
+        }
+        layout.addView(Button(this).apply {
+            text = "💾 Save Profile"
+            setOnClickListener {
+                val p = MayraCareerProfile(
+                    inputs["Full name"]!!.text.toString(), inputs["Headline"]!!.text.toString(), inputs["Location"]!!.text.toString(),
+                    inputs["Education"]!!.text.toString(), inputs["Experience"]!!.text.toString(), inputs["Skills"]!!.text.toString(),
+                    inputs["Certificates"]!!.text.toString(), inputs["Languages"]!!.text.toString(), inputs["Preferred roles"]!!.text.toString(),
+                    inputs["Preferred work mode"]!!.text.toString()
+                )
+                MayraCareerProfileStore.save(adapter, p)
+                val missing = p.missingRequiredFields()
+                showModule("Career Profile Saved", if (missing.isEmpty()) "Profile CV তৈরির জন্য প্রস্তুত।\n\n" + p.toCvText() else "Profile saved. CV প্রস্তুতির আগে পূরণ করুন: " + missing.joinToString(", "))
+            }
+        })
+        layout.addView(Button(this).apply { text = "← Mayra Home"; setOnClickListener { showAssistant() } })
+        setContentView(ScrollView(layout.context).apply { addView(layout) })
     }
 
     private fun showFamilyLogin() {
