@@ -7,7 +7,7 @@ Mayra is a work-in-progress **Android-only** personal AI assistant.
 - Android debug APK builds through GitHub Actions.
 - Android project structure and package identity are checked in CI before Android tests/build.
 - Android voice commands support Bengali, Hindi, and English language selection, with owner authorization required for background commands.
-- Mayra operates independently on the Android phone. Windows/PC companion, pairing, remote computer control and Windows agent components have been removed from this project.
+- Mayra operates independently on the Android phone; the project scope is Android-only.
 - No installation/bootstrap password is used. Owner verification uses the phone's supported biometric/device-credential mechanism.
 
 ## Developer checks
