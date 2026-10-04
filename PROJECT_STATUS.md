@@ -8,7 +8,7 @@
 - Financial lock: Mayra must never spend, purchase, subscribe, withdraw, or execute financial transactions.
 
 ## Current development status
-The latest Android safety work includes owner-controlled Locked Phone Mode, Incoming Call Assistant foundation, one-time strong biometric Owner verification, and the new persistent family identity/authentication/session layer. The final Android APK is not yet release-ready.
+The latest Android safety work includes owner-controlled Locked Phone Mode, password-free biometric/device-credential Owner verification, first-run feature gates, and the persistent family identity/authentication/session layer. Call Assist and phone-to-Windows remote pairing remain OFF until end-to-end implementation is verified. The final Android release is not yet ready.
 
 Estimated overall completion: ~38% (planning estimate based on feature scope, not code-line percentage).
 
