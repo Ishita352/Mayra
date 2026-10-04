@@ -86,6 +86,17 @@ class MayraAgentTests(unittest.TestCase):
         self.assertTrue(token)
         mayra_agent.revoke_session()
 
+    def test_phone_endpoint_requires_authenticated_session(self):
+        mayra_agent.start_pairing()
+        self.assertFalse(mayra_agent.register_phone("192.168.1.10", 8766))
+        self.assertTrue(mayra_agent.owner_approve(mayra_agent.pairing_code()))
+        token = mayra_agent.approve_pairing(mayra_agent.pairing_code() or "")
+        self.assertTrue(token)
+        self.assertTrue(mayra_agent.register_phone("192.168.1.10", 8766))
+        self.assertEqual(mayra_agent.phone_endpoint(), ("192.168.1.10", 8766))
+        mayra_agent.revoke_session()
+        self.assertIsNone(mayra_agent.phone_endpoint())
+
     def test_remote_arbitrary_command_is_rejected(self):
         code = mayra_agent.start_pairing()
         self.assertTrue(mayra_agent.owner_approve(code))
