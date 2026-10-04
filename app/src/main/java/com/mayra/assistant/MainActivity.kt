@@ -237,7 +237,7 @@ class MainActivity : FragmentActivity() {
         } else if (hasFocus && !keyguard.isKeyguardLocked && welcomePendingAfterLock && !welcomeShownForCurrentUnlock) {
             welcomePendingAfterLock = false
             welcomeShownForCurrentUnlock = true
-            speakResponse("Welcome Boss, বলুন কী সাহায্য করতে পারি")
+            speakResponse("রাধে রাধে বস, বলুন কী সাহায্য করতে পারি")
         }
     }
 
@@ -307,7 +307,7 @@ class MainActivity : FragmentActivity() {
                         .putBoolean("owner_command_authorized", true).apply()
                     founderIdentity.recognizeVerifiedOwner(MayraFounderIdentity.VerificationMethod.ANDROID_BIOMETRIC)
                     showAssistant()
-                    speakResponse("Welcome Boss, বলুন কী সাহায্য করতে পারি")
+                    speakResponse("রাধে রাধে বস, বলুন কী সাহায্য করতে পারি")
                 }
             })
         prompt.authenticate(BiometricPrompt.PromptInfo.Builder()
@@ -343,7 +343,7 @@ class MainActivity : FragmentActivity() {
                 prefs.edit().putBoolean("owner_verified", true).apply()
                 founderIdentity.recognizeVerifiedOwner(MayraFounderIdentity.VerificationMethod.ANDROID_BIOMETRIC)
                 showAssistant()
-                speakResponse("Welcome Boss, বলুন কী সাহায্য করতে পারি")
+                speakResponse("রাধে রাধে বস, বলুন কী সাহায্য করতে পারি")
             }
         })
         val info = BiometricPrompt.PromptInfo.Builder()
