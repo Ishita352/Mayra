@@ -6,17 +6,24 @@ import org.junit.Test
 class LocalDeviceLinkCoordinatorTest {
     private val clean = DevicePreConnectionSecurityPolicy.Risk.CLEAN
 
+    private fun cleanScan() = DevicePreConnectionScan(
+        DevicePreConnectionSecurityPolicy.Risk.CLEAN,
+        "VerifiedScanner",
+        1_000L,
+        emptyList()
+    )
+
     @Test fun inviteExpiresAndCannotBeReused() {
         var now = 1_000L
         val c = LocalDeviceLinkCoordinator(clockMs = { now })
         val invite = c.createInvite("device-2", 30_000L)
         assertNotNull(c.acceptInvite("device-2", invite.code,
-            setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, true, DevicePreConnectionScan(DevicePreConnectionSecurityPolicy.Risk.CLEAN, "VerifiedScanner", 1_000L, emptyList())))
+            setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, true, cleanScan()))
         assertNull(c.acceptInvite("device-2", invite.code,
-            setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, true, DevicePreConnectionScan(DevicePreConnectionSecurityPolicy.Risk.CLEAN, "VerifiedScanner", 1_000L, emptyList())))
+            setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, true, cleanScan()))
         now += 31_000L
         assertNull(c.acceptInvite("device-2", invite.code,
-            setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, true, DevicePreConnectionScan(DevicePreConnectionSecurityPolicy.Risk.CLEAN, "VerifiedScanner", 1_000L, emptyList())))
+            setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, true, cleanScan()))
     }
 
     @Test fun wrongCodeDoesNotPair() {
@@ -39,16 +46,16 @@ class LocalDeviceLinkCoordinatorTest {
         val c = LocalDeviceLinkCoordinator(clockMs = { 1_000L })
         val invite = c.createInvite("device-2")
         assertNull(c.acceptInvite("device-2", invite.code,
-            setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, false, DevicePreConnectionScan(DevicePreConnectionSecurityPolicy.Risk.CLEAN, "VerifiedScanner", 1_000L, emptyList())))
+            setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, false, cleanScan()))
         assertNotNull(c.acceptInvite("device-2", invite.code,
-            setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, true))
+            setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, true, cleanScan()))
     }
 
     @Test fun revokeRemovesAccess() {
         val c = LocalDeviceLinkCoordinator(clockMs = { 1_000L })
         val invite = c.createInvite("device-2")
         c.acceptInvite("device-2", invite.code,
-            setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, true, DevicePreConnectionScan(DevicePreConnectionSecurityPolicy.Risk.CLEAN, "VerifiedScanner", 1_000L, emptyList()))
+            setOf(NetworkDeviceControlPolicy.Capability.DEVICE_INFO), clean, true, cleanScan())
         assertTrue(c.mayUse("device-2", NetworkDeviceControlPolicy.Capability.DEVICE_INFO))
         c.revoke("device-2")
         assertFalse(c.mayUse("device-2", NetworkDeviceControlPolicy.Capability.DEVICE_INFO))
