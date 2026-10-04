@@ -802,9 +802,17 @@ class MainActivity : FragmentActivity() {
                     val msg = "Windows computer ইতিমধ্যে paired আছে (device: $paired)।"
                     showVoiceResult(msg); speakResponse(msg); return
                 }
-                val existing = windowsPairingSession.pendingInvite()
-                val invite = existing ?: LocalDeviceLinkCoordinator().createInvite("windows-10")
-                    .also { windowsPairingSession.saveInvite(MayraWindowsPairingSession.Invite(it.deviceId, it.code, it.expiresAtMs)) }
+                val invite = windowsPairingSession.pendingInvite() ?: run {
+                    val created = LocalDeviceLinkCoordinator().createInvite("windows-10")
+                    windowsPairingSession.saveInvite(
+                        MayraWindowsPairingSession.Invite(
+                            created.deviceId,
+                            created.code,
+                            created.expiresAtMs
+                        )
+                    )
+                    windowsPairingSession.pendingInvite()!!
+                }
                 val msg = "Windows 10 pairing code: ${invite.code}\nCodeটি শুধু আপনার Windows Mayra companion-এ Owner-approved pairing-এর জন্য ব্যবহার করুন। এটি ৫ মিনিট valid।"
                 showVoiceResult(msg); speakResponse(msg)
                 return
