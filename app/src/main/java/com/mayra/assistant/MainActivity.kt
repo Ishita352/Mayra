@@ -595,14 +595,34 @@ class MainActivity : FragmentActivity() {
             showVoiceResult("Security Control OFF — নিরাপত্তা checks সক্রিয় না থাকায় এই command চালানো যাবে না।");
             return
         }
-        // Defense-in-depth: re-check the physical device lock immediately before execution.
-        // Voice results can return after the phone transitions between locked/unlocked states.
-        if (!DeviceSecurityGate.mayExecuteUserCommand(this)) {
-            showVoiceResult(if (LockModePolicy.isEnabled(prefs)) {
-                "ফোন locked — Locked Phone Mode চালু আছে, কিন্তু এই voice command-এর নিরাপদ locked-device execution path এখনো সম্পূর্ণভাবে সক্রিয় নয়।"
-            } else {
-                "ফোন locked — Mayra কোনো command চালাবে না। আগে ফোন unlock করুন।"
-            })
+        // Defense-in-depth: route physical lock state through the dedicated Owner-verified gate.
+        // When the phone is locked, only explicitly enabled, verified, non-sensitive voice work may proceed.
+        val keyguard = getSystemService(KeyguardManager::class.java)
+        val locked = keyguard.isKeyguardLocked
+        val gate = MayraLockedPhoneVoiceGate.decide(
+            prefs = prefs,
+            ownerVerified = prefs.getBoolean("owner_verified", false),
+            masterOn = prefs.getBoolean("master_on", true),
+            locked = locked,
+            task = spoken
+        )
+        when (gate) {
+            MayraLockedPhoneVoiceGate.Decision.BLOCK -> {
+                showVoiceResult(if (locked) {
+                    "ফোন locked — এই voice command এখন চালানো যাবে না।"
+                } else {
+                    "Mayra এই command এখন চালাতে পারছে না।"
+                })
+                return
+            }
+            MayraLockedPhoneVoiceGate.Decision.OWNER_VERIFICATION_REQUIRED -> {
+                showVoiceResult("ফোন locked — Owner verification ছাড়া voice command চালানো যাবে না।")
+                return
+            }
+            MayraLockedPhoneVoiceGate.Decision.ALLOW_LIMITED_VOICE -> Unit
+        }
+        if (!locked && !DeviceSecurityGate.mayExecuteUserCommand(this)) {
+            showVoiceResult("Mayra নিরাপত্তা যাচাই সম্পূর্ণ করতে পারেনি।")
             return
         }
         if (isFinishing) return
