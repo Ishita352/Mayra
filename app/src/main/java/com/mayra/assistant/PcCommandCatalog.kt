@@ -9,6 +9,7 @@ object PcCommandCatalog {
         PING, OPEN_NOTEPAD, OPEN_CALCULATOR, OPEN_WINDOWS_SETTINGS,
         OPEN_NETWORK_SETTINGS, OPEN_DISPLAY_SETTINGS, OPEN_SOUND_SETTINGS,
         GET_PC_STATUS, GET_SECURITY_STATUS,
+        BRIDGE_START_SCREEN, BRIDGE_START_FILE_SHARE,
         LIST_SHARED_FILES, OPEN_SHARED_FILE, SEND_FILE_TO_PC, RECEIVE_FILE_FROM_PC,
         READ_CLIPBOARD, WRITE_CLIPBOARD,
         OPEN_BROWSER, BROWSER_AUTOMATION,
@@ -29,6 +30,8 @@ object PcCommandCatalog {
         CommandId.OPEN_SOUND_SETTINGS,
         CommandId.GET_PC_STATUS,
         CommandId.GET_SECURITY_STATUS,
+        CommandId.BRIDGE_START_SCREEN,
+        CommandId.BRIDGE_START_FILE_SHARE,
         CommandId.LIST_SHARED_FILES,
         CommandId.OPEN_SHARED_FILE,
         CommandId.SEND_FILE_TO_PC,
@@ -66,6 +69,8 @@ object PcCommandCatalog {
         CommandId.OPEN_SOUND_SETTINGS -> "Open Sound Settings"
         CommandId.GET_PC_STATUS -> "Read PC status"
         CommandId.GET_SECURITY_STATUS -> "Read Windows security status"
+        CommandId.BRIDGE_START_SCREEN -> "Start screen-control bridge"
+        CommandId.BRIDGE_START_FILE_SHARE -> "Start file-sharing bridge"
         CommandId.LIST_SHARED_FILES -> "List shared files"
         CommandId.OPEN_SHARED_FILE -> "Open shared file"
         CommandId.SEND_FILE_TO_PC -> "Send file to PC"
