@@ -83,7 +83,7 @@ class MayraReferenceHomeActivity : FragmentActivity() {
             val on=!prefs.getBoolean("master_on",false); prefs.edit().putBoolean("master_on",on).apply()
             if(on && prefs.getBoolean("owner_command_authorized",false) && FeatureToggleRegistry.isEnabled(prefs,FeatureToggleRegistry.VOICE_COMMAND)) MayraBackgroundVoiceServiceStarter.start(this)
             if(!on) MayraBackgroundVoiceServiceStarter.stop(this)
-            master.text="⏻  Mayra "+if(on)"ON" else "OFF"; master.background=gradient(if(on)green else blue)
+            master.text="⏻  Mayra "+if(on)"ON" else "OFF"; master.background=gradient(if(on) green else blue)
             status.text=if(on)"Mayra ON — voice command ready." else "Mayra OFF — memory/state preserved."
         }; body.addView(master); body.addView(space(8))
         val grid=GridLayout(this).apply{columnCount=2;useDefaultMargins=true}
