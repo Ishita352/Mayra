@@ -115,7 +115,7 @@ class MayraAgentTests(unittest.TestCase):
         self.assertEqual(startfile.call_args_list[1].args[0], "https://example.com")
 
     @patch("mayra_agent.platform.system", return_value="Windows")
-    @patch("mayra_agent.os.startfile")
+    @patch("mayra_agent.os.startfile", create=True)
     def test_browser_remote_control_rejects_unsafe_url(self, startfile, _system):
         result = mayra_agent.execute("OPEN_BROWSER:file:///C:/secret.txt")
         self.assertFalse(result["ok"])
