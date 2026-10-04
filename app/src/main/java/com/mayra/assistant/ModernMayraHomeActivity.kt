@@ -158,7 +158,7 @@ class ModernMayraHomeActivity : FragmentActivity() {
         }, weightParams())
         grid.addView(row3)
         val row4 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-        row4.addView(card("↗", "WHATSAPP", "Important info") { openAssistant() }, weightParams())
+        row4.addView(card("↗", "WHATSAPP", "Important info") { showWhatsAppVoiceDialog() }, weightParams())
         row4.addView(card("☁", "SELF-REPAIR", "Owner-approved updates") { openAssistant() }, weightParams())
         grid.addView(row4)
         root.addView(grid)
