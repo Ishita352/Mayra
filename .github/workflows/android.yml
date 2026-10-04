@@ -1,5 +1,6 @@
 name: Build Mayra Android
 # CI verification workflow
+# Release gate: Windows tests + Android unit tests + debug APK + artifact upload must all pass.
 
 on:
   workflow_dispatch:
