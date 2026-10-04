@@ -51,6 +51,11 @@ jobs:
           grep -q 'owner_command_authorized' app/src/main/java/com/mayra/assistant/ModernMayraHomeActivity.kt
           grep -q 'owner_command_authorized' app/src/main/java/com/mayra/assistant/MainActivity.kt
           grep -q 'Welcome Boss' app/src/main/java/com/mayra/assistant/ModernMayraHomeActivity.kt
+          grep -q 'recognitionLanguage' app/src/main/java/com/mayra/assistant/MayraBackgroundVoiceService.kt
+          grep -q 'mayra_voice_language' app/src/main/java/com/mayra/assistant/MayraBackgroundVoiceService.kt
+          grep -q 'bengali mode' app/src/main/java/com/mayra/assistant/MayraBackgroundCommandRouter.kt
+          grep -q 'quickPair' app/src/main/java/com/mayra/assistant/LocalDeviceLinkCoordinator.kt
+          grep -q 'markPaired' app/src/main/java/com/mayra/assistant/MayraWindowsPairingSession.kt
           grep -q 'Mayra Owner Command Access' app/src/main/java/com/mayra/assistant/MainActivity.kt
 
       - name: Run Android unit tests
