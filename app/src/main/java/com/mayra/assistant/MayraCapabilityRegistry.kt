@@ -44,7 +44,6 @@ object MayraCapabilityRegistry {
         Capability(39, "Advanced video/information fact-check", Status.COMPLETE),
         Capability(41, "Owner-controlled sharing and multi-user access", Status.COMPLETE),
         Capability(42, "Privacy and activity audit system", Status.COMPLETE),
-        Capability(43, "Explicit-consent remote assistance", Status.PLANNED),
         Capability(44, "India Constitution and legal guidance engine", Status.COMPLETE),
         Capability(45, "Public organisation intelligence and change monitoring", Status.COMPLETE),
         Capability(46, "Hindu scriptures and Ayurveda knowledge", Status.COMPLETE),
