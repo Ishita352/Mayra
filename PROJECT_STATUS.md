@@ -8,7 +8,7 @@
 - Financial lock: Mayra must never spend, purchase, subscribe, withdraw, or execute financial transactions.
 
 ## Current development status
-The latest Android safety work includes owner-controlled Locked Phone Mode, password-free biometric/device-credential Owner verification, first-run feature gates, and the persistent family identity/authentication/session layer. Call Assist and phone-to-Windows remote pairing remain OFF until end-to-end implementation is verified. The final Android release is not yet ready.
+The latest Android safety work includes owner-controlled Locked Phone Mode, password-free biometric/device-credential Owner verification, first-run feature gates, and the persistent family identity/authentication/session layer. Call Assist remains OFF until its Android end-to-end handling is verified. The final Android release is not yet ready.
 
 Estimated overall completion: ~38% (planning estimate based on feature scope, not code-line percentage).
 
@@ -55,7 +55,7 @@ Estimated overall completion: ~38% (planning estimate based on feature scope, no
 - Master switch enforcement across all modules
 - Lock/unlock behavior and background lifecycle
 - Voice/TTS
-- Temporary Owner identity and cross-device audit
+- Temporary Owner identity and local audit
 - Online Test workflow
 - Textile design tooling
 - Cybersecurity tooling
@@ -97,7 +97,7 @@ Estimated overall completion: ~38% (planning estimate based on feature scope, no
 
 ## Additional 7 requirements from earlier conversations — added to the master backlog
 33. Public Mayra website: free GitHub-connected hosting, direct online access such as gopalbasak.com, and step-by-step GitHub Pages/custom-domain publication workflow.
-34. Website ↔ Mayra integration: Owner-controlled Mayra voice/chat interface, phone/computer access, permission-controlled computer actions, GitHub-based website content/code workflow, and Owner permission required for live publishing.
+34. Website ↔ Mayra integration: Owner-controlled Mayra voice/chat interface, Android access, GitHub-based website content/code workflow, and Owner permission required for live publishing.
 36. Detailed Income-Platform Automation: discover AI-permitted income platforms, notify Owner, create/use accounts and biodata only after permission, request secrets only when needed, execute allowed instructed work, verify/submit with Owner confirmation, track completed/pending earnings, and never perform financial transactions.
 37. Income Website Human-Only Rule Engine: if a site prohibits AI/automation, Mayra must not bypass the rule or submit automatically; assist the Owner with manual completion instead. No OTP/CAPTCHA/identity bypass.
 38. Universal Income Rules / Training Layer: one foundational rule/training layer that applies the income-site safety and AI-permission rules consistently across all income websites, with controlled future skill development.
@@ -108,7 +108,6 @@ Estimated overall completion: ~38% (planning estimate based on feature scope, no
 ## Additional 4 requirements from earlier conversations — added to the master backlog
 41. Owner-Controlled Sharing / Multi-User Access completion: Owner can grant or revoke specific feature, device and time-limited access to Family Users while keeping Owner data isolated.
 42. Privacy & Activity Audit System: privacy-compliant audit history for important logins, sessions, permission changes and sensitive feature/device access, visible to the Owner.
-43. Explicit-Consent Remote Assistance: remote assistance/control requires clear user consent, a visible active-session indicator, and no covert microphone, camera, message, file or screen access.
 
 ## Combined backlog policy
 - The 42 active items above are the authoritative combined backlog for Project Mayra.
