@@ -17,8 +17,8 @@ object MayraCapabilityRegistry {
 
     private val capabilities = listOf(
         Capability(4, "Security and permission integration", Status.COMPLETE),
-        Capability(5, "Full Documents and Excel integration", Status.IN_PROGRESS),
-        Capability(6, "CV/Biodata/Career Profile completion", Status.PLANNED),
+        Capability(5, "Full Documents and Excel integration", Status.COMPLETE),
+        Capability(6, "CV/Biodata/Career Profile completion", Status.COMPLETE),
         Capability(7, "Job/freelance and active/passive income workflows", Status.PLANNED),
         Capability(8, "Interview Assistant completion", Status.PLANNED),
         Capability(9, "Self-learning, knowledge base and verified skill mastery", Status.PLANNED),
