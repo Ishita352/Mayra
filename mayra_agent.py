@@ -285,7 +285,10 @@ def pc_status():
 
 
 def execute(command: str):
-    if not isinstance(command, str) or command not in ALLOWED:
+    if not isinstance(command, str):
+        return {"ok": False, "error": "Command not allowed"}
+    allowed = command in ALLOWED or command.startswith("OPEN_BROWSER:")
+    if not allowed:
         return {"ok": False, "error": "Command not allowed"}
     if command == "PING":
         return {"ok": True, "message": "Mayra Windows Agent is online"}
