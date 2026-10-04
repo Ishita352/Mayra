@@ -336,9 +336,12 @@ class MainActivity : FragmentActivity() {
             return
         }
         if (sessionState.hasResumeState()) {
+            val semanticResume = semanticMemoryBridge.resumeSummary()
+            val restoredTitle = semanticResume?.substringBefore("\n")?.ifBlank { sessionState.title() } ?: sessionState.title()
+            val restoredDetails = semanticResume?.substringAfter("\n", "")?.ifBlank { sessionState.details() } ?: sessionState.details()
             showModule(
-                sessionState.title(),
-                sessionState.details() + "\n\nMayra restored this saved session state after restart."
+                restoredTitle,
+                restoredDetails + "\n\nMayra restored this saved semantic session context after restart."
             )
         } else {
             showAssistant()
