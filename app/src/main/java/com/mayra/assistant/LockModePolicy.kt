@@ -10,7 +10,7 @@ import android.content.SharedPreferences
  * Financial actions remain blocked by PaymentSafetyPolicy regardless of this setting.
  */
 object LockModePolicy {
-    private const val KEY_LOCKED_PHONE_MODE = "mayra_locked_phone_active"
+    private const val KEY_LOCKED_PHONE_MODE = "mayra_active_while_locked"
 
     fun isEnabled(prefs: SharedPreferences): Boolean =
         prefs.getBoolean(KEY_LOCKED_PHONE_MODE, false)

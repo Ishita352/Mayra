@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.app.KeyguardManager
 import android.content.Intent
+import android.speech.tts.TextToSpeech
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
@@ -26,9 +27,11 @@ class ModernMayraHomeActivity : FragmentActivity() {
     private val prefs by lazy { getSharedPreferences("mayra_secure", MODE_PRIVATE) }
     private lateinit var orb: TextView
     private lateinit var status: TextView
+    private var welcomeTts: TextToSpeech? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MayraFeatureCheckManager(this).enforceUnavailableFeaturesOff()
         window.decorView.setBackgroundColor(Color.rgb(7, 10, 22))
         if (!MayraFeatureCheckManager.isSetupCompleted(this)) {
             startActivity(Intent(this, MayraFirstRunSetupActivity::class.java))
@@ -77,6 +80,7 @@ class ModernMayraHomeActivity : FragmentActivity() {
                     })
                     identity.recognizeVerifiedOwner(MayraFounderIdentity.VerificationMethod.ANDROID_BIOMETRIC)
                     showHome()
+                    speakOwnerWelcome()
                 }
             })
         val info = BiometricPrompt.PromptInfo.Builder()
@@ -85,6 +89,23 @@ class ModernMayraHomeActivity : FragmentActivity() {
             .setAllowedAuthenticators(authenticators)
             .build()
         prompt.authenticate(info)
+    }
+
+    private fun speakOwnerWelcome() {
+        welcomeTts?.shutdown()
+        welcomeTts = TextToSpeech(this) { result ->
+            if (result == TextToSpeech.SUCCESS) {
+                welcomeTts?.let { speech ->
+                    speech.language = Locale("bn", "IN")
+                    speech.speak(
+                        "Welcome Boss, বলুন কী সাহায্য করতে পারি",
+                        TextToSpeech.QUEUE_FLUSH,
+                        null,
+                        "mayra_owner_welcome"
+                    )
+                }
+            }
+        }
     }
 
     private fun showHome() {
@@ -157,8 +178,20 @@ class ModernMayraHomeActivity : FragmentActivity() {
         }, weightParams())
         grid.addView(row1)
         val row2 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-        row2.addView(card("⌁", "COMPUTER", "Windows 10 link") { showComputerLinkDialog() }, weightParams())
-        row2.addView(card("☎", "CALL ASSIST", "Approved calls") { openAssistant() }, weightParams())
+        row2.addView(card("PC", "COMPUTER", "Windows 10 link") {
+            if (MayraFeatureCheckManager.isEnabled(this, MayraFeatureCheckManager.COMPUTER)) {
+                showComputerLinkDialog()
+            } else {
+                status.text = "Windows pairing is OFF until authenticated phone-to-PC transport is implemented and verified."
+            }
+        }, weightParams())
+        row2.addView(card("CALL", "CALL ASSIST", "Approved calls") {
+            if (MayraFeatureCheckManager.isEnabled(this, MayraFeatureCheckManager.CALL)) {
+                openAssistant()
+            } else {
+                status.text = "Call Assist is OFF until call-handling actions are implemented and verified."
+            }
+        }, weightParams())
         grid.addView(row2)
         val row3 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         row3.addView(card("✦", "3D CHARACTER", "10 character styles") {
@@ -549,6 +582,13 @@ class ModernMayraHomeActivity : FragmentActivity() {
             cornerRadius = radiusDp * resources.displayMetrics.density
             setStroke((1 * resources.displayMetrics.density).toInt().coerceAtLeast(1), Color.rgb(70, 95, 145))
         }
+
+    override fun onDestroy() {
+        welcomeTts?.stop()
+        welcomeTts?.shutdown()
+        welcomeTts = null
+        super.onDestroy()
+    }
 }
 
 
@@ -564,4 +604,5 @@ object MayraBackgroundVoiceServiceStarter {
             .setAction(MayraBackgroundVoiceService.ACTION_STOP)
         context.startService(intent)
     }
+
 }

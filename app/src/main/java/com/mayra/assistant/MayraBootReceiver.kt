@@ -29,7 +29,7 @@ class MayraBootReceiver : BroadcastReceiver() {
         ) return
 
         val prefs = context.getSharedPreferences("mayra_secure", Context.MODE_PRIVATE)
-        if (!prefs.getBoolean("setup_complete", false)) return
+        if (!MayraFeatureCheckManager.isSetupCompleted(context) && !prefs.getBoolean("setup_complete", false)) return
 
         val masterOn = prefs.getBoolean("master_on", false)
         val voiceOn = FeatureToggleRegistry.isEnabled(

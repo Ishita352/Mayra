@@ -33,7 +33,11 @@ object MayraHealthMonitor {
         val warnings = mutableListOf<String>()
         val editor = prefs.edit()
 
-        if (!prefs.getBoolean("setup_complete", false)) {
+        val setupComplete = prefs.getBoolean(
+            MayraFeatureCheckManager.KEY_SETUP_COMPLETED,
+            prefs.getBoolean("setup_complete", false)
+        )
+        if (!setupComplete) {
             if (prefs.getBoolean("master_on", false)) {
                 editor.putBoolean("master_on", false)
                 repaired += "Master state reset because first-time setup is incomplete"
@@ -44,7 +48,8 @@ object MayraHealthMonitor {
             }
         }
 
-        val masterOn = prefs.getBoolean("master_on", false)
+        // Use the effective post-repair Master state, not the stale stored value.
+        val masterOn = prefs.getBoolean("master_on", false) && setupComplete
         val ownerVerified = prefs.getBoolean("owner_verified", false)
 
         if (!ownerVerified && FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.VOICE_COMMAND)) {

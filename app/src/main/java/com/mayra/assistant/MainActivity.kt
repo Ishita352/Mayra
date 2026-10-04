@@ -356,7 +356,7 @@ class MainActivity : FragmentActivity() {
         }
     }
     private fun restoreLastSession() {
-        if (!prefs.getBoolean("master_on", true)) {
+        if (!prefs.getBoolean("master_on", false)) {
             showAssistant(saveSession = false)
             return
         }
@@ -378,7 +378,7 @@ class MainActivity : FragmentActivity() {
 
         MayraNotificationCenter.ensureChannel(this)
         requestNotificationPermissionIfNeeded()
-        if (prefs.getBoolean("master_on", true)) {
+        if (prefs.getBoolean("master_on", false)) {
             BackgroundWorkCoordinator.scheduleDefaults(this)
         } else {
             BackgroundWorkCoordinator.cancelAll(this)
@@ -400,7 +400,7 @@ class MainActivity : FragmentActivity() {
             textSize = 17f
         })
         layout.addView(Button(this).apply {
-            text = if (prefs.getBoolean("master_on", true)) "🟢 মায়রা চালু আছে — বন্ধ করুন" else "🔴 মায়রা বন্ধ আছে — চালু করুন"
+            text = if (prefs.getBoolean("master_on", false)) "🟢 মায়রা চালু আছে — বন্ধ করুন" else "🔴 মায়রা বন্ধ আছে — চালু করুন"
             textSize = 18f
             setOnClickListener { toggleMayraMaster() }
         })
@@ -440,17 +440,17 @@ class MainActivity : FragmentActivity() {
         MayraUserControlCenter.CAMERA -> FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.CAMERA)
         MayraUserControlCenter.INCOMING_CALLS -> FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.INCOMING_CALL_ASSISTANT)
         MayraUserControlCenter.THREE_D_CHARACTER -> prefs.getBoolean("mayra_3d_character_enabled", false)
-        MayraUserControlCenter.VOICE_LIGHT -> prefs.getBoolean("mayra_voice_light_enabled", true)
-        MayraUserControlCenter.WHATSAPP_IMPORTANT -> prefs.getBoolean("mayra_whatsapp_important_enabled", true)
+        MayraUserControlCenter.VOICE_LIGHT -> prefs.getBoolean("mayra_voice_light_enabled", false)
+        MayraUserControlCenter.WHATSAPP_IMPORTANT -> prefs.getBoolean("mayra_whatsapp_important_enabled", false)
         MayraUserControlCenter.VOICE_COMMAND_ACCESS -> FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.VOICE_COMMAND)
-        MayraUserControlCenter.LOCKED_PHONE_ACTIVE -> prefs.getBoolean("mayra_locked_phone_active", false)
+        MayraUserControlCenter.LOCKED_PHONE_ACTIVE -> LockModePolicy.isEnabled(prefs)
         MayraUserControlCenter.SILENT_MODE -> prefs.getBoolean("mayra_silent_mode_behavior", true)
         MayraUserControlCenter.MAYRA_VOLUME -> true
         else -> false
     }
 
     private fun toggleOwnerControl(control: String) {
-        if (!prefs.getBoolean("master_on", true)) {
+        if (!prefs.getBoolean("master_on", false)) {
             showVoiceResult("Mayra Master OFF — এই control পরিবর্তন করা যাবে না।")
             return
         }
@@ -473,7 +473,7 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun toggleMayraMaster() {
-        val currentlyOn = prefs.getBoolean("master_on", true)
+        val currentlyOn = prefs.getBoolean("master_on", false)
         if (currentlyOn) {
             sessionState.saveHome()
             semanticMemoryBridge.saveHomeResume()
@@ -589,7 +589,7 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun executeVoiceCommandInternal(spoken: String) {
-        if (!prefs.getBoolean("master_on", true)) {
+        if (!prefs.getBoolean("master_on", false)) {
             showVoiceResult("Mayra Master OFF — কমান্ড চালানো যাবে না।")
             return
         }
@@ -648,7 +648,7 @@ class MainActivity : FragmentActivity() {
         val gate = MayraLockedPhoneVoiceGate.decide(
             prefs = prefs,
             ownerVerified = prefs.getBoolean("owner_verified", false),
-            masterOn = prefs.getBoolean("master_on", true),
+            masterOn = prefs.getBoolean("master_on", false),
             locked = locked,
             task = spoken
         )
@@ -820,7 +820,7 @@ class MainActivity : FragmentActivity() {
                 showVoiceResult(msg); speakResponse(msg); return
             }
             lowerSpoken.contains("গুরুত্বপূর্ণ") && lowerSpoken.contains("whatsapp") && (lowerSpoken.contains("পাঠাও") || lowerSpoken.contains("send")) -> {
-                if (!prefs.getBoolean("mayra_whatsapp_important_enabled", true)) {
+                if (!prefs.getBoolean("mayra_whatsapp_important_enabled", false)) {
                     showVoiceResult("WhatsApp Important Information OFF।")
                     speakResponse("বস, WhatsApp গুরুত্বপূর্ণ তথ্য পাঠানোর control এখন বন্ধ আছে।")
                     return
@@ -1011,7 +1011,7 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun sendWhatsAppReply(text: String) {
-        if (!prefs.getBoolean("master_on", true) || !prefs.getBoolean("owner_verified", false)) {
+        if (!prefs.getBoolean("master_on", false) || !prefs.getBoolean("owner_verified", false)) {
             showVoiceResult("Mayra এখন reply পাঠানোর জন্য প্রস্তুত নয়.")
             return
         }
@@ -1097,7 +1097,7 @@ class MainActivity : FragmentActivity() {
             return
         }
         val voiceLightEnabled = prefs.getBoolean("mayra_voice_light_enabled", false) &&
-            prefs.getBoolean("master_on", true)
+            prefs.getBoolean("master_on", false)
         setVoiceLight(false)
         responseTts?.shutdown()
         responseTts = TextToSpeech(this) { status ->
@@ -1130,7 +1130,7 @@ class MainActivity : FragmentActivity() {
 
     private fun setVoiceLight(active: Boolean) {
         val enabled = prefs.getBoolean("mayra_voice_light_enabled", false) &&
-            prefs.getBoolean("master_on", true)
+            prefs.getBoolean("master_on", false)
         if (!enabled) {
             voiceLightOverlay?.setActive(false)
             return
