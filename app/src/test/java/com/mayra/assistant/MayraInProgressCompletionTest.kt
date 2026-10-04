@@ -103,11 +103,8 @@ class MayraInProgressCompletionTest {
         assertEquals(MayraDeviceAwareMultitasking.Load.EXCESSIVE, c.load)
     }
 
-    @Test fun registryContainsEightInProgressCapabilitiesBeforeRelease() {
-        val ids = MayraCapabilityRegistry.all()
-            .filter { it.status == MayraCapabilityRegistry.Status.IN_PROGRESS }
-            .map { it.id }
-            .toSet()
-        assertEquals(setOf(56,57,58,59,60,61,62,63), ids)
+    @Test fun registryMarksTheEightCapabilitiesCompleteAfterIntegration() {
+        val ids = setOf(56,57,58,59,60,61,62,63)
+        assertTrue(ids.all { MayraCapabilityRegistry.byId(it)?.status == MayraCapabilityRegistry.Status.COMPLETE })
     }
 }
