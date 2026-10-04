@@ -78,7 +78,7 @@ class MayraReferenceHomeActivity : FragmentActivity() {
         welcome.addView(label("রাধে রাধে বস,",23f,Color.WHITE)); welcome.addView(label("বলুন কী সাহায্য করতে পারি",16f,Color.rgb(205,220,245)))
         status=label(if(prefs.getBoolean("master_on",false))"Mayra is ON and ready." else "Mayra is paused — memory/state preserved.",12f,Color.rgb(150,190,220)); welcome.addView(status); row.addView(welcome); hero.addView(row); body.addView(hero)
         body.addView(space(8))
-        val master=button("⏻  Mayra "+if(prefs.getBoolean("master_on",false))"ON" else "OFF",if(prefs.getBoolean("master_on",false))green:blue)
+        val master=button("⏻  Mayra "+if(prefs.getBoolean("master_on",false))"ON" else "OFF",if(prefs.getBoolean("master_on",false)) green else blue)
         master.setOnClickListener{
             val on=!prefs.getBoolean("master_on",false); prefs.edit().putBoolean("master_on",on).apply()
             if(on && prefs.getBoolean("owner_command_authorized",false) && FeatureToggleRegistry.isEnabled(prefs,FeatureToggleRegistry.VOICE_COMMAND)) MayraBackgroundVoiceServiceStarter.start(this)
