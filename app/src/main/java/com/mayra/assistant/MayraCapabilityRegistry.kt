@@ -55,6 +55,7 @@ object MayraCapabilityRegistry {
         Capability(41, "Owner-controlled sharing and multi-user access", Status.COMPLETE),
         Capability(42, "Privacy and activity audit system", Status.COMPLETE),
         Capability(43, "Explicit-consent remote assistance", Status.PLANNED)
+        Capability(44, "India Constitution and legal guidance engine", Status.COMPLETE)
     )
 
     fun all(): List<Capability> = capabilities
