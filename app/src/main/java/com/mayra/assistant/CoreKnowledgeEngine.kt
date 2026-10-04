@@ -22,6 +22,7 @@ object CoreKnowledgeEngine {
         SECURITY,
         OWNER_SKILLS,
         ONEFORMA,
+        SELF_REPAIR,
         GENERAL
     }
 
@@ -36,6 +37,10 @@ object CoreKnowledgeEngine {
         if (text.isBlank()) return Answer(Domain.GENERAL, false, help())
 
         return when {
+            containsAny(text, "self update", "self-update", "self repair", "self-repair", "নিজেকে আপডেট", "নিজে আপডেট", "কোড ঠিক কর", "কোড পরিবর্তন") ->
+                Answer(Domain.SELF_REPAIR, true,
+                    "Self-repair workflow: সমস্যা শনাক্ত → নিরাপদ patch proposal → policy check → tests/CI → Owner approval → update apply. Owner identity, authentication, permissions, security boundary, audit logging, sensitive data বা payment rules Mayra নিজে পরিবর্তন করবে না.")
+
             containsAny(text, "pdf", "document", "ডকুমেন্ট", "পিডিএফ", "word", "docx") ->
                 Answer(Domain.DOCUMENTS, true, DocumentWorkflow.plan(text).message)
 
