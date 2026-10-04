@@ -500,6 +500,9 @@ class MainActivity : FragmentActivity() {
         layout.addView(language)
 
         layout.addView(sectionButton("আমার Biodata / Career Profile") { showCareerProfileEditor() })
+        layout.addView(sectionButton("💼 Job / Freelance + Income Workflow") { showIncomeWorkflow() })
+        layout.addView(sectionButton("🎤 Interview Assistant") { showInterviewAssistant() })
+        layout.addView(sectionButton("🧠 Self-Learning + Knowledge Base") { showLearningEngine() })
         layout.addView(sectionButton("💰 Active + Passive Income Watcher") {
             showModule("Income Engine", IncomeOpportunityPolicy.summary())
         })
@@ -561,6 +564,52 @@ class MainActivity : FragmentActivity() {
             showModule("Cybersecurity Mode", "শুধু আপনার নিজের বা স্পষ্ট অনুমতি থাকা ডিভাইস, নেটওয়ার্ক ও ওয়েবসাইটে defensive security check করা যাবে.\n\nযা থাকবে: security configuration review, port/service inventory, authorized vulnerability assessment, log ও suspicious activity analysis, malware/security hygiene checks, এবং CTF/private lab practice.\n\nপ্রতিটি কাজের আগে Owner authorization, target এবং scope যাচাই বাধ্যতামূলক. Password/OTP চুরি, authentication bypass, malware deployment বা অনুমতি ছাড়া access করা যাবে না.")
         })
         setContentView(ScrollView(this).apply { addView(layout) })
+    }
+
+    private fun showIncomeWorkflow() {
+        val sample = listOf(
+            MayraIncomeWorkflow.Opportunity("job-1","Android Developer freelance","Owner research",MayraIncomeWorkflow.Type.FREELANCE,true),
+            MayraIncomeWorkflow.Opportunity("job-2","General online task","Unknown platform",MayraIncomeWorkflow.Type.ACTIVE_INCOME,false)
+        )
+        val plan = MayraIncomeWorkflow.plan("job freelance income", sample)
+        showModule("💼 Job / Freelance + Income Workflow",
+            plan.message + "\n\nMatched opportunities: " + plan.opportunities.joinToString("\n") { "• ${it.title} — ${it.status}" } +
+            "\n\n" + MayraIncomeWorkflow.earningsInstruction() +
+            "\n\nAI নিষিদ্ধ platform হলে Mayra manual-only সহায়তা করবে; OTP/CAPTCHA/identity বা platform rule bypass করবে না.")
+    }
+
+    private fun showInterviewAssistant() {
+        val layout = baseLayout()
+        layout.addView(TextView(this).apply { text = "🎤 Interview Assistant"; textSize = 28f })
+        val role = EditText(this).apply { hint = "Job role, যেমন Android Developer" }
+        layout.addView(role)
+        layout.addView(Button(this).apply {
+            text = "Start Interview Preparation"
+            setOnClickListener {
+                val session = MayraInterviewAssistant.start(role.text.toString())
+                showModule("Interview Preparation — ${session.role}",
+                    session.questions.mapIndexed { i, q -> "${i + 1}. $q" }.joinToString("\n") +
+                    "\n\nChecklist:\n• " + session.checklist.joinToString("\n• "))
+            }
+        })
+        layout.addView(Button(this).apply { text = "← Mayra Home"; setOnClickListener { showAssistant() } })
+        setContentView(ScrollView(this).apply { addView(layout) })
+    }
+
+    private fun showLearningEngine() {
+        val item = MayraLearningEngine.KnowledgeItem(
+            id = "learning-demo", topic = "Mayra learning workflow",
+            claim = "Knowledge is verified only after cross-check, test and evidence.",
+            sources = listOf("Source A", "Source B"), skill = "Knowledge Research"
+        )
+        val checked = MayraLearningEngine.advance(item)
+        val tested = MayraLearningEngine.advance(checked, testPassed = true)
+        val verified = MayraLearningEngine.advance(tested.copy(evidence = "Local workflow tests passed"))
+        showModule("🧠 Self-Learning + Knowledge Base",
+            MayraLearningEngine.rule() +
+            "\n\nCurrent example status: ${verified.status}" +
+            "\nSkill mastery: " + (MayraLearningEngine.mastery(verified)?.level ?: 0) +
+            "\n\nMayra verified knowledge-কে evidence ছাড়া mastery হিসেবে গণ্য করবে না এবং Owner-এর অনুমতি ছাড়া নতুন factual credential তৈরি করবে না.")
     }
 
     private fun showCareerProfileEditor() {
