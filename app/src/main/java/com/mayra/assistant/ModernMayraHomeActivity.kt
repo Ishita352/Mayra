@@ -182,7 +182,7 @@ class ModernMayraHomeActivity : FragmentActivity() {
             if (MayraFeatureCheckManager.isEnabled(this, MayraFeatureCheckManager.COMPUTER)) {
                 showComputerLinkDialog()
             } else {
-                status.text = "Windows pairing is OFF until authenticated phone-to-PC transport is implemented and verified."
+                status.text = "Windows pairing is available. Configure the Windows agent for trusted-LAN mode, then pair with owner approval."
             }
         }, weightParams())
         row2.addView(card("CALL", "CALL ASSIST", "Approved calls") {
