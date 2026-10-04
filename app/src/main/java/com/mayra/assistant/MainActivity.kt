@@ -415,7 +415,11 @@ class MainActivity : FragmentActivity() {
             MayraUserControlCenter.INCOMING_CALLS,
             MayraUserControlCenter.THREE_D_CHARACTER,
             MayraUserControlCenter.VOICE_LIGHT,
-            MayraUserControlCenter.WHATSAPP_IMPORTANT
+            MayraUserControlCenter.WHATSAPP_IMPORTANT,
+            MayraUserControlCenter.VOICE_COMMAND_ACCESS,
+            MayraUserControlCenter.LOCKED_PHONE_ACTIVE,
+            MayraUserControlCenter.SILENT_MODE,
+            MayraUserControlCenter.MAYRA_VOLUME
         )
         controls.forEach { control ->
             layout.addView(Button(this).apply {
@@ -436,6 +440,10 @@ class MainActivity : FragmentActivity() {
         MayraUserControlCenter.THREE_D_CHARACTER -> prefs.getBoolean("mayra_3d_character_enabled", false)
         MayraUserControlCenter.VOICE_LIGHT -> prefs.getBoolean("mayra_voice_light_enabled", true)
         MayraUserControlCenter.WHATSAPP_IMPORTANT -> prefs.getBoolean("mayra_whatsapp_important_enabled", true)
+        MayraUserControlCenter.VOICE_COMMAND_ACCESS -> FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.VOICE_COMMAND)
+        MayraUserControlCenter.LOCKED_PHONE_ACTIVE -> prefs.getBoolean("mayra_locked_phone_active", false)
+        MayraUserControlCenter.SILENT_MODE -> prefs.getBoolean("mayra_silent_mode_behavior", true)
+        MayraUserControlCenter.MAYRA_VOLUME -> true
         else -> false
     }
 
@@ -451,7 +459,12 @@ class MainActivity : FragmentActivity() {
             MayraUserControlCenter.INCOMING_CALLS -> if (enabled) "Incoming Call Assistant ON। Android-এর অনুমতি ও supported telecom capability অনুযায়ী call receive/answer করা যাবে।" else "Incoming Call Assistant OFF।"
             MayraUserControlCenter.THREE_D_CHARACTER -> if (enabled) "3D Character ON।" else "3D Character OFF।"
             MayraUserControlCenter.VOICE_LIGHT -> if (enabled) "Voice Light ON। Mayra কথা বলার সময় visual light indication দেখাবে।" else "Voice Light OFF।"
-            else -> if (enabled) "Important-information WhatsApp channel ON। Authorized integration না থাকলে Mayra message prepare করবে, সরাসরি send করবে না।" else "Important-information WhatsApp channel OFF।"
+            MayraUserControlCenter.WHATSAPP_IMPORTANT -> if (enabled) "Important-information WhatsApp channel ON। Authorized integration না থাকলে Mayra message prepare করবে, সরাসরি send করবে না।" else "Important-information WhatsApp channel OFF।"
+            MayraUserControlCenter.VOICE_COMMAND_ACCESS -> if (enabled) "Voice Command Access ON।" else "Voice Command Access OFF।"
+            MayraUserControlCenter.LOCKED_PHONE_ACTIVE -> if (enabled) "Locked Phone Activity ON। শুধু অনুমোদিত নিরাপদ কাজ চলবে।" else "Locked Phone Activity OFF।"
+            MayraUserControlCenter.SILENT_MODE -> if (enabled) "Silent Mode Behavior ON। ফোন silent থাকলে Mayra শুনবে, কিন্তু কথা বলবে না।" else "Silent Mode Behavior OFF।"
+            MayraUserControlCenter.MAYRA_VOLUME -> "Mayra Volume control voice command দিয়ে ব্যবহার করুন: volume বাড়াও / কমাও।"
+            else -> "Control updated."
         }
         showVoiceResult(message)
         speakResponse(message)
@@ -547,6 +560,13 @@ class MainActivity : FragmentActivity() {
         val lowerSpoken = spoken.lowercase(Locale.ROOT)
         val wantsOff = lowerSpoken.contains("বন্ধ") || lowerSpoken.contains("off") || lowerSpoken.contains("disable") || lowerSpoken.contains("बंद")
         when {
+            lowerSpoken.contains("volume") || lowerSpoken.contains("ভলিউম") || lowerSpoken.contains("সাউন্ড বাড়াও") || lowerSpoken.contains("সাউন্ড কমাও") -> {
+                val audio = getSystemService(android.content.Context.AUDIO_SERVICE) as android.media.AudioManager
+                val direction = if (lowerSpoken.contains("কমাও") || lowerSpoken.contains("decrease") || lowerSpoken.contains("down")) -1 else 1
+                audio.adjustVolume(direction, android.media.AudioManager.FLAG_SHOW_UI)
+                val msg = if (direction > 0) "Mayra sound volume বাড়ানো হয়েছে।" else "Mayra sound volume কমানো হয়েছে।"
+                showVoiceResult(msg); speakResponse(msg); return
+            }
             lowerSpoken.contains("থ্রিডি") || lowerSpoken.contains("3d") || lowerSpoken.contains("three d") -> {
                 MayraUserControlCenter.set(prefs, MayraUserControlCenter.THREE_D_CHARACTER, !wantsOff)
                 val msg = if (wantsOff) "3D Character OFF।" else "3D Character ON।"
