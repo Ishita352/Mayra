@@ -250,6 +250,8 @@ class MainActivity : FragmentActivity() {
         })
         if (!MayraInstallationBootstrapManager(this).isCompleted()) {
             showInstallationBootstrap()
+        } else if (!prefs.getBoolean("owner_command_authorized", false)) {
+            showCommandOwnerVerification()
         } else if (prefs.getBoolean("owner_verified", false)) {
             restoreLastSession()
         } else {
@@ -274,6 +276,44 @@ class MainActivity : FragmentActivity() {
             }
         })
         setContentView(layout)
+    }
+
+    private fun showCommandOwnerVerification() {
+        val layout = baseLayout()
+        layout.addView(TextView(this).apply { text = "মায়রা — Owner Command Access"; textSize = 28f })
+        layout.addView(TextView(this).apply {
+            text = "\nFamily users may use the home screen, but Mayra commands require Founder/Owner verification.\n\nএটি installation password নয়।"
+            textSize = 17f
+        })
+        layout.addView(Button(this).apply {
+            text = "VERIFY OWNER"
+            setOnClickListener { authenticateOwnerForSession() }
+        })
+        setContentView(layout)
+    }
+
+    private fun authenticateOwnerForSession() {
+        val manager = BiometricManager.from(this)
+        val authenticators = BiometricManager.Authenticators.BIOMETRIC_WEAK or
+            BiometricManager.Authenticators.DEVICE_CREDENTIAL
+        if (manager.canAuthenticate(authenticators) != BiometricManager.BIOMETRIC_SUCCESS) {
+            Toast.makeText(this, "Face/Fingerprint অথবা ফোনের secure credential সেটআপ নেই।", Toast.LENGTH_LONG).show()
+            return
+        }
+        val prompt = BiometricPrompt(this, ContextCompat.getMainExecutor(this),
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    prefs.edit().putBoolean("owner_verified", true)
+                        .putBoolean("owner_command_authorized", true).apply()
+                    founderIdentity.recognizeVerifiedOwner(MayraFounderIdentity.VerificationMethod.ANDROID_BIOMETRIC)
+                    showAssistant()
+                    speakResponse("Welcome Boss, বলুন কী সাহায্য করতে পারি")
+                }
+            })
+        prompt.authenticate(BiometricPrompt.PromptInfo.Builder()
+            .setTitle("Mayra Owner Command Access")
+            .setSubtitle("Face / Fingerprint অথবা প্রয়োজনে ফোনের secure PIN/Pattern/Password")
+            .setAllowedAuthenticators(authenticators).build())
     }
 
     private fun showFirstOwnerVerification() {
