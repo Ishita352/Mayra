@@ -1,5 +1,6 @@
 package com.mayra.assistant
 
+import android.content.Context
 import android.content.SharedPreferences
 import java.util.Locale
 
@@ -10,7 +11,7 @@ import java.util.Locale
 object MayraBackgroundCommandRouter {
     data class Result(val handled: Boolean, val response: String)
 
-    fun route(prefs: SharedPreferences, spoken: String): Result {
+    fun route(context: Context, spoken: String): Result {\n        val prefs = context.getSharedPreferences("mayra_secure", Context.MODE_PRIVATE)
         val lower = spoken.lowercase(Locale.ROOT).trim()
         val off = lower.contains("off") || lower.contains("বন্ধ") || lower.contains("disable") || lower.contains("बंद")
 
@@ -23,7 +24,7 @@ object MayraBackgroundCommandRouter {
             return Result(true, "বস, Voice Command বন্ধ করেছি।")
         }
         if (listOf("feature status", "what features", "কি কি ফিচার", "কোন কোন ফিচার", "ফিচারগুলোর অবস্থা", "फीचर स्टेटस").any { lower.contains(it) }) {
-            return Result(true, MayraFeatureCheckManager.summary(prefs))
+            return Result(true, MayraFeatureCheckManager.summary(context))
         }
 
         MayraMoodSystem.commandMood(spoken)?.let { mood ->
