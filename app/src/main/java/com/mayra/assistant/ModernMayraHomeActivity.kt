@@ -29,7 +29,7 @@ class ModernMayraHomeActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.setBackgroundDrawableColor(Color.rgb(7, 10, 22))
+        window.decorView.setBackgroundColor(Color.rgb(7, 10, 22))
         if (!MayraFeatureCheckManager.isSetupCompleted(this)) {
             startActivity(Intent(this, MayraFirstRunSetupActivity::class.java))
             finish()
