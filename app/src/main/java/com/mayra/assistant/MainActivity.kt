@@ -25,6 +25,7 @@ import java.util.Locale
 class MainActivity : FragmentActivity() {
     private val sessionState by lazy { MayraSessionState(prefs) }
     private val familyAccountManager by lazy { MayraFamilyAccountManager(MayraFamilyAccountManager.SharedPreferencesStore(prefs)) }\n    private val semanticMemory by lazy { MayraSemanticMemory(MayraSemanticMemory.SharedPreferencesStore(this)) }
+    private val founderIdentity by lazy { MayraFounderIdentity(object : MayraFounderIdentity.Store { override fun get(key: String) = prefs.getString(key, null); override fun put(key: String, value: String) { prefs.edit().putString(key, value).apply() } }) }
     private var activeFamilySession: MayraFamilyAccountManager.AuthenticatedSession? = null
     private val prefs by lazy { getSharedPreferences("mayra_secure", MODE_PRIVATE) }
     private val voiceRequestCode = 7001
@@ -273,6 +274,7 @@ class MainActivity : FragmentActivity() {
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 super.onAuthenticationSucceeded(result)
                 prefs.edit().putBoolean("owner_verified", true).apply()
+                founderIdentity.recognizeVerifiedOwner(MayraFounderIdentity.VerificationMethod.ANDROID_BIOMETRIC)
                 showAssistant()
                 speakResponse("Welcome, Boss! বলুন, কী সাহায্য করতে পারি?")
             }
@@ -353,6 +355,10 @@ class MainActivity : FragmentActivity() {
         }
         val layout = baseLayout()
         layout.addView(TextView(this).apply { text = "মায়রা প্রস্তুত ✓"; textSize = 30f })
+        layout.addView(TextView(this).apply {
+            text = "Founder / Owner: ${founderIdentity.profile().displayName}"
+            textSize = 16f
+        })
         layout.addView(Switch(this).apply {
             text = "🔘 Mayra Master ON/OFF"
             isChecked = prefs.getBoolean("master_on", true)
