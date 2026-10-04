@@ -24,6 +24,8 @@ python -m unittest discover -s tests -v
 
 The tests are safe to run on a development computer; they do not open apps or make network connections.
 
+The Android release gate is: unit tests must pass, the debug APK must build, and the APK artifact must upload successfully. A failed gate is not counted as a completed project step.
+
 ## Safety notes
 
 - Only the explicit allowlist in `mayra_agent.py` can be executed.
