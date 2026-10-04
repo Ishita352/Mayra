@@ -140,8 +140,11 @@ class ModernMayraHomeActivity : FragmentActivity() {
         val row1 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         row1.addView(card("🎙", "VOICE", "Talk to Mayra") { openAssistant() }, weightParams())
         row1.addView(card("◉", "CAMERA", "Visual access") {
-            FeatureToggleRegistry.setEnabled(prefs, FeatureToggleRegistry.CAMERA, true)
-            startActivity(Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE))
+            if (FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.CAMERA)) {
+                startActivity(Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE))
+            } else {
+                status.text = "Camera is OFF — it must be successfully checked during setup first."
+            }
         }, weightParams())
         grid.addView(row1)
         val row2 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
@@ -154,13 +157,16 @@ class ModernMayraHomeActivity : FragmentActivity() {
             animateOrb()
         }, weightParams())
         row3.addView(card("☼", "VOICE LIGHT", "Speaking ring") {
-            val next = !prefs.getBoolean("mayra_voice_light_enabled", true)
+            val next = !prefs.getBoolean("mayra_voice_light_enabled", false)
             prefs.edit().putBoolean("mayra_voice_light_enabled", next).apply()
             status.text = if (next) "Voice Light ON." else "Voice Light OFF."
         }, weightParams())
         grid.addView(row3)
         val row4 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-        row4.addView(card("↗", "WHATSAPP", "Important info") { showWhatsAppVoiceDialog() }, weightParams())
+        row4.addView(card("↗", "WHATSAPP", "Important info") {
+            if (FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.WHATSAPP_ASSISTANT)) showWhatsAppVoiceDialog()
+            else status.text = "WhatsApp is OFF — it must be successfully checked during setup first."
+        }, weightParams())
         row4.addView(card("☁", "SELF-REPAIR", "Owner-approved updates") { openAssistant() }, weightParams())
         grid.addView(row4)
         root.addView(grid)
@@ -222,7 +228,7 @@ class ModernMayraHomeActivity : FragmentActivity() {
     }
 
     private fun openAssistant() {
-        if (!prefs.getBoolean("master_on", true)) {
+        if (!prefs.getBoolean("master_on", false)) {
             status.text = "Mayra is OFF. Turn the master switch ON first."
             return
         }
