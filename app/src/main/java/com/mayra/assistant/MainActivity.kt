@@ -543,6 +543,25 @@ class MainActivity : FragmentActivity() {
         if (TemporaryOwnerAccessManager.isActive(this)) {
             TemporaryOwnerAccessManager.record(this, "VOICE_COMMAND", "RECEIVED", spoken.take(300))
         }
+        val lowerSpoken = spoken.lowercase(Locale.ROOT)
+        val wantsOff = lowerSpoken.contains("বন্ধ") || lowerSpoken.contains("off") || lowerSpoken.contains("disable") || lowerSpoken.contains("बंद")
+        when {
+            lowerSpoken.contains("থ্রিডি") || lowerSpoken.contains("3d") || lowerSpoken.contains("three d") -> {
+                MayraUserControlCenter.set(prefs, MayraUserControlCenter.THREE_D_CHARACTER, !wantsOff)
+                val msg = if (wantsOff) "3D Character OFF।" else "3D Character ON।"
+                showVoiceResult(msg); speakResponse(msg); return
+            }
+            lowerSpoken.contains("ভয়েস লাইট") || lowerSpoken.contains("voice light") || lowerSpoken.contains("লাইট চালু") || lowerSpoken.contains("লাইট বন্ধ") -> {
+                MayraUserControlCenter.set(prefs, MayraUserControlCenter.VOICE_LIGHT, !wantsOff)
+                val msg = if (wantsOff) "Voice Light OFF।" else "Voice Light ON।"
+                showVoiceResult(msg); speakResponse(msg); return
+            }
+            lowerSpoken.contains("গুরুত্বপূর্ণ") && lowerSpoken.contains("whatsapp") && (lowerSpoken.contains("পাঠাও") || lowerSpoken.contains("send")) -> {
+                showVoiceResult("গুরুত্বপূর্ণ তথ্যের WhatsApp channel command পাওয়া গেছে। Authorized WhatsApp integration থাকলে পাঠানো যাবে; বর্তমানে direct API integration না থাকলে Mayra message প্রস্তুত করবে।")
+                speakResponse("বস, WhatsApp গুরুত্বপূর্ণ তথ্য channel-এর জন্য direct authorized integration দরকার।")
+                return
+            }
+        }
         val result = VoiceCommandEngine.parse(spoken)
         when (result.action) {
             VoiceCommandResult.Action.OPEN_SETTINGS -> startActivity(Intent(android.provider.Settings.ACTION_SETTINGS))
@@ -710,6 +729,9 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun speakResponse(message: String) {
+        val voiceLightEnabled = prefs.getBoolean("mayra_voice_light_enabled", true) &&
+            prefs.getBoolean("master_on", true)
+        if (voiceLightEnabled) setVoiceLight(true)
         responseTts?.shutdown()
         responseTts = TextToSpeech(this) { status ->
             if (status == TextToSpeech.SUCCESS) {
@@ -723,6 +745,17 @@ class MainActivity : FragmentActivity() {
                     responseTts?.speak(message, TextToSpeech.QUEUE_FLUSH, null, "mayra_command_response")
                 }
             }
+        }
+    }
+
+    private fun setVoiceLight(active: Boolean) {
+        if (!prefs.getBoolean("mayra_voice_light_enabled", true)) return
+        if (active) {
+            window.statusBarColor = android.graphics.Color.BLACK
+            window.navigationBarColor = android.graphics.Color.BLACK
+        } else {
+            window.statusBarColor = android.graphics.Color.BLACK
+            window.navigationBarColor = android.graphics.Color.BLACK
         }
     }
 
