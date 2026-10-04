@@ -1007,13 +1007,17 @@ class MainActivity : FragmentActivity() {
                     message.contains(Regex("[\\u0900-\\u097F]")) -> Locale("hi", "IN")
                     else -> Locale.US
                 }
-                val r = responseTts?.setLanguage(locale)
                 val mood = MayraMoodSystem.current(prefs)
-                responseTts?.setSpeechRate(mood.speechRate)
-                responseTts?.setPitch(mood.pitch)
-                if (r != TextToSpeech.LANG_MISSING_DATA && r != TextToSpeech.LANG_NOT_SUPPORTED) {
-                    responseTts?.speak(message, TextToSpeech.QUEUE_FLUSH, null, "mayra_command_response")
-                }
+                val baseSpeed = prefs.getFloat(MayraVoiceEngine.PREF_SPEED, 1.0f)
+                val basePitch = prefs.getFloat(MayraVoiceEngine.PREF_PITCH, 1.0f)
+                responseTts?.setSpeechRate((baseSpeed * mood.speechRate).coerceIn(0.5f, 1.6f))
+                responseTts?.setPitch((basePitch * mood.pitch).coerceIn(0.5f, 1.5f))
+                MayraVoiceEngine.speak(
+                    this,
+                    responseTts!!,
+                    message,
+                    "mayra_command_response"
+                )
             }
         }
     }
