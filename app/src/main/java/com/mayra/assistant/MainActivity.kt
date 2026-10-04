@@ -728,6 +728,56 @@ class MainActivity : FragmentActivity() {
             speakResponse(msg)
             return
         }
+        // Voice Engine V1 controls: profile selection, preview, speed and pitch.
+        val voiceRequest = lowerSpoken
+        if (voiceRequest.contains("voice settings") || voiceRequest.contains("voice studio") || voiceRequest.contains("ভয়েস সেটিং") || voiceRequest.contains("ভয়েস সেটিং") || voiceRequest.contains("ভয়েস স্টুডিও")) {
+            val selected = MayraVoiceEngine.profiles.firstOrNull { it.id == MayraVoiceEngine.selectedId(this) } ?: MayraVoiceEngine.profiles.first()
+            val msg = "Voice Studio: " + selected.displayName + ". 10 Female + 10 Male profiles available; Gopal Voice Match reserved. বলুন: Female 2, Male 3, বা Gopal Voice Match।"
+            showVoiceResult(msg); speakResponse(msg); return
+        }
+        val profileMatch = Regex("""(?:voice|ভয়েস|ভয়েস)\s*(?:female|male)\s*(\d{1,2})""").find(voiceRequest)
+        if (profileMatch != null) {
+            val gender = if (voiceRequest.contains("female")) "female" else "male"
+            val number = profileMatch.groupValues[1].toIntOrNull()
+            val id = if (number != null) gender + "_" + number.toString().padStart(2, '0') else ""
+            val profile = MayraVoiceEngine.profiles.firstOrNull { it.id == id }
+            if (profile != null) {
+                MayraVoiceEngine.applyProfile(this, profile.id)
+                val msg = profile.displayName + " selected and saved. বাংলা, Hindi ও English voice output-এ এই profile ব্যবহার হবে।"
+                showVoiceResult(msg); speakResponse(msg); return
+            }
+        }
+        if (voiceRequest.contains("gopal voice match") || voiceRequest.contains("গোপাল voice") || voiceRequest.contains("গোপাল ভয়েস")) {
+            MayraVoiceEngine.applyProfile(this, "gopal_voice_match")
+            val msg = "Gopal Voice Match profile selected and saved. Actual owner-voice matching Phase 2-তে sample capture ও analysis-এর পরে চালু হবে।"
+            showVoiceResult(msg); speakResponse(msg); return
+        }
+        val speedMatch = Regex("""(?:voice\s*)?(?:speed|rate|স্পিড|গতি)\s*(?:to|=|:)?\s*(0?\.\d+|1(?:\.\d+)?)""").find(voiceRequest)
+        if (speedMatch != null) {
+            val value = speedMatch.groupValues[1].toFloatOrNull()
+            if (value != null) {
+                val pitch = prefs.getFloat(MayraVoiceEngine.PREF_PITCH, 1.0f)
+                MayraVoiceEngine.setTuning(this, value, pitch)
+                val msg = "Mayra voice speed " + String.format(Locale.US, "%.2f", value.coerceIn(0.6f, 1.4f)) + "x করা হয়েছে এবং সংরক্ষণ করা হয়েছে।"
+                showVoiceResult(msg); speakResponse(msg); return
+            }
+        }
+        val pitchMatch = Regex("""(?:voice\s*)?(?:pitch|টোন|পিচ)\s*(?:to|=|:)?\s*(0?\.\d+|1(?:\.\d+)?)""").find(voiceRequest)
+        if (pitchMatch != null) {
+            val value = pitchMatch.groupValues[1].toFloatOrNull()
+            if (value != null) {
+                val speed = prefs.getFloat(MayraVoiceEngine.PREF_SPEED, 1.0f)
+                MayraVoiceEngine.setTuning(this, speed, value)
+                val msg = "Mayra voice pitch " + String.format(Locale.US, "%.2f", value.coerceIn(0.7f, 1.3f)) + "x করা হয়েছে এবং সংরক্ষণ করা হয়েছে।"
+                showVoiceResult(msg); speakResponse(msg); return
+            }
+        }
+        if (voiceRequest.contains("voice preview") || voiceRequest.contains("ভয়েস প্রিভিউ") || voiceRequest.contains("ভয়েস প্রিভিউ")) {
+            val selected = MayraVoiceEngine.profiles.firstOrNull { it.id == MayraVoiceEngine.selectedId(this) } ?: MayraVoiceEngine.profiles.first()
+            val msg = "এটি " + selected.displayName + " voice profile-এর preview। Hello Boss. नमस्कार, বস। নমস্কার। আমি মায়রা, কীভাবে সাহায্য করতে পারি?"
+            showVoiceResult(msg); speakResponse(msg); return
+        }
+
         MayraMoodSystem.commandMood(spoken)?.let { mood ->
             MayraMoodSystem.set(prefs, mood)
             val msg = "Mayra " + mood.label + " Mood চালু হয়েছে। এখন থেকে আমার voice style এই mood অনুযায়ী থাকবে।"
