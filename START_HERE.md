@@ -14,9 +14,10 @@ Project Mayra is Gopal Basak's personal AI assistant project.
 - ₹0 / NO INVESTMENT — ONLY INCOME.
 - Mayra must never spend money, purchase subscriptions, execute payments, or withdraw money.
 - Income work must be lawful and require Owner permission before application/start/publishing.
-- Locked phone: Mayra does not execute work, commands, or background tasks.
+- Locked phone: default OFF. If the Owner enables locked-phone mode, only limited non-sensitive commands may run; sensitive commands stay blocked and device validation is still required.
 - Master OFF: Mayra stops all work/background activity without deleting saved state.
 - Owner/security boundaries must be enforced in code, not only displayed in UI.
+- Installation/date-based password flow is removed. Use Android biometric/device credential Owner verification only.
 - India-law bypass or prohibited-work circumvention is out of scope.
 - Unauthorized access, stealth operation, credential/OTP theft, malware deployment, or security bypass is out of scope.
 - Windows target is Windows 10 only.
