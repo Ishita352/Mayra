@@ -115,14 +115,13 @@ Estimated overall completion: ~38% (planning estimate based on feature scope, no
 
 
 ## Additional 4 requirements from earlier conversations — added to the master backlog
-40. Password Recovery System: Owner-controlled recovery for forgotten/lost passwords, with safeguards preventing Family Users from using recovery to escalate permissions.
 41. Owner-Controlled Sharing / Multi-User Access completion: Owner can grant or revoke specific feature, device and time-limited access to Family Users while keeping Owner data isolated.
 42. Privacy & Activity Audit System: privacy-compliant audit history for important logins, sessions, permission changes and sensitive feature/device access, visible to the Owner.
 43. Explicit-Consent Remote Assistance: remote assistance/control requires clear user consent, a visible active-session indicator, and no covert microphone, camera, message, file or screen access.
 
 ## Combined backlog policy
-- The 39 items above are the authoritative combined backlog for Project Mayra.
-- Items 33–39 are committed implementation requirements, not merely notes.
+- The 42 active items above are the authoritative combined backlog for Project Mayra.
+- Items 33–39 and 41–43 are committed implementation requirements, not merely notes. Requirement 40 (Password Recovery System) was explicitly removed by the Owner and is not part of Mayra.
 - Work proceeds sequentially: implement → unit test → integrate → CI → fix errors → continue.
 - Existing foundations count as partial work, not full completion.
 - No feature may weaken the Financial Lock, Owner control, permission boundaries, or human-only site rules.
