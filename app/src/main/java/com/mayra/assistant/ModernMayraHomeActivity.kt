@@ -157,8 +157,20 @@ class ModernMayraHomeActivity : FragmentActivity() {
         }, weightParams())
         grid.addView(row1)
         val row2 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-        row2.addView(card("⌁", "COMPUTER", "Windows 10 link") { showComputerLinkDialog() }, weightParams())
-        row2.addView(card("☎", "CALL ASSIST", "Approved calls") { openAssistant() }, weightParams())
+        row2.addView(card("PC", "COMPUTER", "Windows 10 link") {
+            if (MayraFeatureCheckManager.isEnabled(this, MayraFeatureCheckManager.COMPUTER)) {
+                showComputerLinkDialog()
+            } else {
+                status.text = "Windows pairing is OFF until authenticated phone-to-PC transport is implemented and verified."
+            }
+        }, weightParams())
+        row2.addView(card("CALL", "CALL ASSIST", "Approved calls") {
+            if (MayraFeatureCheckManager.isEnabled(this, MayraFeatureCheckManager.CALL)) {
+                openAssistant()
+            } else {
+                status.text = "Call Assist is OFF until call-handling actions are implemented and verified."
+            }
+        }, weightParams())
         grid.addView(row2)
         val row3 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         row3.addView(card("✦", "3D CHARACTER", "10 character styles") {
