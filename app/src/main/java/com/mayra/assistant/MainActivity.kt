@@ -8,6 +8,8 @@ import android.net.Uri
 import android.provider.Settings
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.speech.tts.TextToSpeech
 import android.speech.RecognizerIntent
 import android.speech.tts.UtteranceProgressListener
@@ -573,6 +575,14 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun executeVoiceCommand(spoken: String) {
+        Handler(Looper.getMainLooper()).postDelayed(
+            { executeVoiceCommandInternal(spoken) },
+            MayraCommandTimingPolicy.RESPONSE_DELAY_MS
+        )
+        showVoiceResult("কমান্ড গ্রহণ করেছি। ৫ সেকেন্ড পরে উত্তর দিয়ে কাজ শুরু করব।")
+    }
+
+    private fun executeVoiceCommandInternal(spoken: String) {
         if (!prefs.getBoolean("master_on", true)) {
             showVoiceResult("Mayra Master OFF — কমান্ড চালানো যাবে না।")
             return
@@ -782,19 +792,36 @@ class MainActivity : FragmentActivity() {
                 return
             }
             VoiceCommandResult.Action.PAIR_COMPUTER -> {
-                showModule("Phone ↔ Computer Pairing", "এখনো Windows agent ইনস্টল/সংযোগ করা হয়নি।\n\nপরবর্তী ধাপ:\n1. Windows কম্পিউটারে Mayra Windows agent তৈরি ও চালু করতে হবে।\n2. দুই ডিভাইসে অনুমোদিত pairing code দিয়ে সংযোগ করতে হবে।\n3. তারপরেই কম্পিউটারে command পাঠানো যাবে।\n\nএই মুহূর্তে কোনো কম্পিউটার command পাঠানো হয়নি।")
-                speakResponse("বস, ফোন-কম্পিউটার pairing-এর জন্য Windows agent দরকার।")
+                val paired = windowsPairingSession.pairedDeviceId()
+                if (paired != null) {
+                    val msg = "Windows computer ইতিমধ্যে paired আছে (device: $paired)।"
+                    showVoiceResult(msg); speakResponse(msg); return
+                }
+                val existing = windowsPairingSession.pendingInvite()
+                val invite = existing ?: LocalDeviceLinkCoordinator().createInvite("windows-10")
+                    .also { windowsPairingSession.saveInvite(MayraWindowsPairingSession.Invite(it.deviceId, it.code, it.expiresAtMs)) }
+                val msg = "Windows 10 pairing code: ${invite.code}\nCodeটি শুধু আপনার Windows Mayra companion-এ Owner-approved pairing-এর জন্য ব্যবহার করুন। এটি ৫ মিনিট valid।"
+                showVoiceResult(msg); speakResponse(msg)
                 return
             }
             VoiceCommandResult.Action.COMPUTER_STATUS -> {
-                showVoiceResult("কম্পিউটার: এখনো paired নয়। Windows agent ও secure pairing এখনও বাকি।")
-                speakResponse("বস, কম্পিউটার এখনও paired নয়।")
-                return
+                val paired = windowsPairingSession.pairedDeviceId()
+                val pending = windowsPairingSession.pendingInvite()
+                val msg = when {
+                    paired != null -> "কম্পিউটার: paired এবং Owner-authorized session state সংরক্ষিত আছে।"
+                    pending != null -> "কম্পিউটার: pairing code pending আছে; Windows companion থেকে এখনও acceptance আসেনি।"
+                    else -> "কম্পিউটার: এখনো paired নয়। 'কম্পিউটার pair করো' বললে নতুন secure pairing code তৈরি হবে।"
+                }
+                showVoiceResult(msg); speakResponse(msg); return
             }
             VoiceCommandResult.Action.COMPUTER_OPEN_BROWSER,
             VoiceCommandResult.Action.COMPUTER_FIND_FILE -> {
-                showVoiceResult("এই কমান্ডটি বুঝেছি, কিন্তু কম্পিউটারে চালাইনি। Windows agent pairing এখনও বাকি।")
-                speakResponse("বস, কম্পিউটার সংযোগ এখনও তৈরি হয়নি।")
+                if (!windowsPairingSession.isPaired()) {
+                    val msg = "বস, আগে Windows 10 computer pair করতে হবে।"
+                    showVoiceResult(msg); speakResponse(msg); return
+                }
+                val msg = "বস, Windows session paired আছে; এই command-এর companion-agent execution এখনো allowlist অনুযায়ী unavailable। আমি command নিজে থেকে চালাইনি।"
+                showVoiceResult(msg); speakResponse(msg)
                 return
             }
             VoiceCommandResult.Action.SHOW_TIME -> {
