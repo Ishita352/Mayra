@@ -558,6 +558,13 @@ class MainActivity : FragmentActivity() {
             TemporaryOwnerAccessManager.record(this, "VOICE_COMMAND", "RECEIVED", spoken.take(300))
         }
         val lowerSpoken = spoken.lowercase(Locale.ROOT)
+        MayraMoodSystem.commandMood(spoken)?.let { mood ->
+            MayraMoodSystem.set(prefs, mood)
+            val msg = "Mayra " + mood.label + " Mood চালু হয়েছে। এখন থেকে আমার voice style এই mood অনুযায়ী থাকবে।"
+            showVoiceResult(msg)
+            speakResponse(msg)
+            return
+        }
         val wantsOff = lowerSpoken.contains("বন্ধ") || lowerSpoken.contains("off") || lowerSpoken.contains("disable") || lowerSpoken.contains("बंद")
         when {
             lowerSpoken.contains("volume") || lowerSpoken.contains("ভলিউম") || lowerSpoken.contains("সাউন্ড বাড়াও") || lowerSpoken.contains("সাউন্ড কমাও") -> {
@@ -767,6 +774,9 @@ class MainActivity : FragmentActivity() {
                     else -> Locale.US
                 }
                 val r = responseTts?.setLanguage(locale)
+                val mood = MayraMoodSystem.current(prefs)
+                responseTts?.setSpeechRate(mood.speechRate)
+                responseTts?.setPitch(mood.pitch)
                 if (r != TextToSpeech.LANG_MISSING_DATA && r != TextToSpeech.LANG_NOT_SUPPORTED) {
                     responseTts?.speak(message, TextToSpeech.QUEUE_FLUSH, null, "mayra_command_response")
                 }
