@@ -235,29 +235,111 @@ class ModernMayraHomeActivity : FragmentActivity() {
     private fun showComputerLinkDialog() {
         val session = windowsPairingSession()
         val paired = session.pairedDeviceId()
-        val pending = session.pendingInvite()
-        val message = when {
-            paired != null -> "Windows 10: paired\\nDevice: " + paired + "\\n\\nPhone-side authorization is saved. The full two-way hardware bridge still requires the Windows companion transport."
-            pending != null -> "Windows 10: pairing code pending\\nDevice: " + pending.deviceId + "\\nCode: " + pending.code + "\\nValid for a short time.\\n\\nEnter this code only in your Mayra Windows companion."
-            else -> "Windows 10: not paired. Create a secure owner-approved pairing code?"
-        }
         val builder = androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle("Mayra ↔ Windows 10")
-            .setMessage(message)
-            .setNegativeButton("Close", null)
-        if (paired != null) {
-            builder.setNeutralButton("Revoke", android.content.DialogInterface.OnClickListener { _, _ ->
-                session.revoke()
-                status.text = "Windows pairing revoked."
-            })
-        } else if (pending == null) {
-            builder.setPositiveButton("Create Code", android.content.DialogInterface.OnClickListener { _, _ ->
-                val invite = LocalDeviceLinkCoordinator().createInvite("windows-10")
-                session.saveInvite(MayraWindowsPairingSession.Invite(invite.deviceId, invite.code, invite.expiresAtMs))
-                status.text = "Windows pairing code created: " + invite.code
-                showComputerLinkDialog()
-            })
+
+        if (paired != null && session.sessionToken() != null && session.pairedHost() != null) {
+            val host = session.pairedHost()!!
+            val port = session.pairedPort()
+            val message = "Windows 10: PAIRED\nDevice: $paired\nEndpoint: $host:$port\n\nAndroid remains fully independent if Windows is offline."
+            builder.setMessage(message)
+                .setNegativeButton("Close", null)
+                .setNeutralButton("Revoke", android.content.DialogInterface.OnClickListener { _, _ ->
+                    val token = session.sessionToken()!!
+                    Thread {
+                        LocalDeviceLinkCoordinator().revoke(LocalDeviceLinkCoordinator.Endpoint(host, port), token)
+                        runOnUiThread {
+                            session.revoke()
+                            status.text = "Windows pairing revoked. Android standalone mode remains active."
+                        }
+                    }.start()
+                })
+                .setPositiveButton("Test Connection", android.content.DialogInterface.OnClickListener { _, _ ->
+                    val token = session.sessionToken()!!
+                    Thread {
+                        val result = LocalDeviceLinkCoordinator().status(
+                            LocalDeviceLinkCoordinator.Endpoint(host, port), token
+                        )
+                        runOnUiThread {
+                            status.text = if (result.ok) "Windows connection: ONLINE ✓" else "Windows connection unavailable — Android continues standalone."
+                            Toast.makeText(this, status.text, Toast.LENGTH_LONG).show()
+                        }
+                    }.start()
+                })
+            builder.show()
+            return
         }
+
+        val form = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(24, 8, 24, 4)
+        }
+        val hostInput = EditText(this).apply {
+            hint = "Windows IP address (e.g. 192.168.1.20)"
+            singleLine = true
+        }
+        val portInput = EditText(this).apply {
+            hint = "Port (default 8765)"
+            setText("8765")
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            singleLine = true
+        }
+        val codeInput = EditText(this).apply {
+            hint = "6-digit Windows pairing code"
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            singleLine = true
+        }
+        form.addView(hostInput)
+        form.addView(portInput)
+        form.addView(codeInput)
+
+        builder.setView(form)
+            .setMessage("Windows agent চালু করে তার PAIRING CODE নিন। Android ও Windows একই trusted Wi-Fi/hotspot-এ রাখুন। প্রথমে Send Pair Request, তারপর Windows-এ owner approval, তারপর Complete Pairing করুন।")
+            .setNegativeButton("Close", null)
+            .setNeutralButton("Send Pair Request", android.content.DialogInterface.OnClickListener { _, _ ->
+                val host = hostInput.text.toString().trim()
+                val port = portInput.text.toString().toIntOrNull() ?: 8765
+                val code = codeInput.text.toString().trim()
+                Thread {
+                    val result = LocalDeviceLinkCoordinator().requestPair(
+                        LocalDeviceLinkCoordinator.Endpoint(host, port), code
+                    )
+                    runOnUiThread {
+                        status.text = if (result.ok) {
+                            "Pair request sent ✓ — এখন Windows PC-তে owner approval দিন।"
+                        } else {
+                            "Pair request failed: " + (result.error ?: "unknown error")
+                        }
+                        Toast.makeText(this, status.text, Toast.LENGTH_LONG).show()
+                    }
+                }.start()
+            })
+            .setPositiveButton("Complete Pairing", android.content.DialogInterface.OnClickListener { _, _ ->
+                val host = hostInput.text.toString().trim()
+                val port = portInput.text.toString().toIntOrNull() ?: 8765
+                val code = codeInput.text.toString().trim()
+                Thread {
+                    val result = LocalDeviceLinkCoordinator().completePair(
+                        LocalDeviceLinkCoordinator.Endpoint(host, port), code
+                    )
+                    runOnUiThread {
+                        if (result.ok) {
+                            val token = try {
+                                org.json.JSONObject(result.response).optString("session_token")
+                            } catch (_: Exception) { "" }
+                            if (token.isNotBlank()) {
+                                session.markPaired("windows-10", host, port, token)
+                                status.text = "Windows 10 paired successfully ✓"
+                            } else {
+                                status.text = "Pairing did not complete. Windows owner approval may still be pending."
+                            }
+                        } else {
+                            status.text = "Pairing failed: " + (result.error ?: "owner approval required")
+                        }
+                        Toast.makeText(this, status.text, Toast.LENGTH_LONG).show()
+                    }
+                }.start()
+            })
         builder.show()
     }
 
