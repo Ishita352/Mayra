@@ -3,6 +3,7 @@ package com.mayra.assistant
 import android.content.Context
 import android.content.Intent
 import android.speech.tts.TextToSpeech
+import androidx.core.content.FileProvider
 import java.io.File
 import java.util.Locale
 import kotlin.concurrent.thread
@@ -37,7 +38,7 @@ object MayraWhatsAppVoiceMessage {
                     if (result == TextToSpeech.SUCCESS) {
                         val share = Intent(Intent.ACTION_SEND).apply {
                             type = "audio/wav"
-                            putExtra(Intent.EXTRA_STREAM, android.net.Uri.fromFile(output))
+                            putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, "com.mayra.assistant.fileprovider", output))
                             setPackage("com.whatsapp")
                             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                         }
