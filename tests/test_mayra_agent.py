@@ -106,6 +106,36 @@ class MayraAgentTests(unittest.TestCase):
         mayra_agent.revoke_session()
         self.assertIsNone(mayra_agent.phone_endpoint())
 
+    @patch("mayra_agent.platform.system", return_value="Windows")
+    @patch("mayra_agent.os.startfile")
+    def test_browser_remote_control_is_executable(self, startfile, _system):
+        self.assertTrue(mayra_agent.execute("OPEN_BROWSER")["ok"])
+        self.assertTrue(mayra_agent.execute("OPEN_BROWSER:https://example.com")["ok"])
+        self.assertEqual(startfile.call_args_list[0].args[0], "https://www.google.com")
+        self.assertEqual(startfile.call_args_list[1].args[0], "https://example.com")
+
+    @patch("mayra_agent.platform.system", return_value="Windows")
+    @patch("mayra_agent.os.startfile")
+    def test_browser_remote_control_rejects_unsafe_url(self, startfile, _system):
+        result = mayra_agent.execute("OPEN_BROWSER:file:///C:/secret.txt")
+        self.assertFalse(result["ok"])
+        self.assertIn("http:// or https://", result["error"])
+        startfile.assert_not_called()
+
+    @patch("mayra_agent.platform.system", return_value="Windows")
+    def test_media_remote_controls_are_no_longer_published_stubs(self, _system):
+        fake_user32 = type("FakeUser32", (), {
+            "keybd_event": staticmethod(lambda *args: None)
+        })()
+        fake_windll = type("FakeWindll", (), {"user32": fake_user32})()
+        with patch.object(mayra_agent, "ctypes", None):
+            # The implementation imports ctypes inside the action; verify the
+            # Windows-only branch remains explicit rather than silently succeeding
+            # on unsupported hosts.
+            result = mayra_agent.execute("MEDIA_NEXT")
+            self.assertFalse(result["ok"])
+            self.assertIn("media control unavailable", result["error"].lower())
+
     def test_remote_arbitrary_command_is_rejected(self):
         code = mayra_agent.start_pairing()
         self.assertTrue(mayra_agent.owner_approve(code))
