@@ -69,7 +69,7 @@ Estimated overall completion: ~38% (planning estimate based on feature scope, no
 
 ## Remaining major implementation sequence
 1. Family Accounts UI + Owner management screen + Family login/session integration — implemented; final CI verification pending
-2. Installation/bootstrap pairing password flow based on installation date; required only during installation/pairing
+2. Password-free installation/bootstrap state consistency and biometric/device-credential Owner verification integration (no installation/date-based password)
 3. Core AI/Knowledge integration and semantic memory/resume expansion
 4. Security/permission integration across every module
 5. Full Documents + Excel integration and validation
