@@ -139,7 +139,7 @@ class MayraAgentTests(unittest.TestCase):
 
 
     def test_bridge_capabilities_is_read_only_and_safe(self):
-        with patch("mayra_agent.shutil.which", side_effect=lambda name: "C:\\tools\\\" + name if name in {"scrcpy", "adb"} else None):
+        with patch("mayra_agent.shutil.which", side_effect=lambda name: ("C:\\tools\\" + name) if name in {"scrcpy", "adb"} else None):
             result = mayra_agent.execute("BRIDGE_CAPABILITIES")
         self.assertTrue(result["ok"])
         self.assertTrue(result["components"]["scrcpy"])
