@@ -5,6 +5,7 @@ import platform
 import secrets
 import socket
 import subprocess
+import shutil
 import threading
 import time
 
@@ -34,6 +35,7 @@ ALLOWED = {
     "MEDIA_PLAY_PAUSE", "MEDIA_NEXT", "MEDIA_PREVIOUS", "SET_VOLUME",
     "SCREEN_VIEW", "SCREEN_CONTROL", "PHONE_CAMERA_FRONT", "PHONE_CAMERA_BACK",
     "PHONE_MICROPHONE", "PHONE_SPEAKER", "PHONE_RECOVERY_STATUS",
+    "BRIDGE_CAPABILITIES",
     "REVOKE_SESSION", "REGISTER_PHONE", "PHONE_COMMAND",
 }
 
@@ -250,6 +252,27 @@ $fw = (Get-NetFirewallProfile | Where-Object {$_.Enabled -eq $true}).Count -gt 0
         return {"ok": False, "error": "Windows security provider status unavailable"}
 
 
+def bridge_capabilities():
+    """
+    Discover optional bridge components without making them mandatory.
+    Mayra keeps its own transport and falls back to standalone mode when a
+    third-party bridge is unavailable. Discovery is intentionally read-only.
+    """
+    return {
+        "ok": True,
+        "components": {
+            "scrcpy": bool(shutil.which("scrcpy") or shutil.which("scrcpy.exe")),
+            "localsend": bool(shutil.which("localsend") or shutil.which("localsend.exe")),
+            "adb": bool(shutil.which("adb") or shutil.which("adb.exe")),
+        },
+        "design": {
+            "screen_control": "scrcpy-compatible",
+            "file_transfer": "LocalSend-compatible",
+            "device_transport": "Mayra-authenticated",
+        },
+    }
+
+
 def pc_status():
     return {
         "ok": True,
@@ -270,6 +293,8 @@ def execute(command: str):
         return pc_status()
     if command == "GET_SECURITY_STATUS":
         return security_status()
+    if command == "BRIDGE_CAPABILITIES":
+        return bridge_capabilities()
     if command == "REVOKE_SESSION":
         revoke_session()
         return {"ok": True, "message": "Session revoked"}
