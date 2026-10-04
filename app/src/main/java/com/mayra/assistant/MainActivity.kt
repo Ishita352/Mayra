@@ -24,6 +24,8 @@ import java.util.Locale
 
 class MainActivity : FragmentActivity() {
     private val sessionState by lazy { MayraSessionState(prefs) }
+    private val familyAccountManager by lazy { MayraFamilyAccountManager(MayraFamilyAccountManager.SharedPreferencesStore(prefs)) }
+    private var activeFamilySession: MayraFamilyAccountManager.AuthenticatedSession? = null
     private val prefs by lazy { getSharedPreferences("mayra_secure", MODE_PRIVATE) }
     private val voiceRequestCode = 7001
     private val notificationRequestCode = 7002
@@ -403,6 +405,14 @@ class MainActivity : FragmentActivity() {
         })
         layout.addView(Button(this).apply { text = "🎙️ Voice Command"; setOnClickListener { if (FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.VOICE_COMMAND)) startVoiceCommand() else showVoiceResult("Voice Command OFF — আগে Home Page থেকে ON করুন।") } })
         layout.addView(Button(this).apply { text = "👑 Temporary Owner Mode (24h)"; setOnClickListener { authenticateTemporaryOwner() } })
+        layout.addView(Button(this).apply {
+            text = "👨‍👩‍👧‍👦 Family Login"
+            setOnClickListener { showFamilyLogin() }
+        })
+        layout.addView(Button(this).apply {
+            text = "⚙️ Family Members (Owner)"
+            setOnClickListener { showFamilyManagement() }
+        })
         layout.addView(TextView(this).apply {
             text = if (LockModePolicy.isEnabled(prefs)) {
                 "\n🔐 Locked Phone Mode: ON\nSetting সংরক্ষিত আছে; ফোন locked থাকলে Mayra এখনো কোনো command চালাবে না।"
@@ -487,6 +497,163 @@ class MainActivity : FragmentActivity() {
             showModule("Cybersecurity Mode", "শুধু আপনার নিজের বা স্পষ্ট অনুমতি থাকা ডিভাইস, নেটওয়ার্ক ও ওয়েবসাইটে defensive security check করা যাবে.\n\nযা থাকবে: security configuration review, port/service inventory, authorized vulnerability assessment, log ও suspicious activity analysis, malware/security hygiene checks, এবং CTF/private lab practice.\n\nপ্রতিটি কাজের আগে Owner authorization, target এবং scope যাচাই বাধ্যতামূলক. Password/OTP চুরি, authentication bypass, malware deployment বা অনুমতি ছাড়া access করা যাবে না.")
         })
         setContentView(ScrollView(this).apply { addView(layout) })
+    }
+
+    private fun showFamilyLogin() {
+        val users = familyAccountManager.listFamilyUsers()
+        val layout = baseLayout()
+        layout.addView(TextView(this).apply { text = "👨‍👩‍👧‍👦 Family Login"; textSize = 28f })
+        if (users.isEmpty()) {
+            layout.addView(TextView(this).apply {
+                text = "\nএখনো কোনো Family User তৈরি করা হয়নি। Owner আগে Family Members থেকে user তৈরি করুন."
+                textSize = 16f
+            })
+        } else {
+            val selector = Spinner(this).apply {
+                adapter = ArrayAdapter(
+                    this@MainActivity,
+                    android.R.layout.simple_spinner_dropdown_item,
+                    users.map { it.userId + " — " + it.displayName }
+                )
+            }
+            layout.addView(TextView(this).apply { text = "\nUser নির্বাচন করুন:"; textSize = 16f })
+            layout.addView(selector)
+            val password = EditText(this).apply {
+                hint = "Family password"
+                inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+            }
+            layout.addView(password)
+            layout.addView(Button(this).apply {
+                text = "Login"
+                setOnClickListener {
+                    val user = users.getOrNull(selector.selectedItemPosition)
+                    if (user == null) {
+                        showVoiceResult("Family User নির্বাচন করুন।")
+                    } else {
+                        val session = familyAccountManager.authenticateFamilyUser(user.userId, password.text.toString())
+                        if (session == null) {
+                            showVoiceResult("Login ব্যর্থ। User disabled হতে পারে অথবা password ভুল।")
+                        } else {
+                            activeFamilySession = session
+                            showVoiceResult("Family login সফল: " + user.displayName + ".")
+                            showAssistant()
+                        }
+                    }
+                }
+            })
+        }
+        layout.addView(Button(this).apply { text = "← Mayra Home"; setOnClickListener { showAssistant() } })
+        setContentView(ScrollView(this).apply { addView(layout) })
+    }
+
+    private fun showFamilyManagement() {
+        val layout = baseLayout()
+        layout.addView(TextView(this).apply { text = "⚙️ Family Members"; textSize = 28f })
+        layout.addView(TextView(this).apply {
+            text = "\nOwner সর্বোচ্চ 10 জন Family User তৈরি, enable/disable, permission এবং password পরিবর্তন করতে পারবেন। Owner-only permissions Family User-কে দেওয়া যাবে না."
+            textSize = 15f
+        })
+        val users = familyAccountManager.listFamilyUsers()
+        users.forEach { profile ->
+            layout.addView(TextView(this).apply {
+                text = "\n" + profile.userId + " — " + profile.displayName + " — " + if (profile.enabled) "ON" else "OFF"
+                textSize = 18f
+            })
+            layout.addView(Switch(this).apply {
+                text = "Enabled"
+                isChecked = profile.enabled
+                setOnCheckedChangeListener { _, checked ->
+                    runCatching {
+                        familyAccountManager.updateFamilyUser(MayraUserIdentity.Role.OWNER, profile.copy(enabled = checked))
+                    }.onSuccess {
+                        showVoiceResult(profile.displayName + ": " + if (checked) "enabled" else "disabled")
+                    }.onFailure { showVoiceResult("Family user update ব্যর্থ: " + it.message) }
+                }
+            })
+            MayraFamilyAccessPolicy.Capability.values().filter { MayraFamilyAccessPolicy.ownerCanGrant(it) }.forEach { capability ->
+                layout.addView(Switch(this).apply {
+                    text = capability.name
+                    isChecked = capability in profile.permissions
+                    setOnCheckedChangeListener { _, checked ->
+                        val permissions = profile.permissions.toMutableSet().apply {
+                            if (checked) add(capability) else remove(capability)
+                        }
+                        runCatching {
+                            familyAccountManager.updateFamilyUser(MayraUserIdentity.Role.OWNER, profile.copy(permissions = permissions))
+                        }.onFailure { showVoiceResult("Permission update ব্যর্থ: " + it.message) }
+                    }
+                })
+            }
+            layout.addView(Button(this).apply {
+                text = "Change Password"
+                setOnClickListener { showFamilyPasswordChange(profile) }
+            })
+            layout.addView(Button(this).apply {
+                text = "Delete User"
+                setOnClickListener {
+                    runCatching { familyAccountManager.deleteFamilyUser(MayraUserIdentity.Role.OWNER, profile.userId) }
+                        .onSuccess {
+                            showVoiceResult(profile.displayName + " মুছে ফেলা হয়েছে।")
+                            showFamilyManagement()
+                        }.onFailure { showVoiceResult("Delete ব্যর্থ: " + it.message) }
+                }
+            })
+        }
+        layout.addView(Button(this).apply {
+            text = "➕ Add Family User"
+            isEnabled = users.size < MayraUserIdentity.MAX_FAMILY_USERS
+            setOnClickListener { showAddFamilyUser() }
+        })
+        layout.addView(Button(this).apply { text = "← Mayra Home"; setOnClickListener { showAssistant() } })
+        setContentView(ScrollView(this).apply { addView(layout) })
+    }
+
+    private fun showAddFamilyUser() {
+        val layout = baseLayout()
+        layout.addView(TextView(this).apply { text = "➕ Add Family User"; textSize = 28f })
+        val name = EditText(this).apply { hint = "User name" }
+        val password = EditText(this).apply {
+            hint = "Password (minimum 6 characters)"
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+        layout.addView(name)
+        layout.addView(password)
+        layout.addView(Button(this).apply {
+            text = "Create"
+            setOnClickListener {
+                runCatching {
+                    familyAccountManager.createFamilyUser(MayraUserIdentity.Role.OWNER, name.text.toString(), password.text.toString())
+                }.onSuccess {
+                    showVoiceResult(it.displayName + " তৈরি হয়েছে: " + it.userId)
+                    showFamilyManagement()
+                }.onFailure { showVoiceResult("Family User তৈরি করা যায়নি: " + it.message) }
+            }
+        })
+        layout.addView(Button(this).apply { text = "← Family Members"; setOnClickListener { showFamilyManagement() } })
+        setContentView(layout)
+    }
+
+    private fun showFamilyPasswordChange(profile: MayraFamilyUserProfile) {
+        val layout = baseLayout()
+        layout.addView(TextView(this).apply { text = "🔑 Change Password — " + profile.displayName; textSize = 24f })
+        val password = EditText(this).apply {
+            hint = "New password (minimum 6 characters)"
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+        layout.addView(password)
+        layout.addView(Button(this).apply {
+            text = "Save Password"
+            setOnClickListener {
+                runCatching {
+                    familyAccountManager.changePassword(MayraUserIdentity.Role.OWNER, profile.userId, password.text.toString())
+                }.onSuccess {
+                    showVoiceResult("Password পরিবর্তন হয়েছে এবং পুরোনো session invalid করা হয়েছে।")
+                    showFamilyManagement()
+                }.onFailure { showVoiceResult("Password পরিবর্তন ব্যর্থ: " + it.message) }
+            }
+        })
+        layout.addView(Button(this).apply { text = "← Family Members"; setOnClickListener { showFamilyManagement() } })
+        setContentView(layout)
     }
 
     private fun showPdfCreator() {
