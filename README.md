@@ -8,13 +8,13 @@ Mayra is a work-in-progress personal assistant for Android and Windows.
 - Android project structure and package identity are checked in CI before Android tests/build.
 - Android build configuration is currently Gradle Kotlin DSL: `settings.gradle.kts`, root `build.gradle.kts`, and `app/build.gradle.kts`.
 - Android voice commands support Bengali, Hindi, and English language selection, with owner authorization required for background commands.
-- The Windows agent remains a **local-only MVP** with a strict command allowlist. Its implemented local allowlist includes `PING`, `OPEN_NOTEPAD`, `OPEN_CALCULATOR`, and selected Windows settings.
-- Android contains the phone-side pairing/session architecture, one-time code flow, persistent session token, owner approval gates, and LAN transport helpers. A Windows companion must still be configured and verified on a real Windows 10 machine before phone↔PC operation can be declared production-ready.
+- The Windows agent supports **explicit trusted-LAN mode** with a strict command allowlist. Loopback-only remains the default; LAN mode requires `MAYRA_AGENT_ALLOW_LAN=1` and should be used only on a trusted private network.
+- Android contains the phone-side pairing/session architecture, one-time code flow, persistent session token, owner approval gates, and LAN transport. A Windows 10 companion launcher is provided for explicit trusted-LAN mode. Physical Android↔Windows end-to-end testing is still required before calling the connection production-ready.
 - Do not expose an unverified Windows agent to an untrusted network.
 
 ## Windows setup
 
-See [Windows setup instructions in Bengali](WINDOWS_SETUP_BN.md). Launch helper: [windows/start_mayra.bat](windows/start_mayra.bat).
+See [Windows setup instructions in Bengali](WINDOWS_SETUP_BN.md). Local launcher: [windows/start_mayra.bat](windows/start_mayra.bat). Trusted-LAN launcher: [windows/start_mayra_lan.bat](windows/start_mayra_lan.bat).
 
 ## Developer checks
 
