@@ -87,7 +87,8 @@ class MayraFeatureCheckManager(private val context: Context) {
             CAMERA -> {
                 val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
                 val hardware = context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
-                CheckResult(granted && hardware, if (granted && hardware) "Camera permission and hardware are available." else "Camera permission and/or hardware is unavailable.")
+                val cameraIntent = Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE).resolveActivity(context.packageManager) != null
+                CheckResult(granted && hardware && cameraIntent, if (granted && hardware && cameraIntent) "Camera permission, hardware and camera activity are available." else "Camera permission, hardware and/or camera activity is unavailable.")
             }
             CALL -> {
                 val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
