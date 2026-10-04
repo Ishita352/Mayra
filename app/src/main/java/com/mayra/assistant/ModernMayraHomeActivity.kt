@@ -291,7 +291,46 @@ class ModernMayraHomeActivity : FragmentActivity() {
         }
         form.addView(hostInput)
         form.addView(portInput)
-        form.addView(codeInput)
+        val quickCodeInput = EditText(this).apply {
+            hint = "8-digit Quick Owner Link code"
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            singleLine = true
+        }
+        val ownerId = prefs.getString("mayra_owner_link_id", null) ?: ("gopal-owner-" +
+            android.provider.Settings.Secure.getString(contentResolver, android.provider.Settings.Secure.ANDROID_ID).takeLast(6)).also {
+            prefs.edit().putString("mayra_owner_link_id", it).apply()
+        }
+        val quickButton = actionButton("QUICK CONNECT  〉")
+        quickButton.setOnClickListener {
+            val host = hostInput.text.toString().trim()
+            val port = portInput.text.toString().toIntOrNull() ?: 8765
+            val quickCode = quickCodeInput.text.toString().trim()
+            if (host.isBlank() || quickCode.length != 8) {
+                status.text = "Windows IP এবং 8-digit Quick Owner Link code দিন।"
+                return@setOnClickListener
+            }
+            Thread {
+                val result = LocalDeviceLinkCoordinator().quickPair(
+                    LocalDeviceLinkCoordinator.Endpoint(host, port), ownerId, quickCode
+                )
+                runOnUiThread {
+                    if (result.ok) {
+                        val token = try { org.json.JSONObject(result.response).optString("session_token") } catch (_: Exception) { "" }
+                        if (token.isNotBlank()) {
+                            windowsPairingSession().markPaired("windows-10", host, port, token)
+                            status.text = "Quick Owner Link সফল ✓ — Windows 10 automatically connected."
+                        } else {
+                            status.text = "Quick Link response invalid."
+                        }
+                    } else {
+                        status.text = "Quick Owner Link failed: " + (result.error ?: "invalid/expired code")
+                    }
+                    Toast.makeText(this, status.text, Toast.LENGTH_LONG).show()
+                }
+            }.start()
+        }
+        form.addView(quickCodeInput)
+        form.addView(quickButton)
 
         builder.setView(form)
             .setMessage("Windows agent চালু করে তার PAIRING CODE নিন। Android ও Windows একই trusted Wi-Fi/hotspot-এ রাখুন। প্রথমে Send Pair Request, তারপর Windows-এ owner approval, তারপর Complete Pairing করুন।")
