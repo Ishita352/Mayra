@@ -5,42 +5,49 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class MayraCentralMemoryVaultTest {
-    @Test fun importantApprovedMemoryCanBeEligibleForSync() {
-        val item = MayraCentralMemoryVault.Item(
-            id = "memory-1",
-            dataClass = MayraCentralMemoryVault.DataClass.CORE_MEMORY,
-            sizeBytes = 100,
-            important = true,
-            ownerApproved = true
-        )
-        val config = MayraCentralMemoryVault.Config(
-            enabled = true,
-            ownerApproved = true
+    private val config = MayraCentralMemoryVault.Config(
+        enabled = true,
+        ownerApprovedForProvider = true
+    )
+
+    private fun item() = MayraCentralMemoryVault.Item(
+        id = "memory-1",
+        dataClass = MayraCentralMemoryVault.DataClass.CORE_MEMORY,
+        sizeBytes = 100,
+        important = true
+    )
+
+    @Test fun everyCloudSaveRequiresSpecificOwnerApproval() {
+        assertEquals(
+            MayraCentralMemoryVault.Decision.OWNER_APPROVAL_REQUIRED,
+            MayraCentralMemoryVault.decision(item(), config)
         )
         assertEquals(
             MayraCentralMemoryVault.Decision.ELIGIBLE_FOR_SYNC,
-            MayraCentralMemoryVault.decision(item, config)
+            MayraCentralMemoryVault.decision(item(), config, ownerApprovedForThisItem = true)
         )
+        assertTrue(MayraCentralMemoryVault.requiresExplicitOwnerApprovalForEveryUpload())
     }
 
     @Test fun unimportantMediaStaysLocal() {
-        val item = MayraCentralMemoryVault.Item(
+        val item = item().copy(
             id = "video-1",
             dataClass = MayraCentralMemoryVault.DataClass.IMPORTANT_VIDEO,
-            sizeBytes = 1000,
             important = false
         )
-        val config = MayraCentralMemoryVault.Config(enabled = true, ownerApproved = true)
         assertEquals(
             MayraCentralMemoryVault.Decision.KEEP_LOCAL,
-            MayraCentralMemoryVault.decision(item, config)
+            MayraCentralMemoryVault.decision(item, config, true)
         )
     }
 
     @Test fun providerAndAccountAreReplaceable() {
         assertTrue(MayraCentralMemoryVault.providerCanBeChanged())
         assertTrue(MayraCentralMemoryVault.accountCanBeChanged())
-        assertEquals("https://www.googleapis.com/auth/drive.file", MayraCentralMemoryVault.googleDriveScope())
+        assertEquals(
+            "https://www.googleapis.com/auth/drive.file",
+            MayraCentralMemoryVault.googleDriveScope()
+        )
     }
 
     @Test fun cloudSyncNeverBuysStorage() {
