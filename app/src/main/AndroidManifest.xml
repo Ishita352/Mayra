@@ -25,7 +25,6 @@
         <provider android:name="androidx.core.content.FileProvider" android:authorities="com.mayra.assistant.fileprovider" android:exported="false" android:grantUriPermissions="true">
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
         </provider>
-        <receiver android:name=".MayraUnlockReceiver" android:exported="false"><intent-filter><action android:name="android.intent.action.USER_PRESENT" /></intent-filter></receiver>
         <receiver android:name=".MayraBootReceiver" android:exported="false"><intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /><action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" /><action android:name="android.intent.action.MY_PACKAGE_REPLACED" /></intent-filter></receiver>
     </application>
 </manifest>
