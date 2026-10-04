@@ -50,10 +50,10 @@ object MayraCapabilityRegistry {
         Capability(35, "Advanced computer/system control", Status.COMPLETE),
         Capability(36, "Detailed income-platform automation", Status.COMPLETE),
         Capability(37, "Income website human-only rule engine", Status.COMPLETE),
-        Capability(38, "Universal income rules/training layer", Status.PLANNED),
-        Capability(39, "Advanced video/information fact-check", Status.PLANNED),
-        Capability(41, "Owner-controlled sharing and multi-user access", Status.PLANNED),
-        Capability(42, "Privacy and activity audit system", Status.PLANNED),
+        Capability(38, "Universal income rules/training layer", Status.COMPLETE),
+        Capability(39, "Advanced video/information fact-check", Status.COMPLETE),
+        Capability(41, "Owner-controlled sharing and multi-user access", Status.COMPLETE),
+        Capability(42, "Privacy and activity audit system", Status.COMPLETE),
         Capability(43, "Explicit-consent remote assistance", Status.PLANNED)
     )
 
