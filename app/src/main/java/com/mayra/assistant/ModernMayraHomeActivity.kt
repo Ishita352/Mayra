@@ -29,6 +29,7 @@ class ModernMayraHomeActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.setBackgroundDrawableColor(Color.rgb(7, 10, 22))
         if (!MayraFeatureCheckManager.isSetupCompleted(this)) {
             startActivity(Intent(this, MayraFirstRunSetupActivity::class.java))
             finish()
@@ -94,6 +95,7 @@ class ModernMayraHomeActivity : FragmentActivity() {
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(28, 30, 28, 34)
+            setBackgroundColor(Color.rgb(7, 10, 22))
         }
         val header = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -155,7 +157,7 @@ class ModernMayraHomeActivity : FragmentActivity() {
         }, weightParams())
         grid.addView(row1)
         val row2 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-        row2.addView(card("⌁", "COMPUTER", "Windows 10 link") { openAssistant() }, weightParams())
+        row2.addView(card("⌁", "COMPUTER", "Windows 10 link") { showComputerLinkDialog() }, weightParams())
         row2.addView(card("☎", "CALL ASSIST", "Approved calls") { openAssistant() }, weightParams())
         grid.addView(row2)
         val row3 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
@@ -229,6 +231,42 @@ class ModernMayraHomeActivity : FragmentActivity() {
         setContentView(scroll)
         animateOrb()
     }
+
+    private fun showComputerLinkDialog() {
+        val session = windowsPairingSession()
+        val paired = session.pairedDeviceId()
+        val pending = session.pendingInvite()
+        val message = when {
+            paired != null -> "Windows 10: paired\\nDevice: " + paired + "\\n\\nPhone-side authorization is saved. The full two-way hardware bridge still requires the Windows companion transport."
+            pending != null -> "Windows 10: pairing code pending\\nDevice: " + pending.deviceId + "\\nCode: " + pending.code + "\\nValid for a short time.\\n\\nEnter this code only in your Mayra Windows companion."
+            else -> "Windows 10: not paired. Create a secure owner-approved pairing code?"
+        }
+        val builder = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Mayra ↔ Windows 10")
+            .setMessage(message)
+            .setNegativeButton("Close", null)
+        if (paired != null) {
+            builder.setNeutralButton("Revoke") {
+                session.revoke()
+                status.text = "Windows pairing revoked."
+            }
+        } else if (pending == null) {
+            builder.setPositiveButton("Create Code") {
+                val invite = LocalDeviceLinkCoordinator().createInvite("windows-10")
+                session.saveInvite(MayraWindowsPairingSession.Invite(invite.deviceId, invite.code, invite.expiresAtMs))
+                status.text = "Windows pairing code created: " + invite.code
+                showComputerLinkDialog()
+            }
+        }
+        builder.show()
+    }
+
+    private fun windowsPairingSession(): MayraWindowsPairingSession =
+        MayraWindowsPairingSession(object : MayraWindowsPairingSession.Store {
+            override fun get(key: String) = prefs.getString(key, null)
+            override fun put(key: String, value: String) { prefs.edit().putString(key, value).apply() }
+            override fun remove(key: String) { prefs.edit().remove(key).apply() }
+        })
 
     private fun showWhatsAppVoiceDialog() {
         val input = EditText(this).apply {
