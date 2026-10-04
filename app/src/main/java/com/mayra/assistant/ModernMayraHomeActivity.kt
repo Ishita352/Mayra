@@ -196,6 +196,29 @@ class ModernMayraHomeActivity : FragmentActivity() {
         animateOrb()
     }
 
+    private fun showWhatsAppVoiceDialog() {
+        val input = EditText(this).apply {
+            hint = "যে কথাটি WhatsApp voice message-এ বলবে"
+            minLines = 3
+            setPadding(24, 18, 24, 18)
+        }
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Mayra → WhatsApp Voice")
+            .setMessage("Mayra প্রথমে নিজের পরিচয় দেবে, তারপর আপনার বলা কথাটি voice message হিসেবে প্রস্তুত করবে। শেষ Send আপনার নিয়ন্ত্রণে থাকবে।")
+            .setView(input)
+            .setNegativeButton("Cancel", null)
+            .setPositiveButton("Prepare Voice") { _, _ ->
+                val text = input.text.toString()
+                MayraWhatsAppVoiceMessage.createAndShare(this, text) { message ->
+                    runOnUiThread {
+                        status.text = message
+                        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+            .show()
+    }
+
     private fun openAssistant() {
         if (!prefs.getBoolean("master_on", true)) {
             status.text = "Mayra is OFF. Turn the master switch ON first."
