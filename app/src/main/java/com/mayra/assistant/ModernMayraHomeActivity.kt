@@ -99,7 +99,7 @@ class ModernMayraHomeActivity : FragmentActivity() {
                 welcomeTts?.let { speech ->
                     speech.language = Locale("bn", "IN")
                     speech.speak(
-                        "Welcome Boss, বলুন কী সাহায্য করতে পারি",
+                        "রাধে রাধে বস, বলুন কী সাহায্য করতে পারি",
                         TextToSpeech.QUEUE_FLUSH,
                         null,
                         "mayra_owner_welcome"
