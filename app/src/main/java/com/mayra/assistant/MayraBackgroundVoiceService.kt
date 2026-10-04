@@ -114,6 +114,8 @@ class MayraBackgroundVoiceService : Service() {
 
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, recognitionLanguage())
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, recognitionLanguage())
             putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
             putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, false)
         }
@@ -121,6 +123,15 @@ class MayraBackgroundVoiceService : Service() {
             recognizer?.startListening(intent)
         } catch (_: Exception) {
             scheduleRestart()
+        }
+    }
+
+    private fun recognitionLanguage(): String {
+        return when (prefs.getString("mayra_voice_language", "auto")?.lowercase(Locale.ROOT)) {
+            "bn", "bengali", "বাংলা" -> "bn-IN"
+            "hi", "hindi", "हिन्दी", "हिंदी" -> "hi-IN"
+            "en", "english" -> "en-IN"
+            else -> Locale.getDefault().toLanguageTag().ifBlank { "en-IN" }
         }
     }
 
@@ -236,13 +247,17 @@ class MayraBackgroundVoiceService : Service() {
     private fun speak(message: String) {
         val audioManager = getSystemService(AudioManager::class.java)
         if (prefs.getBoolean("mayra_silent_mode_behavior", true) && audioManager?.ringerMode == AudioManager.RINGER_MODE_SILENT) return
-        tts?.setLanguage(
-            when {
+        val selected = when (prefs.getString("mayra_voice_language", "auto")?.lowercase(Locale.ROOT)) {
+            "bn", "bengali", "বাংলা" -> Locale("bn", "IN")
+            "hi", "hindi", "हिन्दी", "हिंदी" -> Locale("hi", "IN")
+            "en", "english" -> Locale("en", "IN")
+            else -> when {
                 message.any { it in '\u0980'..'\u09FF' } -> Locale("bn", "IN")
                 message.any { it in '\u0900'..'\u097F' } -> Locale("hi", "IN")
-                else -> Locale.US
+                else -> Locale("en", "IN")
             }
-        )
+        }
+        tts?.setLanguage(selected)
         tts?.speak(message, TextToSpeech.QUEUE_FLUSH, null, "mayra_background")
     }
 
