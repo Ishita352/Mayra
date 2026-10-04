@@ -59,7 +59,9 @@ object MayraCapabilityRegistry {
         Capability(55, "Owner WhatsApp important-information channel", Status.IN_PROGRESS),
         Capability(56, "Owner Home controls: camera, calls, 3D, voice light and WhatsApp", Status.IN_PROGRESS),
         Capability(57, "Voice access, locked-phone activity, silent behavior and Mayra volume", Status.IN_PROGRESS),
-        Capability(58, "Protected Android + Windows 10 device safety and Owner-authorized control", Status.IN_PROGRESS)
+        Capability(58, "Protected Android + Windows 10 device safety and Owner-authorized control", Status.IN_PROGRESS),
+        Capability(59, "Owner approval gate with controllable background automations", Status.IN_PROGRESS),
+        Capability(60, "Multilingual grammar and language intelligence", Status.IN_PROGRESS)
     )
 
     fun all(): List<Capability> = capabilities
