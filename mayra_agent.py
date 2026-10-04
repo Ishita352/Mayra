@@ -331,7 +331,7 @@ def handle_connection(conn):
                     token = approve_pairing(request.get("code", ""))
                     response = {"ok": bool(token), "session_token": token}
                     if not token:
-                        response["error"] = "Pairing code invalid, expired, or not owner-approved"}
+                        response["error"] = "Pairing code invalid, expired, or not owner-approved"
                 elif action == "REVOKE":
                     token = request.get("session_token")
                     if authenticated(token):
