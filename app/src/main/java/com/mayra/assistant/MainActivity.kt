@@ -489,9 +489,9 @@ class MainActivity : FragmentActivity() {
             showVoiceResult("Mayra আবার চালু হয়েছে এবং আগের saved state/knowledge থেকেই resume করছে।")
         }
     }
-    private fun showDocxEditor(text: String) {
+    private fun showDocxEditor(content: String) {
         val editor = EditText(this).apply {
-            setText(text)
+            setText(content)
             setSelection(length())
             minLines = 12
             gravity = android.view.Gravity.TOP
@@ -513,9 +513,9 @@ class MainActivity : FragmentActivity() {
         setContentView(ScrollView(this).apply { addView(layout) })
     }
 
-    private fun showPdfEditor(text: String) {
+    private fun showPdfEditor(content: String) {
         val editor = EditText(this).apply {
-            setText(text)
+            setText(content)
             setSelection(length())
             minLines = 12
             gravity = android.view.Gravity.TOP
