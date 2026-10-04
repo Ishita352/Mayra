@@ -10,6 +10,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.RecognizerIntent
+import android.speech.tts.UtteranceProgressListener
 import android.widget.*
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
@@ -735,6 +736,11 @@ class MainActivity : FragmentActivity() {
         responseTts?.shutdown()
         responseTts = TextToSpeech(this) { status ->
             if (status == TextToSpeech.SUCCESS) {
+                responseTts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+                    override fun onStart(utteranceId: String?) { if (voiceLightEnabled) setVoiceLight(true) }
+                    override fun onDone(utteranceId: String?) { runOnUiThread { setVoiceLight(false) } }
+                    override fun onError(utteranceId: String?) { runOnUiThread { setVoiceLight(false) } }
+                })
                 val locale = when {
                     message.contains(Regex("[\\u0980-\\u09FF]")) -> Locale("bn", "IN")
                     message.contains(Regex("[\\u0900-\\u097F]")) -> Locale("hi", "IN")
@@ -750,13 +756,13 @@ class MainActivity : FragmentActivity() {
 
     private fun setVoiceLight(active: Boolean) {
         if (!prefs.getBoolean("mayra_voice_light_enabled", true)) return
-        if (active) {
-            window.statusBarColor = android.graphics.Color.BLACK
-            window.navigationBarColor = android.graphics.Color.BLACK
-        } else {
-            window.statusBarColor = android.graphics.Color.BLACK
-            window.navigationBarColor = android.graphics.Color.BLACK
-        }
+        val root = window.decorView
+        root.setBackgroundColor(
+            if (active) android.graphics.Color.rgb(235, 245, 255)
+            else android.graphics.Color.BLACK
+        )
+        window.statusBarColor = if (active) android.graphics.Color.rgb(80, 160, 255) else android.graphics.Color.BLACK
+        window.navigationBarColor = if (active) android.graphics.Color.rgb(80, 160, 255) else android.graphics.Color.BLACK
     }
 
     override fun onDestroy() {
