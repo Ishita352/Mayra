@@ -1,0 +1,3 @@
+package com.mayra.assistant
+
+class MayraVoiceLightOverlayStub
