@@ -24,7 +24,12 @@ class MayraSemanticMemory(private val store: Store) {
         val timestampMs: Long
     )
 
-    class SharedPreferencesStore(private val context: android.content.Context) : Store {\n        override fun read(key: String): String? = MayraMemoryStore.read(context, key)\n        override fun write(key: String, value: String) = MayraMemoryStore.write(context, key, value)\n    }\n\n    interface Store {
+    class SharedPreferencesStore(private val context: android.content.Context) : Store {
+        override fun read(key: String): String? = MayraMemoryStore.read(context, key)
+        override fun write(key: String, value: String) = MayraMemoryStore.write(context, key, value)
+    }
+
+    interface Store {
         fun read(key: String): String?
         fun write(key: String, value: String)
     }
@@ -65,7 +70,7 @@ class MayraSemanticMemory(private val store: Store) {
     }
 
     fun buildContext(query: String, limit: Int = 5): String =
-        recall(query, limit).joinToString("\n") { "[\${it.id}] \${it.text}" }
+        recall(query, limit).joinToString("\n") { "[${it.id}] ${it.text}" }
 
     private fun score(entry: MemoryEntry, queryTokens: Set<String>): Int {
         val textScore = tokens(entry.text).count { it in queryTokens } * 2
