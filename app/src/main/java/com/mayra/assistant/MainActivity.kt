@@ -30,49 +30,6 @@ class MainActivity : FragmentActivity() {
     private val familyAccountManager by lazy { MayraFamilyAccountManager(MayraFamilyAccountManager.SharedPreferencesStore(prefs)) }
     private val semanticMemory by lazy { MayraSemanticMemory(MayraSemanticMemory.SharedPreferencesStore(this)) }
     private val semanticMemoryBridge by lazy { MayraSemanticMemoryBridge(semanticMemory) }
-    private val windowsPairingSession by lazy { MayraWindowsPairingSession(object : MayraWindowsPairingSession.Store {
-        override fun get(key: String): String? = prefs.getString(key, null)
-        override fun put(key: String, value: String) { prefs.edit().putString(key, value).apply() }
-        override fun remove(key: String) { prefs.edit().remove(key).apply() }
-    }) }
-    private val founderIdentity by lazy { MayraFounderIdentity(object : MayraFounderIdentity.Store { override fun get(key: String) = prefs.getString(key, null); override fun put(key: String, value: String) { prefs.edit().putString(key, value).apply() } }) }
-    private var activeFamilySession: MayraFamilyAccountManager.AuthenticatedSession? = null
-    private val prefs by lazy { getSharedPreferences("mayra_secure", MODE_PRIVATE) }
-    private val voiceRequestCode = 7001
-    private val notificationRequestCode = 7002
-    private var responseTts: TextToSpeech? = null
-    private var voiceLightOverlay: MayraVoiceLightOverlay? = null
-    private var masterSwitch: Switch? = null
-    private var pendingPdfText: String? = null
-    private var pendingDocxText: String? = null
-    private var pendingDocxEditText: String? = null
-    private var pendingPdfEditText: String? = null
-    private var pendingDocxPdfText: String? = null
-    private var capturingWhatsAppReply = false
-    private var welcomePendingAfterLock = false
-    private var welcomeShownForCurrentUnlock = false
-
-    private val excelPicker = registerForActivityResult(
-        ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        if (uri == null) { showVoiceResult("কোনো spreadsheet নির্বাচন করা হয়নি।"); return@registerForActivityResult }
-        try {
-            val type = contentResolver.getType(uri)
-            val data = contentResolver.openInputStream(uri)?.use { input ->
-                if (type == "text/csv" || type == "text/comma-separated-values" || uri.toString().lowercase().endsWith(".csv")) {
-                    SpreadsheetDocumentEngine.readDelimited(input)
-                } else if (type == "text/tab-separated-values" || uri.toString().lowercase().endsWith(".tsv")) {
-                    SpreadsheetDocumentEngine.readDelimited(input, '\t')
-                } else {
-                    SpreadsheetDocumentEngine.readXlsx(input)
-                }
-            } ?: throw IllegalArgumentException("Spreadsheet file পড়া যায়নি।")
-            val validation = SpreadsheetDocumentEngine.validate(data)
-            showModule("Excel / Spreadsheet Validation", validation.message + "\n\n--- Preview ---\n" + SpreadsheetDocumentEngine.preview(data))
-        } catch (e: Exception) {
-            showVoiceResult("Spreadsheet validation ব্যর্থ: " + (e.message ?: "অজানা error"))
-        }
-    }
 
     private val documentPicker = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -889,54 +846,6 @@ class MainActivity : FragmentActivity() {
                 return
             }
         }
-        // Android -> Windows real LAN command transport. Windows is optional;
-        // failure always falls back to standalone Android mode.
-        if (windowsPairingSession.isPaired()) {
-            val windowsCommand = when {
-                lowerSpoken.contains("computer") && (lowerSpoken.contains("notepad") || lowerSpoken.contains("নোটপ্যাড") || lowerSpoken.contains("नोटपैड")) -> "OPEN_NOTEPAD"
-                lowerSpoken.contains("computer") && (lowerSpoken.contains("calculator") || lowerSpoken.contains("ক্যালকুলেটর") || lowerSpoken.contains("कैलकुलेटर")) -> "OPEN_CALCULATOR"
-                lowerSpoken.contains("computer") && (lowerSpoken.contains("settings") || lowerSpoken.contains("সেটিংস")) -> "OPEN_WINDOWS_SETTINGS"
-                lowerSpoken.contains("computer") && (lowerSpoken.contains("network") || lowerSpoken.contains("নেটওয়ার্ক")) -> "OPEN_NETWORK_SETTINGS"
-                lowerSpoken.contains("computer") && (lowerSpoken.contains("display") || lowerSpoken.contains("ডিসপ্লে")) -> "OPEN_DISPLAY_SETTINGS"
-                lowerSpoken.contains("computer") && (lowerSpoken.contains("sound") || lowerSpoken.contains("সাউন্ড")) -> "OPEN_SOUND_SETTINGS"
-                lowerSpoken.contains("computer") && (lowerSpoken.contains("status") || lowerSpoken.contains("অবস্থা") || lowerSpoken.contains("স্ট্যাটাস")) -> "GET_PC_STATUS"
-                lowerSpoken.contains("computer") && (lowerSpoken.contains("browser") || lowerSpoken.contains("ব্রাউজার") || lowerSpoken.contains("ब्राउज़र")) -> "OPEN_BROWSER"
-                lowerSpoken.contains("computer") && (lowerSpoken.contains("play") || lowerSpoken.contains("pause") || lowerSpoken.contains("প্লে") || lowerSpoken.contains("পজ") || lowerSpoken.contains("चलाओ") || lowerSpoken.contains("रुको")) -> "MEDIA_PLAY_PAUSE"
-                lowerSpoken.contains("computer") && (lowerSpoken.contains("next") || lowerSpoken.contains("পরের গান") || lowerSpoken.contains("अगला")) -> "MEDIA_NEXT"
-                lowerSpoken.contains("computer") && (lowerSpoken.contains("previous") || lowerSpoken.contains("আগের গান") || lowerSpoken.contains("पिछला")) -> "MEDIA_PREVIOUS"
-                else -> null
-            }
-            if (windowsCommand != null) {
-                val host = windowsPairingSession.pairedHost()
-                val token = windowsPairingSession.sessionToken()
-                if (host == null || token == null) {
-                    showVoiceResult("Windows session data অসম্পূর্ণ। Android standalone mode চালু আছে।")
-                    speakResponse("বস, Windows session data অসম্পূর্ণ। Android থেকেই চলছি।")
-                    return
-                }
-                Thread {
-                    val result = LocalDeviceLinkCoordinator().command(
-                        LocalDeviceLinkCoordinator.Endpoint(host, windowsPairingSession.pairedPort()),
-                        token,
-                        windowsCommand
-                    )
-                    runOnUiThread {
-                        val message = if (result.ok) {
-                            try {
-                                val json = org.json.JSONObject(result.response)
-                                json.optString("message").ifBlank { result.response }
-                            } catch (_: Exception) { result.response }
-                        } else {
-                            "Windows command ব্যর্থ। Android standalone mode চালু আছে: " + (result.error ?: "connection unavailable")
-                        }
-                        showVoiceResult(message)
-                        speakResponse(message)
-                    }
-                }.start()
-                return
-            }
-        }
-
         val result = VoiceCommandEngine.parse(spoken)
         when (result.action) {
             VoiceCommandResult.Action.OPEN_SETTINGS -> startActivity(Intent(android.provider.Settings.ACTION_SETTINGS))
@@ -988,47 +897,6 @@ class MainActivity : FragmentActivity() {
                 val msg = if (wantsOff) "Incoming Call Assistant OFF।" else "Incoming Call Assistant ON — Android-supported call workflow-এর জন্য প্রস্তুত।"
                 showVoiceResult(msg)
                 speakResponse(msg)
-                return
-            }
-            VoiceCommandResult.Action.PAIR_COMPUTER -> {
-                val paired = windowsPairingSession.pairedDeviceId()
-                if (paired != null) {
-                    val msg = "Windows computer ইতিমধ্যে paired আছে (device: $paired)।"
-                    showVoiceResult(msg); speakResponse(msg); return
-                }
-                val invite = windowsPairingSession.pendingInvite() ?: run {
-                    val created = LocalDeviceLinkCoordinator().createInvite("windows-10")
-                    windowsPairingSession.saveInvite(
-                        MayraWindowsPairingSession.Invite(
-                            created.deviceId,
-                            created.code,
-                            created.expiresAtMs
-                        )
-                    )
-                    windowsPairingSession.pendingInvite()!!
-                }
-                val msg = "Windows 10 pairing code: ${invite.code}\nCodeটি শুধু আপনার Windows Mayra companion-এ Owner-approved pairing-এর জন্য ব্যবহার করুন। এটি ৫ মিনিট valid।"
-                showVoiceResult(msg); speakResponse(msg)
-                return
-            }
-            VoiceCommandResult.Action.COMPUTER_STATUS -> {
-                val paired = windowsPairingSession.pairedDeviceId()
-                val pending = windowsPairingSession.pendingInvite()
-                val msg = when {
-                    paired != null -> "কম্পিউটার: paired এবং Owner-authorized session state সংরক্ষিত আছে।"
-                    pending != null -> "কম্পিউটার: pairing code pending আছে; Windows companion থেকে এখনও acceptance আসেনি।"
-                    else -> "কম্পিউটার: এখনো paired নয়। 'কম্পিউটার pair করো' বললে নতুন secure pairing code তৈরি হবে।"
-                }
-                showVoiceResult(msg); speakResponse(msg); return
-            }
-            VoiceCommandResult.Action.COMPUTER_OPEN_BROWSER,
-            VoiceCommandResult.Action.COMPUTER_FIND_FILE -> {
-                if (!windowsPairingSession.isPaired()) {
-                    val msg = "বস, আগে Windows 10 computer pair করতে হবে।"
-                    showVoiceResult(msg); speakResponse(msg); return
-                }
-                val msg = "বস, Windows session paired আছে; এই command-এর companion-agent execution এখনো allowlist অনুযায়ী unavailable। আমি command নিজে থেকে চালাইনি।"
-                showVoiceResult(msg); speakResponse(msg)
                 return
             }
             VoiceCommandResult.Action.SHOW_TIME -> {
