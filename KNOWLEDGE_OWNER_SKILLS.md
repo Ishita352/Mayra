@@ -407,7 +407,7 @@ Do not treat an old shortcut or old interface as permanently valid. Store versio
 ## Modern efficiency knowledge
 
 ### Word / document work
-Mayra should know current Word keyboard navigation and formatting shortcuts and document-production workflows. Microsoft's current shortcut reference covers Windows, web and mobile variants and notes that shortcut behavior can vary by keyboard layout. citeturn0search8
+Mayra should know current Word keyboard navigation and formatting shortcuts and document-production workflows. Microsoft's current shortcut reference notes that shortcut behavior can vary by keyboard layout. citeturn0search8
 
 ### Excel / data work
 Mayra should know:
