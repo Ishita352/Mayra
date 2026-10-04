@@ -117,29 +117,13 @@ class MayraBackgroundVoiceService : Service() {
     }
 
     private fun handleCommand(spoken: String) {
-        // The Activity remains the full command executor. This broadcast lets
-        // an existing Mayra Activity receive commands without requiring a
-        // button press. The service also handles safe background controls
-        // directly so basic commands still work after the Activity is cleared.
         sendBroadcast(Intent(ACTION_COMMAND).setPackage(packageName).putExtra(EXTRA_SPOKEN, spoken))
-
-        val lower = spoken.lowercase(Locale.ROOT)
-        when {
-            listOf("stop listening", "voice command off", "ভয়েস কমান্ড বন্ধ", "ভয়েস কমান্ড বন্ধ",
-                "voice off", "मायरा आवाज बंद").any { lower.contains(it) } -> {
-                prefs.edit().putBoolean(FeatureToggleRegistry.VOICE_COMMAND, false).apply()
-                speak("বস, Voice Command বন্ধ করেছি।")
+        val result = MayraBackgroundCommandRouter.route(this, spoken)
+        if (result.handled) {
+            speak(result.response)
+            if (!getSharedPreferences("mayra_secure", MODE_PRIVATE).getBoolean("master_on", false) ||
+                !FeatureToggleRegistry.isEnabled(getSharedPreferences("mayra_secure", MODE_PRIVATE), FeatureToggleRegistry.VOICE_COMMAND)) {
                 stopListening()
-            }
-            listOf("mayra off", "মায়রা অফ", "মায়রা অফ", "master off", "মাস্টার অফ",
-                "मायरा बंद").any { lower.contains(it) } -> {
-                prefs.edit().putBoolean("master_on", false).apply()
-                speak("বস, Mayra Master OFF করেছি।")
-                stopListening()
-            }
-            listOf("feature status", "what features", "কি কি ফিচার", "কোন কোন ফিচার",
-                "ফিচারগুলোর অবস্থা", "फीचर स्टेटस").any { lower.contains(it) } -> {
-                speak(MayraFeatureCheckManager.summary(this))
             }
         }
     }
