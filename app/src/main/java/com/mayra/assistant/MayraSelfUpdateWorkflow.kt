@@ -22,12 +22,12 @@ object MayraSelfUpdateWorkflow {
         request.requestedPermissions.isNotEmpty() || request.risk != Risk.LOW
 
     fun canEditCode(request: Request): Boolean =
-        request.description.isNotBlank() && request.ownerApproved &&
+        request.description.isNotBlank() &&
             !request.requestedPermissions.any { it.equals("financial_transaction", true) }
 
     fun nextStage(request: Request, testsPassed: Boolean): Stage {
         if (!canEditCode(request)) return Stage.BLOCKED
-        if (requiresPermission(request) && !request.ownerApproved) return Stage.PERMISSION_REQUIRED
+        if (!request.ownerApproved) return Stage.PERMISSION_REQUIRED
         if (!testsPassed) return Stage.TESTING
         return Stage.READY_TO_APPLY
     }
@@ -50,5 +50,5 @@ object MayraSelfUpdateWorkflow {
     )
 
     fun rule() =
-        "Mayra can improve its code and prepare updates from an Owner request; elevated changes require explicit permission, tests must pass, security controls cannot be disabled, and financial/secret/covert operations are blocked."
+        "Mayra can improve its code and prepare updates only after explicit Owner approval; every change requires approval, tests must pass, security controls cannot be disabled, and financial/secret/covert operations are blocked."
 }
