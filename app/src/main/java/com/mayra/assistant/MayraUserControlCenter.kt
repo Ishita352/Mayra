@@ -23,7 +23,8 @@ object MayraUserControlCenter {
         val whatsappImportant: Boolean,
         val voiceCommandAccess: Boolean,
         val lockedPhoneActive: Boolean,
-        val silentMode: Boolean
+        val silentMode: Boolean,
+        val volumePercent: Int
     )
 
     fun state(prefs: android.content.SharedPreferences): State = State(
@@ -34,7 +35,8 @@ object MayraUserControlCenter {
         whatsappImportant = prefs.getBoolean("mayra_whatsapp_important_enabled", true),
         voiceCommandAccess = FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.VOICE_COMMAND),
         lockedPhoneActive = prefs.getBoolean("mayra_locked_phone_active", false),
-        silentMode = prefs.getBoolean("mayra_silent_mode_behavior", true)
+        silentMode = prefs.getBoolean("mayra_silent_mode_behavior", true),
+        volumePercent = prefs.getInt("mayra_volume_percent", 70)
     )
 
     fun set(prefs: android.content.SharedPreferences, control: String, enabled: Boolean) {
@@ -47,6 +49,7 @@ object MayraUserControlCenter {
             VOICE_COMMAND_ACCESS -> FeatureToggleRegistry.setEnabled(prefs, FeatureToggleRegistry.VOICE_COMMAND, enabled)
             LOCKED_PHONE_ACTIVE -> prefs.edit().putBoolean("mayra_locked_phone_active", enabled).apply()
             SILENT_MODE -> prefs.edit().putBoolean("mayra_silent_mode_behavior", enabled).apply()
+            MAYRA_VOLUME -> Unit
         }
     }
 
@@ -98,3 +101,13 @@ object MayraUserControlCenter {
 
     fun volumeRule(): String =
         "Mayra volume adjustment শুধু Android-এর অনুমোদিত audio stream ব্যবহার করবে এবং Owner-এর voice command/visible control দিয়ে বাড়ানো-কমানো যাবে."
+
+
+    fun setVolume(prefs: android.content.SharedPreferences, percent: Int): Int {
+        val value = percent.coerceIn(0, 100)
+        prefs.edit().putInt("mayra_volume_percent", value).apply()
+        return value
+    }
+
+    fun volume(prefs: android.content.SharedPreferences): Int =
+        prefs.getInt("mayra_volume_percent", 70).coerceIn(0, 100)
