@@ -581,6 +581,13 @@ class ModernMayraHomeActivity : FragmentActivity() {
             cornerRadius = radiusDp * resources.displayMetrics.density
             setStroke((1 * resources.displayMetrics.density).toInt().coerceAtLeast(1), Color.rgb(70, 95, 145))
         }
+
+    override fun onDestroy() {
+        welcomeTts?.stop()
+        welcomeTts?.shutdown()
+        welcomeTts = null
+        super.onDestroy()
+    }
 }
 
 
@@ -597,10 +604,4 @@ object MayraBackgroundVoiceServiceStarter {
         context.startService(intent)
     }
 
-    override fun onDestroy() {
-        welcomeTts?.stop()
-        welcomeTts?.shutdown()
-        welcomeTts = null
-        super.onDestroy()
-    }
 }
