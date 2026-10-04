@@ -9,7 +9,7 @@ class MayraLockedPhoneVoiceGateTest {
         LockModePolicy.setEnabled(p, true)
         assertEquals(
             MayraLockedPhoneVoiceGate.Decision.OWNER_VERIFICATION_REQUIRED,
-            MayraLockedPhoneVoiceGate.decide(p, false, true, true, "status")
+            MayraLockedPhoneVoiceGate.decide(p, false, false, true, true, "status")
         )
     }
 
@@ -19,7 +19,7 @@ class MayraLockedPhoneVoiceGateTest {
         assertEquals(true, LockModePolicy.isEnabled(p))
         assertEquals(
             MayraLockedPhoneVoiceGate.Decision.OWNER_VERIFICATION_REQUIRED,
-            MayraLockedPhoneVoiceGate.decide(p, false, true, true, "status")
+            MayraLockedPhoneVoiceGate.decide(p, false, false, true, true, "status")
         )
     }
 
@@ -30,7 +30,7 @@ class MayraLockedPhoneVoiceGateTest {
         assertEquals(false, LockModePolicy.isEnabled(p))
         assertEquals(
             MayraLockedPhoneVoiceGate.Decision.BLOCK,
-            MayraLockedPhoneVoiceGate.decide(p, true, true, true, "status")
+            MayraLockedPhoneVoiceGate.decide(p, true, true, true, true, "status")
         )
     }
 
@@ -39,7 +39,7 @@ class MayraLockedPhoneVoiceGateTest {
         LockModePolicy.setEnabled(p, true)
         assertEquals(
             MayraLockedPhoneVoiceGate.Decision.BLOCK,
-            MayraLockedPhoneVoiceGate.decide(p, true, true, true, "payment")
+            MayraLockedPhoneVoiceGate.decide(p, true, true, true, true, "payment")
         )
     }
 
@@ -48,7 +48,7 @@ class MayraLockedPhoneVoiceGateTest {
         LockModePolicy.setEnabled(p, true)
         assertEquals(
             MayraLockedPhoneVoiceGate.Decision.BLOCK,
-            MayraLockedPhoneVoiceGate.decide(p, true, true, true, "পেমেন্ট করো")
+            MayraLockedPhoneVoiceGate.decide(p, true, true, true, true, "পেমেন্ট করো")
         )
     }
 
@@ -56,7 +56,7 @@ class MayraLockedPhoneVoiceGateTest {
         val p = TestSharedPreferences()
         assertEquals(
             MayraLockedPhoneVoiceGate.Decision.ALLOW_LIMITED_VOICE,
-            MayraLockedPhoneVoiceGate.decide(p, true, true, false, "সময় বলো")
+            MayraLockedPhoneVoiceGate.decide(p, true, true, true, false, "সময় বলো")
         )
     }
 }
