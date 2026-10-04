@@ -115,6 +115,26 @@ class MayraAgentTests(unittest.TestCase):
         self.assertEqual(startfile.call_args_list[1].args[0], "https://example.com")
 
     @patch("mayra_agent.platform.system", return_value="Windows")
+    @patch("mayra_agent.subprocess.run")
+    def test_clipboard_read_uses_powershell(self, run, _system):
+        run.return_value = type("Result", (), {"returncode": 0, "stdout": "hello\\n"})()
+        result = mayra_agent.execute("READ_CLIPBOARD")
+        self.assertTrue(result["ok"])
+        self.assertEqual(result["clipboard"], "hello\\n")
+        run.assert_called_once()
+
+    @patch("mayra_agent.platform.system", return_value="Windows")
+    @patch("mayra_agent.subprocess.run")
+    def test_clipboard_write_uses_base64_payload(self, run, _system):
+        import base64
+        run.return_value = type("Result", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+        payload = base64.b64encode("বাংলা clipboard".encode("utf-8")).decode("ascii")
+        result = mayra_agent.execute("WRITE_CLIPBOARD:" + payload)
+        self.assertTrue(result["ok"])
+        self.assertEqual(run.call_args.kwargs["input"], "বাংলা clipboard")
+        self.assertIn("Set-Clipboard", run.call_args.args[0][-1])
+
+    @patch("mayra_agent.platform.system", return_value="Windows")
     @patch("mayra_agent.os.startfile")
     def test_browser_remote_control_rejects_unsafe_url(self, startfile, _system):
         result = mayra_agent.execute("OPEN_BROWSER:file:///C:/secret.txt")
