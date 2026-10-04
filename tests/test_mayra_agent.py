@@ -107,6 +107,24 @@ class MayraAgentTests(unittest.TestCase):
         self.assertEqual(denied["error"], "Command not allowed")
         mayra_agent.revoke_session()
 
+    def test_quick_owner_link_auto_pairs_with_one_time_code(self):
+        mayra_agent.start_pairing()
+        code = mayra_agent.quick_pair_code()
+        self.assertIsNotNone(code)
+        token = mayra_agent.quick_pair("gopal-owner-test", code)
+        self.assertTrue(token)
+        self.assertTrue(mayra_agent.authenticated(token))
+        self.assertIsNone(mayra_agent.quick_pair_code())
+        mayra_agent.revoke_session()
+
+    def test_quick_owner_link_rejects_wrong_code(self):
+        mayra_agent.start_pairing()
+        code = mayra_agent.quick_pair_code()
+        self.assertIsNotNone(code)
+        self.assertIsNone(mayra_agent.quick_pair("gopal-owner-test", "00000000"))
+        self.assertIsNotNone(mayra_agent.quick_pair_code())
+        mayra_agent.revoke_session()
+
 
 if __name__ == "__main__":
     unittest.main()
