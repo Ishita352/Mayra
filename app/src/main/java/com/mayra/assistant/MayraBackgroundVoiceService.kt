@@ -84,6 +84,7 @@ class MayraBackgroundVoiceService : Service() {
             prefs.getBoolean("master_on", false) &&
                 FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.VOICE_COMMAND) &&
                 prefs.getBoolean("owner_verified", false) &&
+                prefs.getBoolean("owner_command_authorized", false) &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
         if (!baseAllowed) return false
         val locked = getSystemService(KeyguardManager::class.java)?.isKeyguardLocked == true
@@ -145,7 +146,9 @@ class MayraBackgroundVoiceService : Service() {
     }
 
     private fun startPhoneCommandServer() {
-        if (!prefs.getBoolean("master_on", false) || !prefs.getBoolean("owner_verified", false)) return
+        if (!prefs.getBoolean("master_on", false) ||
+            !prefs.getBoolean("owner_verified", false) ||
+            !prefs.getBoolean("owner_command_authorized", false)) return
         if (phoneServer != null) return
         phoneServerThread = Thread {
             try {
@@ -176,6 +179,10 @@ class MayraBackgroundVoiceService : Service() {
                 val writer = PrintWriter(OutputStreamWriter(it.getOutputStream(), Charsets.UTF_8), true)
                 val line = reader.readLine() ?: return
                 val request = JSONObject(line)
+                if (!prefs.getBoolean("owner_command_authorized", false)) {
+                    writer.println(JSONObject().put("ok", false).put("error", "Owner verification required"))
+                    return
+                }
                 val expected = prefs.getString("windows_paired_token", null)
                 val token = request.optString("session_token")
                 if (expected.isNullOrBlank() || token != expected) {
@@ -223,7 +230,8 @@ class MayraBackgroundVoiceService : Service() {
         if (locked) {
             val decision = MayraLockedPhoneVoiceGate.decide(
                 prefs,
-                ownerVerified = prefs.getBoolean("owner_verified", false),
+                ownerVerified = prefs.getBoolean("owner_verified", false) &&
+                    prefs.getBoolean("owner_command_authorized", false),
                 masterOn = prefs.getBoolean("master_on", false),
                 locked = true,
                 task = spoken
