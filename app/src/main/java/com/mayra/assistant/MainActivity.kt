@@ -679,8 +679,32 @@ class MainActivity : FragmentActivity() {
                 showVoiceResult(msg); speakResponse(msg); return
             }
             lowerSpoken.contains("গুরুত্বপূর্ণ") && lowerSpoken.contains("whatsapp") && (lowerSpoken.contains("পাঠাও") || lowerSpoken.contains("send")) -> {
-                showVoiceResult("গুরুত্বপূর্ণ তথ্যের WhatsApp channel command পাওয়া গেছে। Authorized WhatsApp integration থাকলে পাঠানো যাবে; বর্তমানে direct API integration না থাকলে Mayra message প্রস্তুত করবে।")
-                speakResponse("বস, WhatsApp গুরুত্বপূর্ণ তথ্য channel-এর জন্য direct authorized integration দরকার।")
+                if (!prefs.getBoolean("mayra_whatsapp_important_enabled", true)) {
+                    showVoiceResult("WhatsApp Important Information OFF।")
+                    speakResponse("বস, WhatsApp গুরুত্বপূর্ণ তথ্য পাঠানোর control এখন বন্ধ আছে।")
+                    return
+                }
+                val title = if (sessionState.hasResumeState()) sessionState.title() else "Mayra Important Information"
+                val body = if (sessionState.hasResumeState()) sessionState.details() else "Owner-requested important information from Mayra."
+                val message = MayraWhatsAppImportantChannel.Message(
+                    category = MayraWhatsAppImportantChannel.Category.SYSTEM,
+                    priority = MayraWhatsAppImportantChannel.Priority.HIGH,
+                    title = title,
+                    body = body
+                )
+                val decision = MayraWhatsAppImportantChannel.deliveryDecision(message, integrationAuthorized = true, ownerApproved = true)
+                if (decision != MayraWhatsAppImportantChannel.Delivery.SEND_VIA_AUTHORIZED_INTEGRATION) {
+                    showVoiceResult("WhatsApp message validation/authorization ব্যর্থ।")
+                    return
+                }
+                val launched = MayraWhatsAppShare.launch(this, message)
+                val response = if (launched) {
+                    "বস, গুরুত্বপূর্ণ তথ্য WhatsApp-এ পাঠানোর জন্য WhatsApp chat খুলে দেওয়া হয়েছে। Send button-টি আপনার নিয়ন্ত্রণে থাকবে।"
+                } else {
+                    "বস, WhatsApp খোলা যায়নি। WhatsApp ইনস্টল আছে কি না এবং availability পরীক্ষা করুন।"
+                }
+                showVoiceResult(response)
+                speakResponse(response)
                 return
             }
         }
