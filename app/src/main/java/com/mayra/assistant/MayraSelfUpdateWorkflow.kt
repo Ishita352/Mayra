@@ -8,7 +8,7 @@ package com.mayra.assistant
  * actions are never part of the update workflow.
  */
 object MayraSelfUpdateWorkflow {
-    enum class Stage { REQUESTED, ANALYZING, PERMISSION_REQUIRED, EDITING, TESTING, VERIFIED, READY_TO_APPLY, APPLIED, BLOCKED }
+    enum class Stage { REQUESTED, SUGGESTED, ANALYZING, PERMISSION_REQUIRED, OWNER_APPROVAL_REQUIRED, EDITING, TESTING, VERIFIED, READY_TO_APPLY, APPLIED, BLOCKED }
     enum class Risk { LOW, ELEVATED, HIGH }
 
     data class Request(
@@ -17,6 +17,9 @@ object MayraSelfUpdateWorkflow {
         val requestedPermissions: Set<String> = emptySet(),
         val risk: Risk = Risk.LOW
     )
+
+    fun suggest(request: Request): String =
+        "Mayra suggests: ${request.description}. It will explain the change, required permissions, risks and tests before asking Owner approval."
 
     fun requiresPermission(request: Request): Boolean =
         request.requestedPermissions.isNotEmpty() || request.risk != Risk.LOW
@@ -27,10 +30,12 @@ object MayraSelfUpdateWorkflow {
 
     fun nextStage(request: Request, testsPassed: Boolean): Stage {
         if (!canEditCode(request)) return Stage.BLOCKED
-        if (!request.ownerApproved) return Stage.PERMISSION_REQUIRED
+        if (!request.ownerApproved) return Stage.OWNER_APPROVAL_REQUIRED
         if (!testsPassed) return Stage.TESTING
         return Stage.READY_TO_APPLY
     }
+
+    fun approvalRequiredForEveryChange() = true
 
     fun allowedOperations(): Set<String> = setOf(
         "inspect_source",
