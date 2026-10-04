@@ -7,7 +7,7 @@ class MayraHealthMonitorTest {
     @Test fun repairsUnsafeStateCombinations() {
         val prefs = TestSharedPreferences()
         prefs.edit()
-            .putBoolean("setup_complete", false)
+            .putBoolean(MayraFeatureCheckManager.KEY_SETUP_COMPLETED, false)
             .putBoolean("master_on", true)
             .putBoolean(FeatureToggleRegistry.VOICE_COMMAND, true)
             .putBoolean("mayra_voice_light_enabled", true)
@@ -24,7 +24,7 @@ class MayraHealthMonitorTest {
     @Test fun clearsIncompleteWindowsPairing() {
         val prefs = TestSharedPreferences()
         prefs.edit()
-            .putBoolean("setup_complete", true)
+            .putBoolean(MayraFeatureCheckManager.KEY_SETUP_COMPLETED, true)
             .putBoolean("owner_verified", true)
             .putString("windows_paired_device", "windows-10")
             .putString("windows_paired_host", "192.168.1.20")
@@ -40,7 +40,7 @@ class MayraHealthMonitorTest {
     @Test fun healthyStateNeedsNoRepair() {
         val prefs = TestSharedPreferences()
         prefs.edit()
-            .putBoolean("setup_complete", true)
+            .putBoolean(MayraFeatureCheckManager.KEY_SETUP_COMPLETED, true)
             .putBoolean("owner_verified", true)
             .putBoolean("master_on", true)
             .putBoolean(FeatureToggleRegistry.VOICE_COMMAND, true)
