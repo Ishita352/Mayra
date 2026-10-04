@@ -236,6 +236,10 @@ class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MayraMemoryStore.initialize(this)
+        MayraOwnerBiodataPortfolio.seedCareerProfileIfMissing(object : MayraCareerProfileStore.Store {
+            override fun read(key: String): String? = prefs.getString(key, null)
+            override fun write(key: String, value: String) { prefs.edit().putString(key, value).apply() }
+        })
         if (!MayraInstallationBootstrapManager(this).isCompleted()) {
             showInstallationBootstrap()
         } else if (prefs.getBoolean("owner_verified", false)) {
