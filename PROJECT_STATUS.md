@@ -51,7 +51,7 @@ Estimated overall completion: ~38% (planning estimate based on feature scope, no
 
 ## Partially implemented
 - Owner/security integration
-- Family account UI/integration into the main Android navigation
+- Family account UI/integration into the main Android navigation — implemented in Android Home: Family Login + Owner Family Members management (CI currently running)
 - Locked Phone Mode: owner-controlled setting and execution gate are added; full locked-device background execution path is still pending
 - Incoming Call Assistant: Android service foundation exists; complete owner settings/security testing and device-specific answer workflow remain
 - Master switch enforcement across all modules
@@ -68,7 +68,7 @@ Estimated overall completion: ~38% (planning estimate based on feature scope, no
 - Windows 10 assistant
 
 ## Remaining major implementation sequence
-1. Family Accounts UI + Owner management screen + Family login/session integration
+1. Family Accounts UI + Owner management screen + Family login/session integration — implemented; final CI verification pending
 2. Installation/bootstrap pairing password flow based on installation date; required only during installation/pairing
 3. Core AI/Knowledge integration and semantic memory/resume expansion
 4. Security/permission integration across every module
