@@ -48,6 +48,10 @@ jobs:
           fi
           grep -q 'rootProject.name = "Mayra"' settings.gradle.kts
           grep -q 'include(":app")' settings.gradle.kts
+          grep -q 'owner_command_authorized' app/src/main/java/com/mayra/assistant/ModernMayraHomeActivity.kt
+          grep -q 'owner_command_authorized' app/src/main/java/com/mayra/assistant/MainActivity.kt
+          grep -q 'Welcome Boss' app/src/main/java/com/mayra/assistant/ModernMayraHomeActivity.kt
+          grep -q 'Mayra Owner Command Access' app/src/main/java/com/mayra/assistant/MainActivity.kt
 
       - name: Run Android unit tests
         run: gradle test --no-daemon
