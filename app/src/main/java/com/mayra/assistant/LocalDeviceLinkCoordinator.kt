@@ -12,10 +12,8 @@ import java.util.concurrent.ConcurrentHashMap
 import org.json.JSONObject
 
 /**
- * Session coordinator plus the Android-side LAN transport for the Windows companion.
- *
- * Android remains standalone: transport calls are explicit, short-lived and run
- * off the UI thread. A Windows connection is never required for normal Mayra use.
+ * Session coordinator plus Android transport for the Windows companion.
+ * Android remains fully standalone; Windows connectivity is optional.
  */
 class LocalDeviceLinkCoordinator(
     private val clockMs: () -> Long = { System.currentTimeMillis() },
@@ -28,7 +26,8 @@ class LocalDeviceLinkCoordinator(
         val createdAtMs: Long,
         val securityScan: DevicePreConnectionScan
     )
-    data class Endpoint(val host: String, val port: Int = 8765)
+    data class Endpoint(val host: String, val port: Int = 8765, val internet: Boolean = false)
+    enum class LinkMode { LAN, INTERNET }
     data class TransportResult(val ok: Boolean, val response: String, val error: String? = null)
 
     private val pending = ConcurrentHashMap<String, PairingInvite>()
@@ -65,10 +64,7 @@ class LocalDeviceLinkCoordinator(
         return session
     }
 
-    /**
-     * Sends one bounded JSON request to the Windows agent.
-     * No shell/command execution is performed on Android.
-     */
+    /** Bounded JSON request. The endpoint can be LAN or Internet-reachable. */
     fun request(endpoint: Endpoint, payload: JSONObject, timeoutMs: Int = 5000): TransportResult {
         if (endpoint.host.isBlank() || endpoint.port !in 1..65535) {
             return TransportResult(false, "", "Invalid Windows endpoint")
@@ -80,50 +76,52 @@ class LocalDeviceLinkCoordinator(
                 val writer = PrintWriter(OutputStreamWriter(socket.getOutputStream(), Charsets.UTF_8), true)
                 val reader = BufferedReader(InputStreamReader(socket.getInputStream(), Charsets.UTF_8))
                 writer.println(payload.toString())
-                val line = reader.readLine() ?: return TransportResult(false, "", "Windows agent returned no response")
+                val line = reader.readLine()
+                    ?: return TransportResult(false, "", "Windows agent returned no response")
                 val response = JSONObject(line)
-                TransportResult(response.optBoolean("ok", false), line,
-                    response.optString("error").takeIf { it.isNotBlank() })
+                TransportResult(
+                    response.optBoolean("ok", false),
+                    line,
+                    response.optString("error").takeIf { it.isNotBlank() }
+                )
             }
         } catch (e: Exception) {
             TransportResult(false, "", "Windows connection failed: " + (e.message ?: "unknown error"))
         }
     }
 
-    fun quickPair(endpoint: Endpoint, ownerId: String, code: String): TransportResult =\n        request(endpoint, JSONObject().put("action", "QUICK_PAIR").put("owner_id", ownerId).put("code", code))\n\n    fun requestPair(endpoint: Endpoint, code: String): TransportResult =
+    fun internetEndpoint(host: String, port: Int = 8765): Endpoint =
+        Endpoint(host.trim(), port, internet = true)
+
+    fun lanEndpoint(host: String, port: Int = 8765): Endpoint =
+        Endpoint(host.trim(), port, internet = false)
+
+    fun linkMode(endpoint: Endpoint): LinkMode =
+        if (endpoint.internet) LinkMode.INTERNET else LinkMode.LAN
+
+    fun quickPair(endpoint: Endpoint, ownerId: String, code: String): TransportResult =
+        request(endpoint, JSONObject()
+            .put("action", "QUICK_PAIR")
+            .put("owner_id", ownerId)
+            .put("code", code))
+
+    fun requestPair(endpoint: Endpoint, code: String): TransportResult =
         request(endpoint, JSONObject().put("action", "PAIR_REQUEST").put("code", code))
 
     fun completePair(endpoint: Endpoint, code: String): TransportResult =
         request(endpoint, JSONObject().put("action", "PAIR_APPROVE").put("code", code))
 
-    fun registerPhone(endpoint: Endpoint, sessionToken: String, phoneHost: String, phonePort: Int = 8766): TransportResult =
+    fun registerPhone(
+        endpoint: Endpoint,
+        sessionToken: String,
+        phoneHost: String,
+        phonePort: Int = 8766
+    ): TransportResult =
         request(endpoint, JSONObject()
             .put("action", "REGISTER_PHONE")
             .put("session_token", sessionToken)
             .put("host", phoneHost)
             .put("port", phonePort))
-
-    companion object {
-        fun localLanAddress(): String? {
-            return try {
-                val interfaces = NetworkInterface.getNetworkInterfaces()
-                while (interfaces.hasMoreElements()) {
-                    val network = interfaces.nextElement()
-                    if (!network.isUp || network.isLoopback) continue
-                    val addresses = network.inetAddresses
-                    while (addresses.hasMoreElements()) {
-                        val address = addresses.nextElement()
-                        if (!address.isLoopbackAddress && address.hostAddress?.contains(":") == false) {
-                            return address.hostAddress
-                        }
-                    }
-                }
-                null
-            } catch (_: Exception) {
-                null
-            }
-        }
-    }
 
     fun command(endpoint: Endpoint, sessionToken: String, command: String): TransportResult =
         request(endpoint, JSONObject()
@@ -152,5 +150,27 @@ class LocalDeviceLinkCoordinator(
             NetworkDeviceControlPolicy.PairingState.PAIRED,
             capability in session.capabilities
         )
+    }
+
+    companion object {
+        fun localLanAddress(): String? {
+            return try {
+                val interfaces = NetworkInterface.getNetworkInterfaces()
+                while (interfaces.hasMoreElements()) {
+                    val network = interfaces.nextElement()
+                    if (!network.isUp || network.isLoopback) continue
+                    val addresses = network.inetAddresses
+                    while (addresses.hasMoreElements()) {
+                        val address = addresses.nextElement()
+                        if (!address.isLoopbackAddress && address.hostAddress?.contains(":") == false) {
+                            return address.hostAddress
+                        }
+                    }
+                }
+                null
+            } catch (_: Exception) {
+                null
+            }
+        }
     }
 }
