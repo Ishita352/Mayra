@@ -59,6 +59,42 @@ object MayraVoiceEngine {
         return true
     }
 
+
+    data class ProfileTuning(val speed: Float, val pitch: Float)
+
+    fun profileTuning(profile: MayraVoiceProfile): ProfileTuning = when (profile.style) {
+        "sweet" -> ProfileTuning(0.96f, 1.08f)
+        "soft" -> ProfileTuning(0.90f, 1.04f)
+        "natural" -> ProfileTuning(1.00f, 1.00f)
+        "elegant" -> ProfileTuning(0.94f, 1.02f)
+        "professional" -> ProfileTuning(0.98f, 0.98f)
+        "warm" -> ProfileTuning(0.94f, 0.96f)
+        "friendly" -> ProfileTuning(1.04f, 1.04f)
+        "clear" -> ProfileTuning(1.02f, 1.00f)
+        "energetic" -> ProfileTuning(1.12f, 1.06f)
+        "calm" -> ProfileTuning(0.88f, 0.96f)
+        "deep" -> ProfileTuning(0.90f, 0.88f)
+        "gentle" -> ProfileTuning(0.92f, 0.98f)
+        "rich" -> ProfileTuning(0.94f, 0.92f)
+        "owner" -> ProfileTuning(1.00f, 1.00f)
+        else -> ProfileTuning(1.00f, 1.00f)
+    }
+
+    fun applyProfile(context: Context, profileId: String): Boolean {
+        val profile = profiles.firstOrNull { it.id == profileId } ?: return false
+        select(context, profileId)
+        val tuning = profileTuning(profile)
+        setTuning(context, tuning.speed, tuning.pitch)
+        return true
+    }
+
+    fun findProfile(query: String): MayraVoiceProfile? {
+        val q = query.trim().lowercase(Locale.ROOT)
+        return profiles.firstOrNull { it.id == q } ?: profiles.firstOrNull {
+            it.displayName.lowercase(Locale.ROOT).contains(q) || it.style.lowercase(Locale.ROOT) == q
+        }
+    }
+
     fun setTuning(context: Context, speed: Float, pitch: Float) {
         context.getSharedPreferences("mayra_secure", Context.MODE_PRIVATE).edit()
             .putFloat(PREF_SPEED, speed.coerceIn(0.6f, 1.4f))
