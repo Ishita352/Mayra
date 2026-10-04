@@ -43,3 +43,16 @@ class MayraLegalGuidanceEngineTest {
         assertFalse(MayraLegalGuidanceEngine.isPotentiallyIllegal("explain bail procedure"))
     }
 }
+
+    @Test
+    fun lawfulDefenseRoutesIncludeIngredientsProcedureJurisdictionEvidenceAndRemedies() {
+        val routes = MayraLegalGuidanceEngine.lawfulDefenseRoutes(
+            MayraLegalGuidanceEngine.Matter("A case needs review", MayraLegalGuidanceEngine.MatterType.CRIMINAL)
+        )
+        assertTrue(routes.size >= 5)
+        assertTrue(routes.any { it.route.contains("ingredient", ignoreCase = true) })
+        assertTrue(routes.any { it.route.contains("procedural", ignoreCase = true) })
+        assertTrue(routes.any { it.route.contains("jurisdiction", ignoreCase = true) })
+        assertTrue(routes.any { it.route.contains("evidentiary", ignoreCase = true) })
+        assertTrue(routes.any { it.route.contains("post-order", ignoreCase = true) })
+    }
