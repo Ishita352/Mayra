@@ -13,6 +13,27 @@ class MayraLockedPhoneVoiceGateTest {
         )
     }
 
+    @Test fun homeControlAndSecurityGateShareTheSameLockedPhoneState() {
+        val p = TestSharedPreferences()
+        MayraUserControlCenter.set(p, MayraUserControlCenter.LOCKED_PHONE_ACTIVE, true)
+        assertEquals(true, LockModePolicy.isEnabled(p))
+        assertEquals(
+            MayraLockedPhoneVoiceGate.Decision.OWNER_VERIFICATION_REQUIRED,
+            MayraLockedPhoneVoiceGate.decide(p, false, true, true, "status")
+        )
+    }
+
+    @Test fun disablingHomeControlDisablesLockedPhoneGate() {
+        val p = TestSharedPreferences()
+        MayraUserControlCenter.set(p, MayraUserControlCenter.LOCKED_PHONE_ACTIVE, true)
+        MayraUserControlCenter.set(p, MayraUserControlCenter.LOCKED_PHONE_ACTIVE, false)
+        assertEquals(false, LockModePolicy.isEnabled(p))
+        assertEquals(
+            MayraLockedPhoneVoiceGate.Decision.BLOCK,
+            MayraLockedPhoneVoiceGate.decide(p, true, true, true, "status")
+        )
+    }
+
     @Test fun sensitiveTaskBlocked() {
         val p = TestSharedPreferences()
         LockModePolicy.setEnabled(p, true)

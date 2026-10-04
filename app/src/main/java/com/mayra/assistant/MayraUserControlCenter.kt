@@ -28,7 +28,7 @@ object MayraUserControlCenter {
         prefs.getBoolean("mayra_voice_light_enabled",true),
         prefs.getBoolean("mayra_whatsapp_important_enabled",true),
         FeatureToggleRegistry.isEnabled(prefs,FeatureToggleRegistry.VOICE_COMMAND),
-        prefs.getBoolean("mayra_locked_phone_active",false),
+        LockModePolicy.isEnabled(prefs),
         prefs.getBoolean("mayra_silent_mode_behavior",true),
         volume(prefs)
     )
@@ -41,7 +41,7 @@ object MayraUserControlCenter {
             VOICE_LIGHT -> prefs.edit().putBoolean("mayra_voice_light_enabled",enabled).apply()
             WHATSAPP_IMPORTANT -> prefs.edit().putBoolean("mayra_whatsapp_important_enabled",enabled).apply()
             VOICE_COMMAND_ACCESS -> FeatureToggleRegistry.setEnabled(prefs,FeatureToggleRegistry.VOICE_COMMAND,enabled)
-            LOCKED_PHONE_ACTIVE -> prefs.edit().putBoolean("mayra_locked_phone_active",enabled).apply()
+            LOCKED_PHONE_ACTIVE -> LockModePolicy.setEnabled(prefs, enabled)
             SILENT_MODE -> prefs.edit().putBoolean("mayra_silent_mode_behavior",enabled).apply()
             MAYRA_VOLUME -> Unit
         }

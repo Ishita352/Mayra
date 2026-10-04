@@ -229,7 +229,7 @@ class MainActivity : FragmentActivity() {
         } else if (hasFocus && !keyguard.isKeyguardLocked && welcomePendingAfterLock && !welcomeShownForCurrentUnlock) {
             welcomePendingAfterLock = false
             welcomeShownForCurrentUnlock = true
-            speakResponse("Welcome, Boss! বলুন, কী সাহায্য করতে পারি?")
+            speakResponse("Welcome Boss, বলুন কী সাহায্য করতে পারি")
         }
     }
 
@@ -295,7 +295,7 @@ class MainActivity : FragmentActivity() {
                 prefs.edit().putBoolean("owner_verified", true).apply()
                 founderIdentity.recognizeVerifiedOwner(MayraFounderIdentity.VerificationMethod.ANDROID_BIOMETRIC)
                 showAssistant()
-                speakResponse("Welcome, Boss! বলুন, কী সাহায্য করতে পারি?")
+                speakResponse("Welcome Boss, বলুন কী সাহায্য করতে পারি")
             }
         })
         val info = BiometricPrompt.PromptInfo.Builder()
@@ -650,6 +650,21 @@ class MainActivity : FragmentActivity() {
             MayraVoiceRuntime.Action.NONE -> Unit
         }
         val lowerSpoken = spoken.lowercase(Locale.ROOT)
+
+        // Owner-requested home controls are also available through voice.
+        if (lowerSpoken.contains("lock") && (lowerSpoken.contains("active") || lowerSpoken.contains("চালু") || lowerSpoken.contains("বন্ধ") || lowerSpoken.contains("সক্রিয়"))) {
+            val off = lowerSpoken.contains("বন্ধ") || lowerSpoken.contains("off") || lowerSpoken.contains("disable") || lowerSpoken.contains("নিষ্ক্রিয়") || lowerSpoken.contains("बंद")
+            LockModePolicy.setEnabled(prefs, !off)
+            val msg = if (off) "Locked Phone Activity OFF।" else "Locked Phone Activity ON — শুধু নিরাপদ, Owner-verified কাজ চলবে।"
+            showVoiceResult(msg); speakResponse(msg); return
+        }
+        if (lowerSpoken.contains("silent mode") || lowerSpoken.contains("সাইলেন্ট মোড") || lowerSpoken.contains("silent behavior")) {
+            val off = lowerSpoken.contains("বন্ধ") || lowerSpoken.contains("off") || lowerSpoken.contains("disable") || lowerSpoken.contains("बंद")
+            MayraUserControlCenter.set(prefs, MayraUserControlCenter.SILENT_MODE, !off)
+            val msg = if (off) "Silent Mode Behavior OFF।" else "Silent Mode Behavior ON — ফোন silent থাকলে Mayra কথা বলবে না।"
+            showVoiceResult(msg); speakResponse(msg); return
+        }
+
         MayraActionPermissionPolicy.automationVoiceCommand(spoken)?.let { (automation, enabled) ->
             MayraActionPermissionPolicy.setAutomation(prefs, automation, enabled)
             val state = if (enabled) "চালু" else "বন্ধ"
