@@ -56,7 +56,8 @@ object MayraCapabilityRegistry {
         Capability(52, "Lawful video-income platform intelligence", Status.COMPLETE),
         Capability(53, "Continuous background self-development, learning and opportunity discovery", Status.COMPLETE),
         Capability(54, "Core no-investment, free-first builder and human-only-site principles", Status.COMPLETE),
-        Capability(55, "Owner WhatsApp important-information channel", Status.IN_PROGRESS)
+        Capability(55, "Owner WhatsApp important-information channel", Status.IN_PROGRESS),
+        Capability(56, "Owner Home controls: camera, calls, 3D, voice light and WhatsApp", Status.IN_PROGRESS)
     )
 
     fun all(): List<Capability> = capabilities
