@@ -13,6 +13,8 @@ object MayraOfflineVoiceWorkflow {
         CLOUD_UPLOAD
     }
 
+    data class QueuedUpload(val itemId: String, val queuedAtMillis: Long, val approved: Boolean = false)
+
     enum class Decision {
         ALLOW_OFFLINE, QUEUE_FOR_LATER, OWNER_APPROVAL_REQUIRED, NETWORK_REQUIRED, BLOCKED
     }
@@ -45,6 +47,12 @@ object MayraOfflineVoiceWorkflow {
             else -> null
         }
     }
+
+    fun queueItem(itemId: String, nowMillis: Long = System.currentTimeMillis()): QueuedUpload? =
+        if (itemId.isBlank()) null else QueuedUpload(itemId, nowMillis, false)
+
+    fun releaseQueued(item: QueuedUpload, online: Boolean, ownerApproved: Boolean): Decision =
+        if (!online) Decision.QUEUE_FOR_LATER else if (!ownerApproved) Decision.OWNER_APPROVAL_REQUIRED else Decision.QUEUE_FOR_LATER
 
     fun rule(): String =
         "When offline, Mayra may continue only tasks designed for local/offline execution. " +
