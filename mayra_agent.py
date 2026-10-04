@@ -35,7 +35,7 @@ ALLOWED = {
     "MEDIA_PLAY_PAUSE", "MEDIA_NEXT", "MEDIA_PREVIOUS", "SET_VOLUME",
     "SCREEN_VIEW", "SCREEN_CONTROL", "PHONE_CAMERA_FRONT", "PHONE_CAMERA_BACK",
     "PHONE_MICROPHONE", "PHONE_SPEAKER", "PHONE_RECOVERY_STATUS",
-    "BRIDGE_CAPABILITIES",
+    "BRIDGE_CAPABILITIES", "BRIDGE_START_SCREEN", "BRIDGE_START_FILE_SHARE",
     "REVOKE_SESSION", "REGISTER_PHONE", "PHONE_COMMAND",
 }
 
@@ -273,6 +273,24 @@ def bridge_capabilities():
     }
 
 
+def start_optional_bridge(component):
+    """Start an installed optional bridge without allowing arbitrary process execution."""
+    if platform.system() != "Windows":
+        return {"ok": False, "error": "This action is Windows-only"}
+    executables = {
+        "scrcpy": shutil.which("scrcpy") or shutil.which("scrcpy.exe"),
+        "localsend": shutil.which("localsend") or shutil.which("localsend.exe"),
+    }
+    executable = executables.get(component)
+    if not executable:
+        return {"ok": False, "error": f"{component} is not installed or not on PATH"}
+    try:
+        subprocess.Popen([executable])
+        return {"ok": True, "message": f"{component} bridge started"}
+    except OSError:
+        return {"ok": False, "error": f"{component} bridge could not be started"}
+
+
 def pc_status():
     return {
         "ok": True,
@@ -298,6 +316,10 @@ def execute(command: str):
         return security_status()
     if command == "BRIDGE_CAPABILITIES":
         return bridge_capabilities()
+    if command == "BRIDGE_START_SCREEN":
+        return start_optional_bridge("scrcpy")
+    if command == "BRIDGE_START_FILE_SHARE":
+        return start_optional_bridge("localsend")
     if command == "REVOKE_SESSION":
         revoke_session()
         return {"ok": True, "message": "Session revoked"}
