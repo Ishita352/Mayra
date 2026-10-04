@@ -8,12 +8,8 @@ import android.content.Context
  * Only resumable task context is stored; secrets and authentication material
  * are never written by this bridge.
  */
-class MayraSemanticMemoryBridge(
-    context: Context,
-    private val memory: MayraSemanticMemory = MayraSemanticMemory(
-        MayraSemanticMemory.SharedPreferencesStore(context)
-    )
-) {
+class MayraSemanticMemoryBridge(private val memory: MayraSemanticMemory) {
+
     fun saveHomeResume() {
         memory.saveResume(
             taskId = "mayra-home",
@@ -42,5 +38,10 @@ class MayraSemanticMemoryBridge(
 
     companion object {
         private const val MAX_CONTEXT_LENGTH = 20_000
+
+        fun from(context: Context): MayraSemanticMemoryBridge =
+            MayraSemanticMemoryBridge(
+                MayraSemanticMemory(MayraSemanticMemory.SharedPreferencesStore(context))
+            )
     }
 }
