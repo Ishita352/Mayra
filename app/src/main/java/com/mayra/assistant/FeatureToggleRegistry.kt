@@ -2,7 +2,7 @@ package com.mayra.assistant
 
 import android.content.SharedPreferences
 
-object FeatureToggleRegistry {
+object FeatureToggleRegistry {\n    // Self-healing health rules are kept in MayraHealthMonitor and invoked by lifecycle components.
     const val VOICE_COMMAND = "voice_command_enabled"
     const val CAMERA = "camera_enabled"
     const val INCOMING_CALL_ASSISTANT = "incoming_call_assistant_enabled"
