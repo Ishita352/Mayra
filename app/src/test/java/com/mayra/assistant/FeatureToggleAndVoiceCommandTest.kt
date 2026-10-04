@@ -8,10 +8,11 @@ import org.junit.Test
 class FeatureToggleAndVoiceCommandTest {
     @Test
     fun featureToggleDefaultsAreSafe() {
-        assertTrue(FeatureToggleRegistry.defaultFor(FeatureToggleRegistry.VOICE_COMMAND))
-        assertTrue(FeatureToggleRegistry.defaultFor(FeatureToggleRegistry.CAMERA))
+        assertFalse(FeatureToggleRegistry.defaultFor(FeatureToggleRegistry.VOICE_COMMAND))
+        assertFalse(FeatureToggleRegistry.defaultFor(FeatureToggleRegistry.CAMERA))
         assertFalse(FeatureToggleRegistry.defaultFor(FeatureToggleRegistry.INCOMING_CALL_ASSISTANT))
-        assertTrue(FeatureToggleRegistry.defaultFor(FeatureToggleRegistry.SECURITY))
+        assertFalse(FeatureToggleRegistry.defaultFor(FeatureToggleRegistry.WHATSAPP_ASSISTANT))
+        assertFalse(FeatureToggleRegistry.defaultFor(FeatureToggleRegistry.SECURITY))
         assertFalse(FeatureToggleRegistry.defaultFor("unknown_key"))
     }
 
