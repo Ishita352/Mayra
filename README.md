@@ -1,35 +1,28 @@
 # Mayra
 
-Mayra is a work-in-progress personal assistant for Android and Windows.
+Mayra is a work-in-progress **Android-only** personal AI assistant.
 
 ## Current status
 
 - Android debug APK builds through GitHub Actions.
 - Android project structure and package identity are checked in CI before Android tests/build.
-- Android build configuration is currently Gradle Kotlin DSL: `settings.gradle.kts`, root `build.gradle.kts`, and `app/build.gradle.kts`.
 - Android voice commands support Bengali, Hindi, and English language selection, with owner authorization required for background commands.
-- The Windows agent supports **explicit trusted-LAN mode** with a strict command allowlist. Loopback-only remains the default; LAN mode requires `MAYRA_AGENT_ALLOW_LAN=1` and should be used only on a trusted private network.
-- Android contains the phone-side pairing/session architecture, one-time code flow, persistent session token, owner approval gates, and LAN transport. A Windows 10 companion launcher is provided for explicit trusted-LAN mode. Physical Android↔Windows end-to-end testing is still required before calling the connection production-ready.
-- Do not expose an unverified Windows agent to an untrusted network.
-
-## Windows setup
-
-See [Windows setup instructions in Bengali](WINDOWS_SETUP_BN.md). Local launcher: [windows/start_mayra.bat](windows/start_mayra.bat). Trusted-LAN launcher: [windows/start_mayra_lan.bat](windows/start_mayra_lan.bat).
+- Mayra operates independently on the Android phone. Windows/PC companion, pairing, remote computer control and Windows agent components have been removed from this project.
+- No installation/bootstrap password is used. Owner verification uses the phone's supported biometric/device-credential mechanism.
 
 ## Developer checks
 
-Run the Windows-agent unit tests with Python 3:
+Run the Android unit tests and build:
 
 ```sh
-python -m unittest discover -s tests -v
+gradle test --no-daemon
+gradle assembleDebug --no-daemon
 ```
 
-The tests are safe to run on a development computer; they do not open apps or make network connections.
-
-The Android release gate is: unit tests must pass, the debug APK must build, and the APK artifact must upload successfully. A failed gate is not counted as a completed project step.
+The Android release gate is: unit tests must pass, the debug APK must build, and the APK artifact must upload successfully.
 
 ## Safety notes
 
-- Only the explicit allowlist in `mayra_agent.py` can be executed.
+- Owner authorization is required for sensitive Mayra commands.
 - Do not store passwords, OTPs, or sensitive personal files in this prototype.
 - Build success is not the same as installation or device testing.
