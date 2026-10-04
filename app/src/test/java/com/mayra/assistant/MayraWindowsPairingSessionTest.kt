@@ -20,10 +20,20 @@ class MayraWindowsPairingSessionTest {
         now = 2001L
         assertNull(session.pendingInvite())
 
-        session.markPaired("windows-10")
+        session.markPaired("windows-10", "192.168.1.20", 8765, "persistent-token")
         assertTrue(session.isPaired())
         assertEquals("windows-10", session.pairedDeviceId())
-        session.revoke()
-        assertFalse(session.isPaired())
+        assertEquals("192.168.1.20", session.pairedHost())
+        assertEquals(8765, session.pairedPort())
+        assertEquals("persistent-token", session.sessionToken())
+
+        // A new session object over the same persistent store represents a reboot/restart.
+        val restored = MayraWindowsPairingSession(store) { now }
+        assertTrue(restored.isPaired())
+        assertEquals("persistent-token", restored.sessionToken())
+
+        restored.revoke()
+        assertFalse(restored.isPaired())
+        assertNull(restored.sessionToken())
     }
 }
