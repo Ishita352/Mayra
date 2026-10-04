@@ -112,6 +112,14 @@ Estimated overall completion: ~38% (planning estimate based on feature scope, no
 38. Universal Income Rules / Training Layer: one foundational rule/training layer that applies the income-site safety and AI-permission rules consistently across all income websites, with controlled future skill development.
 39. Advanced Video / Information Fact-Check: extract claims, cross-check multiple reliable public sources, detect recycled/old footage where possible, provide source links/evidence status, identify uncertainty and source conflicts.
 
+
+
+## Additional 4 requirements from earlier conversations — added to the master backlog
+40. Password Recovery System: Owner-controlled recovery for forgotten/lost passwords, with safeguards preventing Family Users from using recovery to escalate permissions.
+41. Owner-Controlled Sharing / Multi-User Access completion: Owner can grant or revoke specific feature, device and time-limited access to Family Users while keeping Owner data isolated.
+42. Privacy & Activity Audit System: privacy-compliant audit history for important logins, sessions, permission changes and sensitive feature/device access, visible to the Owner.
+43. Explicit-Consent Remote Assistance: remote assistance/control requires clear user consent, a visible active-session indicator, and no covert microphone, camera, message, file or screen access.
+
 ## Combined backlog policy
 - The 39 items above are the authoritative combined backlog for Project Mayra.
 - Items 33–39 are committed implementation requirements, not merely notes.
