@@ -7,7 +7,7 @@ import java.util.Locale
 /**
  * Mayra Voice Engine V1.
  *
- * Keeps the 20 audition slots stable while allowing each Android TTS engine
+ * Keeps the 20 audition slots plus a dedicated Gopal Voice Match slot stable while allowing each Android TTS engine
  * to supply the best matching installed voice. The engine never claims a
  * profile is available unless the current device exposes a compatible voice.
  */
@@ -44,6 +44,7 @@ object MayraVoiceEngine {
         MayraVoiceProfile("male_07", "Male 07 • Calm", "male", "calm"),
         MayraVoiceProfile("male_08", "Male 08 • Energetic", "male", "energetic"),
         MayraVoiceProfile("male_09", "Male 09 • Gentle", "male", "gentle"),
+        MayraVoiceProfile("male_10", "Male 10 • Rich", "male", "rich"),
         MayraVoiceProfile("gopal_voice_match", "Gopal Voice Match", "match", "owner", true)
     )
 
@@ -70,7 +71,9 @@ object MayraVoiceEngine {
         tts: TextToSpeech,
         text: String,
         utteranceId: String,
-        onReady: (() -> Unit)? = null
+        onReady: (() -> Unit)? = null,
+        speedMultiplier: Float = 1.0f,
+        pitchMultiplier: Float = 1.0f
     ) {
         val prefs = context.getSharedPreferences("mayra_secure", Context.MODE_PRIVATE)
         val selected = profiles.firstOrNull { it.id == selectedId(context) } ?: profiles.first()
@@ -79,6 +82,9 @@ object MayraVoiceEngine {
             text.contains(Regex("[\\u0900-\\u097F]")) -> Locale("hi", "IN")
             else -> Locale.US
         }
+
+        val languageResult = tts.setLanguage(locale)
+        if (languageResult == TextToSpeech.LANG_MISSING_DATA || languageResult == TextToSpeech.LANG_NOT_SUPPORTED) return
 
         val voices = tts.voices.orEmpty()
         val compatible = voices.filter { voice ->
@@ -94,13 +100,11 @@ object MayraVoiceEngine {
                 }
             }.thenByDescending { it.quality }
         )
-        if (ranked.isNotEmpty()) tts.voice = ranked.first()
-
-        val speed = prefs.getFloat(PREF_SPEED, 1.0f)
-        val pitch = prefs.getFloat(PREF_PITCH, 1.0f)
+        val speed = (prefs.getFloat(PREF_SPEED, 1.0f) * speedMultiplier).coerceIn(0.5f, 1.6f)
+        val pitch = (prefs.getFloat(PREF_PITCH, 1.0f) * pitchMultiplier).coerceIn(0.5f, 1.5f)
         tts.setSpeechRate(speed)
         tts.setPitch(pitch)
-        if (tts.setLanguage(locale) >= TextToSpeech.LANG_MISSING_DATA) return
+        if (ranked.isNotEmpty()) tts.voice = ranked.first()
         onReady?.invoke()
         tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId)
     }
