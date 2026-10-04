@@ -1,11 +1,6 @@
 package com.mayra.assistant
 
-/**
- * Central catalog for the 37 active follow-up capabilities requested for Mayra.
- *
- * This is an integration contract, not a claim that every capability is finished.
- * A capability is only marked COMPLETE after its implementation and CI verification.
- */
+/** Central catalog for Mayra follow-up capabilities. */
 object MayraCapabilityRegistry {
     enum class Status { COMPLETE, IN_PROGRESS, PLANNED }
 
@@ -54,13 +49,12 @@ object MayraCapabilityRegistry {
         Capability(39, "Advanced video/information fact-check", Status.COMPLETE),
         Capability(41, "Owner-controlled sharing and multi-user access", Status.COMPLETE),
         Capability(42, "Privacy and activity audit system", Status.COMPLETE),
-        Capability(43, "Explicit-consent remote assistance", Status.PLANNED)
-        Capability(44, "India Constitution and legal guidance engine", Status.COMPLETE)
+        Capability(43, "Explicit-consent remote assistance", Status.PLANNED),
+        Capability(44, "India Constitution and legal guidance engine", Status.COMPLETE),
+        Capability(45, "Public organisation intelligence and change monitoring", Status.COMPLETE)
     )
 
     fun all(): List<Capability> = capabilities
-
     fun byId(id: Int): Capability? = capabilities.firstOrNull { it.id == id }
-
     fun count(status: Status): Int = capabilities.count { it.status == status }
 }
