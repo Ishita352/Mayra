@@ -1,5 +1,7 @@
 # Mayra Windows 10 PC Companion
 
+> **Current implementation status (2026-10-04):** this file describes the target architecture. The current Windows agent is local-only, binds to loopback, and does not yet provide end-to-end phone-to-PC pairing or remote commands. Do not expose it to LAN/Internet until authenticated TLS pairing and tests are complete.
+
 Mayra is split into two cooperating applications:
 
 - Android: Mayra Mobile, the owner's control interface.
