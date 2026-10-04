@@ -658,10 +658,14 @@ class MainActivity : FragmentActivity() {
         val wantsOff = lowerSpoken.contains("বন্ধ") || lowerSpoken.contains("off") || lowerSpoken.contains("disable") || lowerSpoken.contains("बंद")
         when {
             lowerSpoken.contains("volume") || lowerSpoken.contains("ভলিউম") || lowerSpoken.contains("সাউন্ড বাড়াও") || lowerSpoken.contains("সাউন্ড কমাও") -> {
+                val direction = if (lowerSpoken.contains("কমাও") || lowerSpoken.contains("decrease") || lowerSpoken.contains("down")) -10 else 10
+                val current = MayraUserControlCenter.volume(prefs)
+                val value = MayraUserControlCenter.setVolume(prefs, current + direction)
                 val audio = getSystemService(android.content.Context.AUDIO_SERVICE) as android.media.AudioManager
-                val direction = if (lowerSpoken.contains("কমাও") || lowerSpoken.contains("decrease") || lowerSpoken.contains("down")) -1 else 1
-                audio.adjustVolume(direction, android.media.AudioManager.FLAG_SHOW_UI)
-                val msg = if (direction > 0) "Mayra sound volume বাড়ানো হয়েছে।" else "Mayra sound volume কমানো হয়েছে।"
+                val max = audio.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC).coerceAtLeast(1)
+                val target = ((max * value) / 100.0).toInt().coerceIn(0, max)
+                audio.setStreamVolume(android.media.AudioManager.STREAM_MUSIC, target, android.media.AudioManager.FLAG_SHOW_UI)
+                val msg = "Mayra volume $value% করা হয়েছে।"
                 showVoiceResult(msg); speakResponse(msg); return
             }
             lowerSpoken.contains("থ্রিডি") || lowerSpoken.contains("3d") || lowerSpoken.contains("three d") -> {
@@ -847,6 +851,12 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun speakResponse(message: String) {
+        val silentBehavior = prefs.getBoolean("mayra_silent_mode_behavior", true)
+        val ringerMode = (getSystemService(android.content.Context.AUDIO_SERVICE) as android.media.AudioManager).ringerMode
+        if (silentBehavior && ringerMode == android.media.AudioManager.RINGER_MODE_SILENT) {
+            setVoiceLight(false)
+            return
+        }
         val voiceLightEnabled = prefs.getBoolean("mayra_voice_light_enabled", true) &&
             prefs.getBoolean("master_on", true)
         if (voiceLightEnabled) setVoiceLight(true)
