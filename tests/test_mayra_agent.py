@@ -57,10 +57,14 @@ class MayraAgentTests(unittest.TestCase):
             server_side.close()
             client_side.close()
 
-    def test_non_loopback_bind_is_refused_until_tls_pairing_exists(self):
-        with patch.object(mayra_agent, "HOST", "0.0.0.0"):
+    def test_non_loopback_bind_requires_explicit_opt_in(self):
+        with patch.object(mayra_agent, "HOST", "0.0.0.0"), patch.object(mayra_agent, "ALLOW_LAN", False):
             with self.assertRaises(SystemExit):
                 mayra_agent.main()
+
+    def test_non_loopback_bind_is_allowed_with_explicit_trusted_lan_opt_in(self):
+        with patch.object(mayra_agent, "HOST", "0.0.0.0"), patch.object(mayra_agent, "ALLOW_LAN", True):
+            self.assertTrue(mayra_agent.ALLOW_LAN)
 
     def test_invalid_json_is_rejected(self):
         self.assertEqual(
