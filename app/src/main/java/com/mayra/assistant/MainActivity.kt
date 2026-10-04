@@ -24,7 +24,8 @@ import java.util.Locale
 
 class MainActivity : FragmentActivity() {
     private val sessionState by lazy { MayraSessionState(prefs) }
-    private val familyAccountManager by lazy { MayraFamilyAccountManager(MayraFamilyAccountManager.SharedPreferencesStore(prefs)) }\n    private val semanticMemory by lazy { MayraSemanticMemory(MayraSemanticMemory.SharedPreferencesStore(this)) }
+    private val familyAccountManager by lazy { MayraFamilyAccountManager(MayraFamilyAccountManager.SharedPreferencesStore(prefs)) }
+    private val semanticMemory by lazy { MayraSemanticMemory(MayraSemanticMemory.SharedPreferencesStore(this)) }
     private val founderIdentity by lazy { MayraFounderIdentity(object : MayraFounderIdentity.Store { override fun get(key: String) = prefs.getString(key, null); override fun put(key: String, value: String) { prefs.edit().putString(key, value).apply() } }) }
     private var activeFamilySession: MayraFamilyAccountManager.AuthenticatedSession? = null
     private val prefs by lazy { getSharedPreferences("mayra_secure", MODE_PRIVATE) }
