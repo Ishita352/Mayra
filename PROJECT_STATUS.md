@@ -3,7 +3,7 @@
 ## Owner
 - Project: Mayra — Personal AI Assistant
 - Owner: Gopal Basak
-- Primary platforms: Android first, then Windows 10 only
+- Primary platform: Android only
 - Cost policy: ₹0 / NO INVESTMENT — ONLY INCOME
 - Financial lock: Mayra must never spend, purchase, subscribe, withdraw, or execute financial transactions.
 
@@ -38,8 +38,6 @@ Estimated overall completion: ~38% (planning estimate based on feature scope, no
 - Online Test policy with Preparation / Authorized Assistance / Human-Only modes
 - Textile Design Studio workflow foundation
 - Cybersecurity authorized-use policy/UI foundation
-- Phone-to-Windows command intent foundation
-- Windows 10 local-only agent MVP with safe allowlist and unit tests
 - Active/Passive/Semi-passive income opportunity policy foundation
 - AI Training & Skill Engine UI/workflow foundation
 - Job Watcher UI foundation
@@ -64,8 +62,6 @@ Estimated overall completion: ~38% (planning estimate based on feature scope, no
 - Income engine
 - Job/freelance monitoring
 - Self-learning/knowledge system
-- Phone ↔ Windows integration
-- Windows 10 assistant
 
 ## Remaining major implementation sequence
 1. Family Accounts UI + Owner management screen + Family login/session integration — implemented; final CI verification pending
@@ -94,19 +90,14 @@ Estimated overall completion: ~38% (planning estimate based on feature scope, no
 24. Android full integration
 25. Android real-device/security testing
 26. Final Android APK build and verification
-27. Windows 10 secure pairing
-28. Windows 10 computer-control expansion
-29. Cross-device workflows
-30. Windows 10 full testing
-31. Master documentation, backup and release package
-32. Final project certificate after completion
+27. Master documentation, backup and Android release package
+28. Final project certificate after completion
 
 
 
 ## Additional 7 requirements from earlier conversations — added to the master backlog
 33. Public Mayra website: free GitHub-connected hosting, direct online access such as gopalbasak.com, and step-by-step GitHub Pages/custom-domain publication workflow.
 34. Website ↔ Mayra integration: Owner-controlled Mayra voice/chat interface, phone/computer access, permission-controlled computer actions, GitHub-based website content/code workflow, and Owner permission required for live publishing.
-35. Advanced Computer/System Control: broader Owner commands for Windows 10 and Android covering settings/system tasks, apps/files, network, display, sound and similar capabilities, subject to OS permissions and Owner confirmation for risky changes.
 36. Detailed Income-Platform Automation: discover AI-permitted income platforms, notify Owner, create/use accounts and biodata only after permission, request secrets only when needed, execute allowed instructed work, verify/submit with Owner confirmation, track completed/pending earnings, and never perform financial transactions.
 37. Income Website Human-Only Rule Engine: if a site prohibits AI/automation, Mayra must not bypass the rule or submit automatically; assist the Owner with manual completion instead. No OTP/CAPTCHA/identity bypass.
 38. Universal Income Rules / Training Layer: one foundational rule/training layer that applies the income-site safety and AI-permission rules consistently across all income websites, with controlled future skill development.
@@ -135,4 +126,4 @@ Estimated overall completion: ~38% (planning estimate based on feature scope, no
 - No final APK is declared ready until CI and real-device/security testing pass.
 
 ## Development order
-Android first. Each backlog item must be implemented, unit-tested and integrated before moving to the next dependent item. Windows expansion comes after Android integration and final Android testing.
+Android first. Each backlog item must be implemented, unit-tested and integrated before moving to the next dependent item. Android is the sole platform; development proceeds through Android integration and final Android testing.
