@@ -96,7 +96,11 @@ class MayraFeatureCheckManager(private val context: Context) {
             }
             CALL -> {
                 val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
-                CheckResult(granted, if (granted) "Phone-state permission is available for Call Assist." else "Phone-state permission is not granted.")
+                CheckResult(
+                    false,
+                    if (granted) "Phone-state permission is available, but call-handling actions are not implemented yet. Call Assist remains OFF."
+                    else "Phone-state permission is not granted, and call-handling actions are not implemented yet. Call Assist remains OFF."
+                )
             }
             WHATSAPP -> {
                 val installed = try { context.packageManager.getApplicationInfo("com.whatsapp", 0); true } catch (_: Exception) { false }
@@ -106,8 +110,8 @@ class MayraFeatureCheckManager(private val context: Context) {
             VOICE_LIGHT -> CheckResult(true, "Voice Light state and animation hooks are available.")
             LOCKED -> CheckResult(context.getSystemService(KeyguardManager::class.java) != null, "Locked-phone state can be detected.")
             SILENT -> CheckResult(context.getSystemService(AudioManager::class.java) != null, "Phone audio state can be read.")
-            COMPUTER -> CheckResult(true, "Windows pairing session storage and command gate are available.")
-            QUICK_LINK -> CheckResult(true, "One-time Quick Owner Link code flow is available.")
+            COMPUTER -> CheckResult(false, "Phone-to-Windows authenticated pairing/remote commands are not implemented and verified yet. Keep this feature OFF.")
+            QUICK_LINK -> CheckResult(false, "Quick Owner Link is not integrated end-to-end with the current local-only Windows agent. Keep this feature OFF.")
             BIODATA -> CheckResult(true, "Biodata/Career profile module is available.")
             JOBS -> CheckResult(true, "Job Watcher foundation is available.")
             EXCEL -> CheckResult(true, "Excel/Data Analysis foundation is available.")
