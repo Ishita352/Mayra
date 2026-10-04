@@ -34,8 +34,12 @@ class MayraInstallationBootstrapManager(private val context: Context) {
         prefs.edit().putBoolean(KEY_COMPLETED, true).apply()
     }
 
-    private fun expectedPassword(): String =
-        PASSWORD_PREFIX + SimpleDateFormat(DATE_PATTERN, Locale.ROOT).format(Date(installationTimeMs()))
+    private fun expectedPassword(): String = passwordForInstallTime(installationTimeMs())
+
+    internal fun passwordForTesting(installTimeMs: Long): String = passwordForInstallTime(installTimeMs)
+
+    private fun passwordForInstallTime(installTimeMs: Long): String =
+        PASSWORD_PREFIX + SimpleDateFormat(DATE_PATTERN, Locale.ROOT).format(Date(installTimeMs))
 
     private fun installationTimeMs(): Long =
         runCatching {
