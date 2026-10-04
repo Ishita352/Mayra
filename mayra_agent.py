@@ -275,11 +275,44 @@ def execute(command: str):
         return {"ok": True, "message": "Session revoked"}
     if command == "PHONE_RECOVERY_STATUS":
         return {"ok": True, "message": "Recovery status must be supplied by the authenticated Android recovery module"}
+    if command == "OPEN_BROWSER":
+        if platform.system() != "Windows":
+            return {"ok": False, "error": "This action is Windows-only"}
+        try:
+            os.startfile("https://www.google.com")
+            return {"ok": True, "message": "Default browser opened"}
+        except OSError:
+            return {"ok": False, "error": "Default browser could not be opened"}
+    if command.startswith("OPEN_BROWSER:"):
+        if platform.system() != "Windows":
+            return {"ok": False, "error": "This action is Windows-only"}
+        target = command.split(":", 1)[1].strip()
+        if not (target.startswith("https://") or target.startswith("http://")):
+            return {"ok": False, "error": "Browser URL must use http:// or https://"}
+        try:
+            os.startfile(target)
+            return {"ok": True, "message": "Browser URL opened"}
+        except OSError:
+            return {"ok": False, "error": "Browser URL could not be opened"}
+    if command in {"MEDIA_PLAY_PAUSE", "MEDIA_NEXT", "MEDIA_PREVIOUS"}:
+        if platform.system() != "Windows":
+            return {"ok": False, "error": "This action is Windows-only"}
+        try:
+            import ctypes
+            media_vk = {
+                "MEDIA_PLAY_PAUSE": 0xB3,
+                "MEDIA_NEXT": 0xB0,
+                "MEDIA_PREVIOUS": 0xB1,
+            }[command]
+            ctypes.windll.user32.keybd_event(media_vk, 0, 0, 0)
+            ctypes.windll.user32.keybd_event(media_vk, 0, 2, 0)
+            return {"ok": True, "message": "Media command sent"}
+        except (AttributeError, OSError):
+            return {"ok": False, "error": "Windows media control unavailable"}
     if command in {
         "LIST_SHARED_FILES", "OPEN_SHARED_FILE", "SEND_FILE_TO_PC",
         "RECEIVE_FILE_FROM_PC", "READ_CLIPBOARD", "WRITE_CLIPBOARD",
-        "OPEN_BROWSER", "BROWSER_AUTOMATION", "MEDIA_PLAY_PAUSE",
-        "MEDIA_NEXT", "MEDIA_PREVIOUS", "SET_VOLUME", "SCREEN_VIEW",
+        "BROWSER_AUTOMATION", "SET_VOLUME", "SCREEN_VIEW",
         "SCREEN_CONTROL", "PHONE_CAMERA_FRONT", "PHONE_CAMERA_BACK",
         "PHONE_MICROPHONE", "PHONE_SPEAKER",
     }:
