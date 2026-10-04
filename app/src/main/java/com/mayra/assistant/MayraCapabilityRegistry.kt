@@ -65,7 +65,8 @@ object MayraCapabilityRegistry {
         Capability(61, "CV-derived advanced Owner skill portfolio and CV-free opportunity matching", Status.IN_PROGRESS),
         Capability(62, "Owner-approved learning certificates and job-platform profile preparation", Status.IN_PROGRESS),
         Capability(63, "Device-aware multitasking and health-protected workload scaling", Status.IN_PROGRESS),
-        Capability(64, "Local-first central memory vault and replaceable cloud storage", Status.IN_PROGRESS)
+        Capability(64, "Local-first central memory vault and replaceable cloud storage", Status.IN_PROGRESS),
+        Capability(65, "Offline-first voice-controlled work and deferred upload queue", Status.IN_PROGRESS)
     )
 
     fun all(): List<Capability> = capabilities
