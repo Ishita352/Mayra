@@ -3,7 +3,6 @@ package com.mayra.assistant
 /** Central catalog for Mayra follow-up capabilities. */
 object MayraCapabilityRegistry {
     enum class Status { COMPLETE, IN_PROGRESS, PLANNED }
-
     data class Capability(val id: Int, val title: String, val status: Status)
 
     private val capabilities = listOf(
@@ -48,7 +47,8 @@ object MayraCapabilityRegistry {
         Capability(43, "Explicit-consent remote assistance", Status.PLANNED),
         Capability(44, "India Constitution and legal guidance engine", Status.COMPLETE),
         Capability(45, "Public organisation intelligence and change monitoring", Status.COMPLETE),
-        Capability(46, "Hindu scriptures and Ayurveda knowledge", Status.COMPLETE)
+        Capability(46, "Hindu scriptures and Ayurveda knowledge", Status.COMPLETE),
+        Capability(47, "Education intelligence and Burdwan academic updates", Status.COMPLETE)
     )
 
     fun all(): List<Capability> = capabilities
