@@ -13,7 +13,7 @@ object MayraUserIdentity {
     )
 
     fun isValidFamilyUserId(id: String): Boolean =
-        id.matches(Regex("family-[0-9]{2}"))
+        Regex("""^family-(0[1-9]|10)$""").matches(id)
 
     fun familyUserIds(): List<String> =
         (1..MAX_FAMILY_USERS).map { "family-" + it.toString().padStart(2, '0') }
