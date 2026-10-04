@@ -55,3 +55,6 @@ class MayraOfflineVoiceWorkflowTest {
         )
     }
 }
+
+
+@Test fun queuedUploadRequiresConnectivityAndOwnerApproval() { val q=MayraOfflineVoiceWorkflow.queueItem("memory-1",100L)!!; assertEquals(MayraOfflineVoiceWorkflow.Decision.QUEUE_FOR_LATER, MayraOfflineVoiceWorkflow.releaseQueued(q,false,true)); assertEquals(MayraOfflineVoiceWorkflow.Decision.OWNER_APPROVAL_REQUIRED, MayraOfflineVoiceWorkflow.releaseQueued(q,true,false)); assertEquals(MayraOfflineVoiceWorkflow.Decision.QUEUE_FOR_LATER, MayraOfflineVoiceWorkflow.releaseQueued(q,true,true)) }
