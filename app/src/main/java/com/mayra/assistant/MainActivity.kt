@@ -1008,15 +1008,13 @@ class MainActivity : FragmentActivity() {
                     else -> Locale.US
                 }
                 val mood = MayraMoodSystem.current(prefs)
-                val baseSpeed = prefs.getFloat(MayraVoiceEngine.PREF_SPEED, 1.0f)
-                val basePitch = prefs.getFloat(MayraVoiceEngine.PREF_PITCH, 1.0f)
-                responseTts?.setSpeechRate((baseSpeed * mood.speechRate).coerceIn(0.5f, 1.6f))
-                responseTts?.setPitch((basePitch * mood.pitch).coerceIn(0.5f, 1.5f))
                 MayraVoiceEngine.speak(
                     this,
                     responseTts!!,
                     message,
-                    "mayra_command_response"
+                    "mayra_command_response",
+                    speedMultiplier = mood.speechRate,
+                    pitchMultiplier = mood.pitch
                 )
             }
         }
