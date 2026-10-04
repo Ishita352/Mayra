@@ -1,14 +1,11 @@
 package com.mayra.assistant
 
-import android.content.Context
-import androidx.test.core.app.ApplicationProvider
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class MayraLockedPhoneVoiceGateTest {
     @Test fun lockedModeNeedsOwnerVerification() {
-        val p = ApplicationProvider.getApplicationContext<Context>()
-            .getSharedPreferences("lock-test", Context.MODE_PRIVATE)
+        val p = TestSharedPreferences()
         LockModePolicy.setEnabled(p, true)
         assertEquals(
             MayraLockedPhoneVoiceGate.Decision.OWNER_VERIFICATION_REQUIRED,
@@ -17,8 +14,7 @@ class MayraLockedPhoneVoiceGateTest {
     }
 
     @Test fun sensitiveTaskBlocked() {
-        val p = ApplicationProvider.getApplicationContext<Context>()
-            .getSharedPreferences("lock-test-2", Context.MODE_PRIVATE)
+        val p = TestSharedPreferences()
         LockModePolicy.setEnabled(p, true)
         assertEquals(
             MayraLockedPhoneVoiceGate.Decision.BLOCK,
@@ -27,8 +23,7 @@ class MayraLockedPhoneVoiceGateTest {
     }
 
     @Test fun bengaliSensitiveTaskBlocked() {
-        val p = ApplicationProvider.getApplicationContext<Context>()
-            .getSharedPreferences("lock-test-3", Context.MODE_PRIVATE)
+        val p = TestSharedPreferences()
         LockModePolicy.setEnabled(p, true)
         assertEquals(
             MayraLockedPhoneVoiceGate.Decision.BLOCK,
@@ -37,8 +32,7 @@ class MayraLockedPhoneVoiceGateTest {
     }
 
     @Test fun unlockedOwnerCanUseNormalVoiceCommand() {
-        val p = ApplicationProvider.getApplicationContext<Context>()
-            .getSharedPreferences("lock-test-4", Context.MODE_PRIVATE)
+        val p = TestSharedPreferences()
         assertEquals(
             MayraLockedPhoneVoiceGate.Decision.ALLOW_LIMITED_VOICE,
             MayraLockedPhoneVoiceGate.decide(p, true, true, false, "সময় বলো")
