@@ -131,7 +131,12 @@ class MayraBackgroundVoiceService : Service() {
         if (phoneServer != null) return
         phoneServerThread = Thread {
             try {
-                phoneServer = ServerSocket(phonePort)
+                // Remote phone↔Windows transport is not yet secured with TLS pairing.
+                // Bind only to loopback so LAN devices cannot reach this command endpoint.
+                phoneServer = ServerSocket().apply {
+                    reuseAddress = false
+                    bind(java.net.InetSocketAddress(java.net.InetAddress.getByName("127.0.0.1"), phonePort))
+                }
                 while (!Thread.currentThread().isInterrupted && canRun()) {
                     val socket = phoneServer?.accept() ?: break
                     Thread { handlePhoneConnection(socket) }.start()
