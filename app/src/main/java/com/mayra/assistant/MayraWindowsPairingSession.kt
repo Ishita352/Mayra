@@ -1,10 +1,10 @@
 package com.mayra.assistant
 
 /**
- * Persistent phone-side pairing session contract for the Windows companion.
+ * Persistent phone-side Windows companion session.
  *
- * The actual transport/agent remains responsible for accepting the code.
- * This class never treats a generated code as proof of pairing by itself.
+ * A pairing code is only a bootstrap factor. A paired session additionally
+ * stores the Windows endpoint and authenticated session token.
  */
 class MayraWindowsPairingSession(
     private val store: Store,
@@ -41,12 +41,26 @@ class MayraWindowsPairingSession(
         clear()
     }
 
-    fun pairedDeviceId(): String? = store.get(KEY_PAIRED_DEVICE)?.takeIf { it.isNotBlank() }
+    fun markPaired(deviceId: String, host: String, port: Int, token: String) {
+        require(deviceId.isNotBlank() && host.isNotBlank() && port in 1..65535 && token.isNotBlank())
+        store.put(KEY_PAIRED_DEVICE, deviceId)
+        store.put(KEY_HOST, host)
+        store.put(KEY_PORT, port.toString())
+        store.put(KEY_TOKEN, token)
+        clear()
+    }
 
-    fun isPaired(): Boolean = pairedDeviceId() != null
+    fun pairedDeviceId(): String? = store.get(KEY_PAIRED_DEVICE)?.takeIf { it.isNotBlank() }
+    fun pairedHost(): String? = store.get(KEY_HOST)?.takeIf { it.isNotBlank() }
+    fun pairedPort(): Int = store.get(KEY_PORT)?.toIntOrNull() ?: 8765
+    fun sessionToken(): String? = store.get(KEY_TOKEN)?.takeIf { it.isNotBlank() }
+    fun isPaired(): Boolean = pairedDeviceId() != null && sessionToken() != null
 
     fun revoke() {
         store.remove(KEY_PAIRED_DEVICE)
+        store.remove(KEY_HOST)
+        store.remove(KEY_PORT)
+        store.remove(KEY_TOKEN)
         clear()
     }
 
@@ -61,5 +75,8 @@ class MayraWindowsPairingSession(
         private const val KEY_CODE = "windows_pairing_code"
         private const val KEY_EXPIRES = "windows_pairing_expires"
         private const val KEY_PAIRED_DEVICE = "windows_paired_device"
+        private const val KEY_HOST = "windows_paired_host"
+        private const val KEY_PORT = "windows_paired_port"
+        private const val KEY_TOKEN = "windows_paired_token"
     }
 }
