@@ -35,8 +35,13 @@ class MayraBootReceiver : BroadcastReceiver() {
         val voiceOn = FeatureToggleRegistry.isEnabled(
             prefs, FeatureToggleRegistry.VOICE_COMMAND
         )
+        val windowsPaired =
+            !prefs.getString("windows_paired_token", null).isNullOrBlank() &&
+            !prefs.getString("windows_paired_host", null).isNullOrBlank()
 
-        if (!masterOn) return
+        // Pairing/login state is stored independently from Master/Voice state.
+        // Power-off/reboot must never revoke the trusted Windows session.
+        if (!masterOn && !windowsPaired) return
 
         val manager = context.getSystemService(NotificationManager::class.java)
         if (android.os.Build.VERSION.SDK_INT >= 26) {
@@ -60,10 +65,15 @@ class MayraBootReceiver : BroadcastReceiver() {
             )
         }
 
-        val text = if (voiceOn) {
-            "Mayra চালু আছে। Background Voice পুনরায় চালু করতে Mayra খুলুন।"
-        } else {
-            "Mayra Master চালু আছে।"
+        val text = when {
+            windowsPaired && voiceOn ->
+                "Windows 10 login محفوظ আছে। Mayra খুললে connection পুনরায় প্রস্তুত হবে; Background Voice চালু করতে Mayra খুলুন।"
+            windowsPaired ->
+                "Windows 10 login محفوظ আছে। Mayra খুললে connection পুনরায় প্রস্তুত হবে।"
+            voiceOn ->
+                "Mayra চালু আছে। Background Voice পুনরায় চালু করতে Mayra খুলুন।"
+            else ->
+                "Mayra Master চালু আছে।"
         }
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
