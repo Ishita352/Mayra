@@ -501,6 +501,7 @@ class MainActivity : FragmentActivity() {
 
         layout.addView(sectionButton("আমার Biodata / Career Profile") { showCareerProfileEditor() })
         layout.addView(sectionButton("💼 Job / Freelance + Income Workflow") { showIncomeWorkflow() })
+        layout.addView(sectionButton("🏛️ Government Jobs — WB + Central") { showGovernmentJobs() })
         layout.addView(sectionButton("📚 Note Selling Income Research") { showNoteIncomeWorkflow() })
         layout.addView(sectionButton("🎤 Interview Assistant") { showInterviewAssistant() })
         layout.addView(sectionButton("🧠 Self-Learning + Knowledge Base") { showLearningEngine() })
