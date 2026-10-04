@@ -123,7 +123,7 @@ class MainActivity : FragmentActivity() {
     private val docxEditPicker = registerForActivityResult(
         ActivityResultContracts.CreateDocument("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
     ) { uri ->
-        val text = pendingDocxEditText
+        val text = (pendingDocxEditText as? String)
         pendingDocxEditText = null
         if (uri == null || text == null) {
             showVoiceResult("Edited DOCX save করা হয়নি।")
@@ -135,7 +135,7 @@ class MainActivity : FragmentActivity() {
     private val docxCreatePicker = registerForActivityResult(
         ActivityResultContracts.CreateDocument("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
     ) { uri ->
-        val text = pendingDocxText
+        val text = (pendingDocxText as? String)
         pendingDocxText = null
         if (uri == null || text == null) {
             showVoiceResult("DOCX output তৈরি করা হয়নি।")
@@ -172,7 +172,7 @@ class MainActivity : FragmentActivity() {
     private val pdfCreatePicker = registerForActivityResult(
         ActivityResultContracts.CreateDocument("application/pdf")
     ) { uri ->
-        val text = pendingDocxPdfText ?: pendingPdfEditText ?: pendingPdfText
+        val text = (pendingDocxPdfText ?: pendingPdfEditText ?: pendingPdfText) as? String
         pendingDocxPdfText = null
         pendingPdfEditText = null
         pendingPdfText = null
