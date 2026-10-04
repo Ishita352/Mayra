@@ -16,12 +16,20 @@ object FeatureToggleRegistry {
         prefs.edit().putBoolean(key, enabled).apply()
     }
 
-    fun defaultFor(key: String): Boolean = when (key) {
-        VOICE_COMMAND -> true
-        CAMERA -> true
-        INCOMING_CALL_ASSISTANT -> false
-        WHATSAPP_ASSISTANT -> true
-        SECURITY -> true
-        else -> false
+    fun defaultFor(key: String): Boolean = false
+
+    fun resetAllToOff(prefs: SharedPreferences) {
+        prefs.edit()
+            .putBoolean(VOICE_COMMAND, false)
+            .putBoolean(CAMERA, false)
+            .putBoolean(INCOMING_CALL_ASSISTANT, false)
+            .putBoolean(WHATSAPP_ASSISTANT, false)
+            .putBoolean(SECURITY, false)
+            .putBoolean("mayra_3d_character_enabled", false)
+            .putBoolean("mayra_voice_light_enabled", false)
+            .putBoolean("mayra_active_while_locked", false)
+            .putBoolean("mayra_silent_mode_behavior", false)
+            .putBoolean("master_on", false)
+            .apply()
     }
 }
