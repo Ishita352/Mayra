@@ -26,7 +26,13 @@ class MayraFirstRunSetupActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        FeatureToggleRegistry.resetAllToOff(prefs)
+        // Initialize the first-run defaults only once. Do not reset enabled
+        // features when Android recreates this Activity during permission or
+        // biometric/credential flows.
+        if (!prefs.getBoolean("first_run_feature_defaults_initialized", false)) {
+            FeatureToggleRegistry.resetAllToOff(prefs)
+            prefs.edit().putBoolean("first_run_feature_defaults_initialized", true).apply()
+        }
         buildUi()
         showCurrent()
     }
@@ -104,27 +110,50 @@ class MayraFirstRunSetupActivity : FragmentActivity() {
 
     private fun authenticateOwner() {
         val bm = BiometricManager.from(this)
-        if (bm.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) != BiometricManager.BIOMETRIC_SUCCESS) {
-            status.text = "OFF • ✗ Owner biometric unavailable on this phone."
+        // Some phones expose face/fingerprint as BIOMETRIC_WEAK rather than
+        // BIOMETRIC_STRONG. Mayra should not block owner verification on those
+        // devices, and Android's device credential is a supported fallback.
+        val authenticators =
+            BiometricManager.Authenticators.BIOMETRIC_WEAK or
+                BiometricManager.Authenticators.DEVICE_CREDENTIAL
+
+        if (bm.canAuthenticate(authenticators) != BiometricManager.BIOMETRIC_SUCCESS) {
+            status.text = "OFF • ✗ No supported biometric or device credential is configured."
             manager.markChecked(MayraFeatureCheckManager.OWNER, false)
             return
         }
-        val prompt = BiometricPrompt(this, ContextCompat.getMainExecutor(this), object : BiometricPrompt.AuthenticationCallback() {
-            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                prefs.edit().putBoolean("owner_verified", true).apply()
-                MayraFounderIdentity(object : MayraFounderIdentity.Store {
-                    override fun get(key: String) = prefs.getString(key, null)
-                    override fun put(key: String, value: String) { prefs.edit().putString(key, value).apply() }
-                }).recognizeVerifiedOwner(MayraFounderIdentity.VerificationMethod.ANDROID_BIOMETRIC)
-                completeCheck(MayraFeatureCheckManager.specs()[index])
+
+        val prompt = BiometricPrompt(
+            this,
+            ContextCompat.getMainExecutor(this),
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    prefs.edit().putBoolean("owner_verified", true).apply()
+                    MayraFounderIdentity(object : MayraFounderIdentity.Store {
+                        override fun get(key: String) = prefs.getString(key, null)
+                        override fun put(key: String, value: String) {
+                            prefs.edit().putString(key, value).apply()
+                        }
+                    }).recognizeVerifiedOwner(
+                        MayraFounderIdentity.VerificationMethod.ANDROID_BIOMETRIC
+                    )
+                    completeCheck(MayraFeatureCheckManager.specs()[index])
+                }
+
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    status.text = "OFF • ✗ Owner verification cancelled or unavailable."
+                    manager.markChecked(MayraFeatureCheckManager.OWNER, false)
+                }
             }
-        })
+        )
+
+        // DEVICE_CREDENTIAL is included, so Android supplies PIN/Pattern/
+        // Password fallback when the phone has no usable biometric.
         prompt.authenticate(
             BiometricPrompt.PromptInfo.Builder()
                 .setTitle("Mayra Owner Verification")
-                .setSubtitle("Face অথবা Fingerprint দিয়ে Owner যাচাই করুন")
-                .setNegativeButtonText("Cancel")
-                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+                .setSubtitle("Face / Fingerprint ব্যবহার করুন; প্রয়োজনে ফোনের PIN/Pattern/Password ব্যবহার করুন")
+                .setAllowedAuthenticators(authenticators)
                 .build()
         )
     }
