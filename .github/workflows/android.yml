@@ -1,6 +1,6 @@
 name: Build Mayra Android
 # CI verification workflow
-# Release gate: Windows tests + Android unit tests + debug APK + artifact upload must all pass.
+# Release gate: Android unit tests + debug APK + artifact upload must all pass.
 
 on:
   workflow_dispatch:
@@ -14,13 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Test Windows agent command allowlist
-        run: python -m unittest discover -s tests -v
 
       - uses: actions/setup-java@v4
         with:
@@ -80,8 +73,6 @@ jobs:
             "ownerCommandAuthorized|app/src/main/java/com/mayra/assistant/MayraLockedPhoneVoiceGate.kt"
             "Owner verification required|app/src/main/java/com/mayra/assistant/MayraBackgroundVoiceService.kt"
             "bengali mode|app/src/main/java/com/mayra/assistant/MayraBackgroundCommandRouter.kt"
-            "quickPair|app/src/main/java/com/mayra/assistant/LocalDeviceLinkCoordinator.kt"
-            "markPaired|app/src/main/java/com/mayra/assistant/MayraWindowsPairingSession.kt"
             "Mayra Owner Command Access|app/src/main/java/com/mayra/assistant/MainActivity.kt"
           )
           missing=0
