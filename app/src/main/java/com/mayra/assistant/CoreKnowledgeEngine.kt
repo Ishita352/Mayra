@@ -21,6 +21,7 @@ object CoreKnowledgeEngine {
         TEXTILE,
         SECURITY,
         OWNER_SKILLS,
+        ONEFORMA,
         GENERAL
     }
 
@@ -44,6 +45,10 @@ object CoreKnowledgeEngine {
             containsAny(text, "cv", "resume", "biodata", "career", "সিভি", "বায়োডাটা", "রিজিউমে") ->
                 Answer(Domain.BIODATA, true,
                     "Career profile workflow: আপনার আসল education, experience, skills ও certificates ব্যবহার করে CV/biodata প্রস্তুত করা হবে।")
+
+            containsAny(text, "oneforma", "one forma") ->
+                Answer(Domain.ONEFORMA, true,
+                    "OneForma workflow: public project discovery → live project rules/SOW check → region/language/skill eligibility → Owner approval → application preparation. Mayra নিজে identity verification, NDA বা prohibited automation bypass করবে না.")
 
             containsAny(text, "job", "freelance", "remote work", "কাজ খুঁজ", "চাকরি", "ফ্রিল্যান্স") ->
                 Answer(Domain.JOBS, true,

@@ -9,7 +9,7 @@ object JobWatcherWorkflow {
     data class ScanPolicy(
         val enabled: Boolean,
         val maxResults: Int = 25,
-        val refreshHours: Int = 6
+        val refreshHours: Int = 2
     )
 
     data class Candidate(
