@@ -42,7 +42,10 @@ jobs:
           grep -q 'applicationId = "com.mayra.assistant"' app/build.gradle.kts
           test "$(grep -o 'versionCode = [0-9]*' app/build.gradle.kts | awk '{print $3}')" -ge 2
           grep -q 'versionName = "0.2.0"' app/build.gradle.kts
-          ! grep -RniE 'installation[ -]?password|bootstrap[ -]?password|install[ -]?password' app/src/main || true
+          if grep -RniE 'installation[ -]?password|bootstrap[ -]?password|install[ -]?password' app/src/main; then
+            echo 'Installation/bootstrap password code detected; build blocked.'
+            exit 1
+          fi
           grep -q 'rootProject.name = "Mayra"' settings.gradle.kts
           grep -q 'include(":app")' settings.gradle.kts
 
