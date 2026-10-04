@@ -123,18 +123,19 @@ class MayraAgentTests(unittest.TestCase):
         startfile.assert_not_called()
 
     @patch("mayra_agent.platform.system", return_value="Windows")
-    def test_media_remote_controls_are_no_longer_published_stubs(self, _system):
+    def test_media_remote_controls_are_executable_with_windows_api(self, _system):
+        import sys
         fake_user32 = type("FakeUser32", (), {
             "keybd_event": staticmethod(lambda *args: None)
         })()
         fake_windll = type("FakeWindll", (), {"user32": fake_user32})()
-        with patch.object(mayra_agent, "ctypes", None):
-            # The implementation imports ctypes inside the action; verify the
-            # Windows-only branch remains explicit rather than silently succeeding
-            # on unsupported hosts.
-            result = mayra_agent.execute("MEDIA_NEXT")
-            self.assertFalse(result["ok"])
-            self.assertIn("media control unavailable", result["error"].lower())
+        fake_ctypes = type("FakeCtypes", (), {"windll": fake_windll})()
+        with patch.dict(sys.modules, {"ctypes": fake_ctypes}):
+            for command in ("MEDIA_PLAY_PAUSE", "MEDIA_NEXT", "MEDIA_PREVIOUS"):
+                with self.subTest(command=command):
+                    result = mayra_agent.execute(command)
+                    self.assertTrue(result["ok"])
+                    self.assertIn("Media command sent", result["message"])
 
     def test_remote_arbitrary_command_is_rejected(self):
         code = mayra_agent.start_pairing()
