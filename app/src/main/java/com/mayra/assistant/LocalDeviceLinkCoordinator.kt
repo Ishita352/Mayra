@@ -6,6 +6,7 @@ import java.io.OutputStreamWriter
 import java.io.PrintWriter
 import java.net.InetSocketAddress
 import java.net.Socket
+import java.net.NetworkInterface
 import java.security.SecureRandom
 import java.util.concurrent.ConcurrentHashMap
 import org.json.JSONObject
@@ -94,6 +95,35 @@ class LocalDeviceLinkCoordinator(
 
     fun completePair(endpoint: Endpoint, code: String): TransportResult =
         request(endpoint, JSONObject().put("action", "PAIR_APPROVE").put("code", code))
+
+    fun registerPhone(endpoint: Endpoint, sessionToken: String, phoneHost: String, phonePort: Int = 8766): TransportResult =
+        request(endpoint, JSONObject()
+            .put("action", "REGISTER_PHONE")
+            .put("session_token", sessionToken)
+            .put("host", phoneHost)
+            .put("port", phonePort))
+
+    companion object {
+        fun localLanAddress(): String? {
+            return try {
+                val interfaces = NetworkInterface.getNetworkInterfaces()
+                while (interfaces.hasMoreElements()) {
+                    val network = interfaces.nextElement()
+                    if (!network.isUp || network.isLoopback) continue
+                    val addresses = network.inetAddresses
+                    while (addresses.hasMoreElements()) {
+                        val address = addresses.nextElement()
+                        if (!address.isLoopbackAddress && address.hostAddress?.contains(":") == false) {
+                            return address.hostAddress
+                        }
+                    }
+                }
+                null
+            } catch (_: Exception) {
+                null
+            }
+        }
+    }
 
     fun command(endpoint: Endpoint, sessionToken: String, command: String): TransportResult =
         request(endpoint, JSONObject()
