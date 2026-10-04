@@ -2,8 +2,7 @@ package com.mayra.assistant
 
 import android.content.Context
 import android.content.SharedPreferences
-import org.json.JSONArray
-import org.json.JSONObject
+import java.util.Base64
 
 class MayraPersistentUploadQueue(private val p: SharedPreferences) {
     constructor(context: Context) : this(
@@ -12,20 +11,36 @@ class MayraPersistentUploadQueue(private val p: SharedPreferences) {
 
     data class Item(val itemId: String, val queuedAtMillis: Long, val ownerApproved: Boolean)
 
+    private val encoder = Base64.getUrlEncoder().withoutPadding()
+    private val decoder = Base64.getUrlDecoder()
+
+    private fun encodeId(id: String): String =
+        encoder.encodeToString(id.toByteArray(Charsets.UTF_8))
+
+    private fun decodeId(value: String): String =
+        String(decoder.decode(value), Charsets.UTF_8)
+
     private fun read(): MutableList<Item> {
-        val a = JSONArray(p.getString("items", "[]"))
-        return MutableList(a.length()) { i ->
-            val o = a.getJSONObject(i)
-            Item(o.getString("id"), o.getLong("time"), o.getBoolean("approved"))
-        }
+        val raw = p.getString("items", "") ?: ""
+        if (raw.isBlank()) return mutableListOf()
+        return raw.lineSequence().mapNotNull { line ->
+            val parts = line.split('|', limit = 3)
+            if (parts.size != 3) return@mapNotNull null
+            runCatching {
+                Item(
+                    itemId = decodeId(parts[0]),
+                    queuedAtMillis = parts[1].toLong(),
+                    ownerApproved = parts[2].toBooleanStrict()
+                )
+            }.getOrNull()
+        }.toMutableList()
     }
 
     private fun write(xs: List<Item>) {
-        val a = JSONArray()
-        xs.distinctBy { it.itemId }.forEach {
-            a.put(JSONObject().put("id", it.itemId).put("time", it.queuedAtMillis).put("approved", it.ownerApproved))
+        val raw = xs.distinctBy { it.itemId }.joinToString("\n") {
+            "${encodeId(it.itemId)}|${it.queuedAtMillis}|${it.ownerApproved}"
         }
-        p.edit().putString("items", a.toString()).apply()
+        p.edit().putString("items", raw).apply()
     }
 
     fun enqueue(id: String, time: Long = System.currentTimeMillis(), approved: Boolean = false) {
