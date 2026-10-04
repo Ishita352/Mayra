@@ -506,6 +506,7 @@ class MainActivity : FragmentActivity() {
         layout.addView(sectionButton("🎤 Interview Assistant") { showInterviewAssistant() })
         layout.addView(sectionButton("🧠 Self-Learning + Knowledge Base") { showLearningEngine() })
         layout.addView(sectionButton("📈 E-commerce + Stock + Crypto Intelligence") { showIncomeMarketIntelligence() })
+        layout.addView(sectionButton("🎬 Video + Photo + Social Media Work") { showContentCreationIntelligence() })
         layout.addView(sectionButton("💰 Active + Passive Income Watcher") {
             showModule("Income Engine", IncomeOpportunityPolicy.summary())
         })
@@ -1160,6 +1161,37 @@ class MainActivity : FragmentActivity() {
         val msg = if (sent) "WhatsApp reply পাঠানো হয়েছে।" else "WhatsApp-এর reply action পাওয়া যায়নি। আগে WhatsApp notification access ON করুন এবং একটি reply-capable notification আসতে দিন।"
         showVoiceResult(msg)
         speakResponse(msg)
+    }
+
+    private fun showContentCreationIntelligence() {
+        val layout = baseLayout()
+        layout.addView(TextView(this).apply { text = "🎬 Video / Photo / Social Media Work"; textSize = 28f })
+        layout.addView(TextView(this).apply {
+            text = "\nMayra-তে video editing, photo editing, YouTube content work এবং social-media account handling-এর কাজের workflow যোগ হয়েছে. আপনার আগের অভিজ্ঞতাও skill-matching-এ ব্যবহার করা যাবে, তবে নতুন experience বানিয়ে বলা হবে না."
+            textSize = 17f
+        })
+        val areas = listOf(
+            MayraContentCreationIntelligence.Area.VIDEO_EDITING,
+            MayraContentCreationIntelligence.Area.PHOTO_EDITING,
+            MayraContentCreationIntelligence.Area.YOUTUBE,
+            MayraContentCreationIntelligence.Area.SOCIAL_MEDIA_MANAGEMENT
+        )
+        areas.forEach { area ->
+            val plan = MayraContentCreationIntelligence.plan(area)
+            layout.addView(TextView(this).apply {
+                text = "\n$area\nSkills: " + plan.skills.joinToString(", ") +
+                    "\nDeliverables: " + plan.deliverables.joinToString(", ")
+                textSize = 15f
+            })
+        }
+        layout.addView(TextView(this).apply {
+            text = "\nআপনার existing experience:\n" +
+                MayraContentCreationIntelligence.ownerExperienceProfile().existingSkills.joinToString(" • ") +
+                "\n\nClient-work rule:\n" + MayraContentCreationIntelligence.clientWorkRule()
+            textSize = 15f
+        })
+        layout.addView(Button(this).apply { text = "← Mayra Home"; setOnClickListener { showAssistant() } })
+        setContentView(ScrollView(this).apply { addView(layout) })
     }
 
     private fun showPublicInfoLookup() {
