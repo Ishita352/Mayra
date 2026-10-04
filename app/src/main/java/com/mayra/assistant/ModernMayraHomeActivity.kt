@@ -246,17 +246,17 @@ class ModernMayraHomeActivity : FragmentActivity() {
             .setMessage(message)
             .setNegativeButton("Close", null)
         if (paired != null) {
-            builder.setNeutralButton("Revoke") {
+            builder.setNeutralButton("Revoke", android.content.DialogInterface.OnClickListener { _, _ ->
                 session.revoke()
                 status.text = "Windows pairing revoked."
-            }
+            })
         } else if (pending == null) {
-            builder.setPositiveButton("Create Code") {
+            builder.setPositiveButton("Create Code", android.content.DialogInterface.OnClickListener { _, _ ->
                 val invite = LocalDeviceLinkCoordinator().createInvite("windows-10")
                 session.saveInvite(MayraWindowsPairingSession.Invite(invite.deviceId, invite.code, invite.expiresAtMs))
                 status.text = "Windows pairing code created: " + invite.code
                 showComputerLinkDialog()
-            }
+            })
         }
         builder.show()
     }
