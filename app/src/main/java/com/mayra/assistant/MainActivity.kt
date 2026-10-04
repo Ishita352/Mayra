@@ -30,6 +30,11 @@ class MainActivity : FragmentActivity() {
     private val familyAccountManager by lazy { MayraFamilyAccountManager(MayraFamilyAccountManager.SharedPreferencesStore(prefs)) }
     private val semanticMemory by lazy { MayraSemanticMemory(MayraSemanticMemory.SharedPreferencesStore(this)) }
     private val semanticMemoryBridge by lazy { MayraSemanticMemoryBridge(semanticMemory) }
+    private val windowsPairingSession by lazy { MayraWindowsPairingSession(object : MayraWindowsPairingSession.Store {
+        override fun get(key: String): String? = prefs.getString(key, null)
+        override fun put(key: String, value: String) { prefs.edit().putString(key, value).apply() }
+        override fun remove(key: String) { prefs.edit().remove(key).apply() }
+    }) }
     private val founderIdentity by lazy { MayraFounderIdentity(object : MayraFounderIdentity.Store { override fun get(key: String) = prefs.getString(key, null); override fun put(key: String, value: String) { prefs.edit().putString(key, value).apply() } }) }
     private var activeFamilySession: MayraFamilyAccountManager.AuthenticatedSession? = null
     private val prefs by lazy { getSharedPreferences("mayra_secure", MODE_PRIVATE) }
