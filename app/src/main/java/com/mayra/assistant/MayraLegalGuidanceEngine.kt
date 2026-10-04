@@ -110,6 +110,60 @@ object MayraLegalGuidanceEngine {
         return prohibited.any { s.contains(it) }
     }
 
+    /**
+     * Lawful defense-route analysis.
+     * "Legal loopholes" are treated only as lawful defenses, procedural safeguards,
+     * statutory exceptions or remedies—not as instructions to evade enforcement.
+     */
+    data class DefenseRoute(
+        val route: String,
+        val legalBasisToVerify: String,
+        val whatMayHelp: String,
+        val evidenceNeeded: String,
+        val limitation: String
+    )
+
+    fun lawfulDefenseRoutes(matter: Matter): List<DefenseRoute> {
+        if (matter.description.isBlank()) return emptyList()
+        return listOf(
+            DefenseRoute(
+                "Check whether every legal ingredient of the alleged offence is actually established",
+                "Verify the exact offence definition in the current applicable Act/section",
+                "A missing mandatory ingredient can materially affect the case",
+                "FIR/complaint, charge, evidence and applicable statutory text",
+                "Mayra must not conclude that an ingredient is missing without reviewing the facts and current law"
+            ),
+            DefenseRoute(
+                "Check procedural safeguards and constitutional protections",
+                "Verify the Constitution and current criminal procedure law",
+                "An unlawful or defective procedure may create a lawful remedy or challenge",
+                "Notices, arrest/remand records, orders, dates and procedural documents",
+                "The legal effect of a defect depends on the statute and court's assessment"
+            ),
+            DefenseRoute(
+                "Check jurisdiction, limitation and maintainability",
+                "Verify the applicable jurisdiction, limitation/filing rules and special statute",
+                "A matter filed in the wrong forum, out of time, or not maintainable may have a lawful procedural remedy",
+                "Filing dates, place of occurrence, court orders and governing statute",
+                "Exceptions and extensions may apply"
+            ),
+            DefenseRoute(
+                "Check evidentiary reliability and admissibility",
+                "Verify the Bharatiya Sakshya Adhiniyam and applicable special rules",
+                "Material contradictions, inadmissible material or failure to prove required facts may support a lawful defense",
+                "Lawfully obtained records, witness material, expert material and court filings",
+                "Do not fabricate, destroy, conceal or manipulate evidence"
+            ),
+            DefenseRoute(
+                "Check available post-order remedies",
+                "Verify the current statute and latest binding/relevant judgments",
+                "Bail, discharge, appeal, revision, review, quashing or other remedies may exist depending on stage and jurisdiction",
+                "Latest order/judgment, case stage, limitation and certified/public records",
+                "Only a competent court can grant the final relief"
+            )
+        )
+    }
+
     fun rule(): String =
         "Use the Constitution, current central/state legislation, applicable rules and current authoritative judgments. " +
         "For every legal answer, separate facts from allegations and law from inference; cite the source and date; " +
