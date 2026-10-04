@@ -2,7 +2,7 @@
 
 ## বর্তমান অবস্থা
 
-এটি Windows-এর জন্য প্রাথমিক local-only agent। এখন পর্যন্ত এটি `PING`, `OPEN_NOTEPAD`, এবং `OPEN_CALCULATOR`—এই তিনটি command সমর্থন করে। **ফোন থেকে remote command/pairing এখনো চালু নয়।**
+এটি Windows-এর জন্য প্রাথমিক local-only agent। এটি `PING`, `OPEN_NOTEPAD`, `OPEN_CALCULATOR`, এবং Windows / Network / Display / Sound Settings খোলার command সমর্থন করে। অন্যান্য declared capability এখনো চালু নয়। **ফোন থেকে remote command/pairing এখনো চালু নয়।**
 
 ## চালানোর নিয়ম
 
