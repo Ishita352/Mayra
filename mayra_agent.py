@@ -11,6 +11,7 @@ import time
 HOST = os.environ.get("MAYRA_AGENT_HOST", "0.0.0.0")
 PORT = int(os.environ.get("MAYRA_AGENT_PORT", "8765"))
 MAX_REQUEST_BYTES = 4096
+SOCKET_TIMEOUT_SECONDS = 8
 PAIRING_TTL_SECONDS = 300
 QUICK_LINK_TTL_SECONDS = 120
 
@@ -303,7 +304,7 @@ def execute(command: str):
 
 
 def handle_connection(conn):
-    conn.settimeout(5)
+    conn.settimeout(SOCKET_TIMEOUT_SECONDS)
     try:
         data = conn.recv(MAX_REQUEST_BYTES + 1)
         if not data:
@@ -364,7 +365,7 @@ def handle_connection(conn):
                         else:
                             host, port = endpoint
                             try:
-                                with socket.create_connection((host, port), timeout=5) as phone:
+                                with socket.create_connection((host, port), timeout=SOCKET_TIMEOUT_SECONDS) as phone:
                                     payload = {
                                         "action": "PHONE_COMMAND",
                                         "session_token": request.get("session_token"),
@@ -411,6 +412,7 @@ def main():
     code = start_pairing()
     print("\nMayra Windows Agent — persistent owner-approved LAN login")
     print(f"Listening on {HOST}:{PORT}")
+    print("Remote Internet mode: supported when this endpoint is reachable over the Internet; LAN remains the default safe path.")
     print(f"PAIRING CODE: {code} (expires in {PAIRING_TTL_SECONDS}s)")
     print(f"QUICK OWNER LINK CODE: {quick_pair_code()} (expires in {QUICK_LINK_TTL_SECONDS}s)")
     print("Existing login is preserved across Windows restart/power-off until explicit logout/revoke.")
