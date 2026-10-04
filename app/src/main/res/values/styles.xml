@@ -3,7 +3,11 @@
     <style name="Theme.Mayra" parent="android:style/Theme.Material.Light.NoActionBar">
         <item name="android:fontFamily">sans</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:navigationBarColor">#FFFFFF</item>
-        <item name="android:statusBarColor">#FFFFFF</item>
+        <item name="android:navigationBarColor">#070A16</item>
+        <item name="android:statusBarColor">#070A16</item>
+        <item name="android:windowBackground">#070A16</item>
+        <item name="android:colorBackground">#070A16</item>
+        <item name="android:navigationBarDividerColor">#070A16</item>
+        <item name="android:windowActionModeOverlay">true</item>
     </style>
 </resources>
