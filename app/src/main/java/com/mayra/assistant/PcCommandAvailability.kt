@@ -15,6 +15,8 @@ object PcCommandAvailability {
         PcCommandCatalog.CommandId.OPEN_SOUND_SETTINGS,
         PcCommandCatalog.CommandId.GET_PC_STATUS,
         PcCommandCatalog.CommandId.GET_SECURITY_STATUS,
+        PcCommandCatalog.CommandId.BRIDGE_START_SCREEN,
+        PcCommandCatalog.CommandId.BRIDGE_START_FILE_SHARE,
         PcCommandCatalog.CommandId.REVOKE_SESSION -> true
         else -> false
     }
