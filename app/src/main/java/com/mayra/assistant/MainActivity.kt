@@ -600,6 +600,33 @@ class MainActivity : FragmentActivity() {
             showVoiceResult("Security Control OFF — নিরাপত্তা checks সক্রিয় না থাকায় এই command চালানো যাবে না।");
             return
         }
+        val lowerCommand = spoken.lowercase(Locale.ROOT)
+        val voiceWhatsAppMarker = listOf(
+            "whatsapp voice message", "whatsapp-এ voice message",
+            "whatsapp এ voice message", "হোয়াটসঅ্যাপে ভয়েস মেসেজ",
+            "হোয়াটসঅ্যাপে ভয়েস মেসেজ", "व्हाट्सऐप पर वॉइस मैसेज"
+        ).firstOrNull { lowerCommand.contains(it) }
+        if (voiceWhatsAppMarker != null) {
+            val raw = spoken.substringAfter(voiceWhatsAppMarker, "").trim()
+            val content = raw
+                .replace(Regex("^(to|for|কে|কে বল|বল|বলো|পাঠাও|করো|send|भेजो|को)\\s*[:,-]?\\s*", RegexOption.IGNORE_CASE), "")
+                .substringAfter("saying", raw)
+                .substringAfter("বলবে", raw)
+                .substringAfter("এই কথাটা", raw)
+                .trim()
+            if (content.isBlank()) {
+                showVoiceResult("বস, WhatsApp voice message-এ কী কথা বলব সেটি বলুন।")
+                speakResponse("বস, voice message-এ কী কথা বলব?")
+            } else {
+                MayraWhatsAppVoiceMessage.createAndShare(this, content) { message ->
+                    runOnUiThread {
+                        showVoiceResult(message)
+                        speakResponse(message)
+                    }
+                }
+            }
+            return
+        }
         // Defense-in-depth: route physical lock state through the dedicated Owner-verified gate.
         // When the phone is locked, only explicitly enabled, verified, non-sensitive voice work may proceed.
         val keyguard = getSystemService(KeyguardManager::class.java)
