@@ -67,7 +67,7 @@ class MayraBootReceiver : BroadcastReceiver() {
 
         val text = when {
             windowsPaired && voiceOn ->
-                "Windows 10 login محفوظ আছে। Mayra খুললে connection পুনরায় প্রস্তুত হবে; Background Voice চালু করতে Mayra খুলুন।"
+                "Windows 10 login সংরক্ষিত আছে। Mayra খুললে connection পুনরায় প্রস্তুত হবে; Background Voice চালু করতে Mayra খুলুন।"
             windowsPaired ->
                 "Windows 10 login محفوظ আছে। Mayra খুললে connection পুনরায় প্রস্তুত হবে।"
             voiceOn ->
