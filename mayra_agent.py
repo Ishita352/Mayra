@@ -46,6 +46,8 @@ ALLOWED = {
     "PHONE_SPEAKER",
     "PHONE_RECOVERY_STATUS",
     "REVOKE_SESSION",
+    "REGISTER_PHONE",
+    "PHONE_COMMAND",
 }
 
 _state_lock = threading.Lock()
@@ -54,6 +56,7 @@ _pairing_expires = 0.0
 _session_token = None
 _session_expires = 0.0
 _owner_approved_code = None
+_phone_endpoint = None
 
 
 def _new_pairing_code():
@@ -68,6 +71,8 @@ def start_pairing():
         _session_token = None
         _session_expires = 0.0
         _owner_approved_code = None
+        global _phone_endpoint
+        _phone_endpoint = None
         return _pairing_code
 
 
@@ -102,6 +107,20 @@ def approve_pairing(code):
         _session_expires = time.time() + SESSION_TTL_SECONDS
         _pairing_code = None
         return _session_token
+
+
+def register_phone(host, port):
+    global _phone_endpoint
+    if not isinstance(host, str) or not host.strip() or not isinstance(port, int) or not (1 <= port <= 65535):
+        return False
+    with _state_lock:
+        _phone_endpoint = (host.strip(), port)
+        return True
+
+
+def phone_endpoint():
+    with _state_lock:
+        return _phone_endpoint
 
 
 def revoke_session():
@@ -230,6 +249,39 @@ def handle_connection(conn):
                         response = {"ok": True, "message": "Session revoked"}
                     else:
                         response = {"ok": False, "error": "Authentication required"}
+                elif action == "REGISTER_PHONE":
+                    if not authenticated(request.get("session_token")):
+                        response = {"ok": False, "error": "Authentication required"}
+                    else:
+                        host = request.get("host", "")
+                        try:
+                            port = int(request.get("port", 8766))
+                        except (TypeError, ValueError):
+                            port = 0
+                        response = {"ok": register_phone(host, port), "message": "Android endpoint registered"}
+                        if not response["ok"]:
+                            response["error"] = "Invalid Android endpoint"
+                elif action == "PHONE_COMMAND":
+                    if not authenticated(request.get("session_token")):
+                        response = {"ok": False, "error": "Authentication required"}
+                    else:
+                        endpoint = phone_endpoint()
+                        if endpoint is None:
+                            response = {"ok": False, "error": "Android endpoint not registered"}
+                        else:
+                            host, port = endpoint
+                            try:
+                                with socket.create_connection((host, port), timeout=5) as phone:
+                                    payload = {
+                                        "action": "PHONE_COMMAND",
+                                        "session_token": request.get("session_token"),
+                                        "command": request.get("command", "")
+                                    }
+                                    phone.sendall((json.dumps(payload) + "\n").encode("utf-8"))
+                                    line = phone.recv(MAX_REQUEST_BYTES + 1).decode("utf-8").strip()
+                                    response = json.loads(line)
+                            except (OSError, ValueError, json.JSONDecodeError):
+                                response = {"ok": False, "error": "Android endpoint unavailable"}
                 elif action == "COMMAND":
                     if not authenticated(request.get("session_token")):
                         response = {"ok": False, "error": "Authentication required"}
@@ -280,6 +332,22 @@ def main():
             elif command == "REVOKE":
                 revoke_session()
                 print("Session revoked.")
+            elif command.startswith("PHONE "):
+                endpoint = phone_endpoint()
+                if endpoint is None or not authenticated(_session_token):
+                    print("Android endpoint is not registered.")
+                else:
+                    host, port = endpoint
+                    try:
+                        with socket.create_connection((host, port), timeout=5) as phone:
+                            phone.sendall((json.dumps({
+                                "action": "PHONE_COMMAND",
+                                "session_token": _session_token,
+                                "command": command[6:].strip()
+                            }) + "\n").encode("utf-8"))
+                            print(phone.recv(MAX_REQUEST_BYTES + 1).decode("utf-8").strip())
+                    except OSError as exc:
+                        print("Android connection failed:", exc)
 
     threading.Thread(target=owner_console, daemon=True).start()
 
