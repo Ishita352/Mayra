@@ -806,7 +806,12 @@ class MainActivity : FragmentActivity() {
                     spoken.lowercase(Locale.ROOT).contains("disable") ||
                     spoken.lowercase(Locale.ROOT).contains("बंद")
                 FeatureToggleRegistry.setEnabled(prefs, FeatureToggleRegistry.VOICE_COMMAND, !wantsOff)
-                val msg = if (wantsOff) "Voice Command OFF — সাধারণ voice command বন্ধ করা হয়েছে।" else "Voice Command ON — voice command চালু হয়েছে।"
+                if (wantsOff) {
+                    MayraBackgroundVoiceServiceStarter.stop(this)
+                } else if (prefs.getBoolean("master_on", false) && prefs.getBoolean("owner_verified", false)) {
+                    MayraBackgroundVoiceServiceStarter.start(this)
+                }
+                val msg = if (wantsOff) "Voice Command OFF — সাধারণ voice command এবং background listening বন্ধ হয়েছে." else "Voice Command ON — background voice command প্রস্তুত হয়েছে."
                 showVoiceResult(msg)
                 speakResponse(msg)
                 return
