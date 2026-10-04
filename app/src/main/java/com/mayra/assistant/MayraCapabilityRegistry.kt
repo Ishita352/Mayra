@@ -56,7 +56,7 @@ object MayraCapabilityRegistry {
         Capability(52, "Lawful video-income platform intelligence", Status.COMPLETE),
         Capability(53, "Continuous background self-development, learning and opportunity discovery", Status.COMPLETE),
         Capability(54, "Core no-investment, free-first builder and human-only-site principles", Status.COMPLETE),
-        Capability(55, "Owner WhatsApp important-information channel", Status.IN_PROGRESS),
+        Capability(55, "Owner WhatsApp important-information channel", Status.COMPLETE),
         Capability(56, "Owner Home controls: camera, calls, 3D, voice light and WhatsApp", Status.IN_PROGRESS),
         Capability(57, "Voice access, locked-phone activity, silent behavior and Mayra volume", Status.IN_PROGRESS),
         Capability(58, "Protected Android + Windows 10 device safety and Owner-authorized control", Status.IN_PROGRESS),
