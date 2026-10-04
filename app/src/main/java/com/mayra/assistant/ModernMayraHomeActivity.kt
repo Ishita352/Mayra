@@ -31,6 +31,7 @@ class ModernMayraHomeActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        prefs.edit().putBoolean("owner_command_authorized", false).apply()
         MayraFeatureCheckManager(this).enforceUnavailableFeaturesOff()
         window.decorView.setBackgroundColor(Color.rgb(7, 10, 22))
         if (!MayraFeatureCheckManager.isSetupCompleted(this)) {
@@ -135,7 +136,14 @@ class ModernMayraHomeActivity : FragmentActivity() {
                 prefs.edit().putBoolean("master_on", checked).apply()
                 text = if (checked) "ON" else "OFF"
                 if (checked && FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.VOICE_COMMAND)) {
-                    MayraBackgroundVoiceServiceStarter.start(this@ModernMayraHomeActivity)
+                    if (prefs.getBoolean("owner_command_authorized", false)) {
+                        MayraBackgroundVoiceServiceStarter.start(this@ModernMayraHomeActivity)
+                    } else {
+                        prefs.edit().putBoolean("master_on", false).apply()
+                        isChecked = false
+                        status.text = "Owner verification is required before Mayra can accept commands."
+                        authenticateOwnerForSession { }
+                    }
                 } else if (!checked) {
                     MayraBackgroundVoiceServiceStarter.stop(this@ModernMayraHomeActivity)
                 }
@@ -500,7 +508,42 @@ class ModernMayraHomeActivity : FragmentActivity() {
             status.text = "Mayra is OFF. Turn the master switch ON first."
             return
         }
+        if (!prefs.getBoolean("owner_command_authorized", false)) {
+            authenticateOwnerForSession { startActivity(Intent(this, MainActivity::class.java)) }
+            return
+        }
         startActivity(Intent(this, MainActivity::class.java))
+    }
+
+    private fun authenticateOwnerForSession(onAuthorized: () -> Unit) {
+        val manager = BiometricManager.from(this)
+        val authenticators = BiometricManager.Authenticators.BIOMETRIC_WEAK or
+            BiometricManager.Authenticators.DEVICE_CREDENTIAL
+        if (manager.canAuthenticate(authenticators) != BiometricManager.BIOMETRIC_SUCCESS) {
+            status.text = "Owner verification unavailable. Configure Face/Fingerprint or the phone's secure credential."
+            return
+        }
+        val prompt = BiometricPrompt(this, ContextCompat.getMainExecutor(this),
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    prefs.edit().putBoolean("owner_verified", true)
+                        .putBoolean("owner_command_authorized", true).apply()
+                    MayraFounderIdentity(object : MayraFounderIdentity.Store {
+                        override fun get(key: String) = prefs.getString(key, null)
+                        override fun put(key: String, value: String) { prefs.edit().putString(key, value).apply() }
+                    }).recognizeVerifiedOwner(MayraFounderIdentity.VerificationMethod.ANDROID_BIOMETRIC)
+                    status.text = "Owner verified ✓ — Mayra command access enabled."
+                    speakOwnerWelcome()
+                    onAuthorized()
+                }
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    status.text = "Owner verification cancelled. Mayra command access remains locked."
+                }
+            })
+        prompt.authenticate(BiometricPrompt.PromptInfo.Builder()
+            .setTitle("Mayra Owner Command Access")
+            .setSubtitle("Face / Fingerprint অথবা প্রয়োজনে ফোনের secure PIN/Pattern/Password")
+            .setAllowedAuthenticators(authenticators).build())
     }
 
     private fun animateOrb() {
