@@ -99,6 +99,26 @@ object MayraOwnerBiodataPortfolio {
     fun skillNames(): Set<String> = skills.map { it.name }.toSet()
     fun opportunities(): List<WorkOpportunity> = opportunities
 
+
+    fun careerProfileFromCv(): MayraCareerProfile = MayraCareerProfile(
+        fullName = "Gopal Basak",
+        headline = "Freelance Professional • Data Entry • AI Support • Digital & Creative Work",
+        location = "Dhatrigram, Kalna, Purba Bardhaman, West Bengal – 713405",
+        education = "Bachelor of Arts (B.A.), Bardhaman University, 2017–2020, 75%\nHigher Secondary, Dhatrigram High School, 2015–2016, 72%\nDiploma in Computer Course, Two-Year Computer Course",
+        experience = "Freelance Professional — Independent / Remote: Data & Digital Operations; Customer Service & Support; Language, Audio/Video & Content; AI Training & Quality Review.\nProduction Supervisor — Surya Fast Food Limited (Priya Gold).\nSupervisor Engineer — Aparna Construction, Hyderabad.",
+        skills = skillNames().joinToString(" • "),
+        certificates = "Two-Year Computer Course Diploma",
+        languages = "Bengali (Native) • Hindi (Professional) • English (Professional)",
+        preferredRoles = "Data Entry • Data/Office Operations • Customer Support • Web Research • Translation • Content Writing • Photo/Video Editing • AI Training/Content Review • Online Micro-tasks",
+        preferredWorkMode = "Freelance / Independent / Remote"
+    )
+
+    fun seedCareerProfileIfMissing(store: MayraCareerProfileStore.Store) {
+        if (MayraCareerProfileStore.load(store) == null) {
+            MayraCareerProfileStore.save(store, careerProfileFromCv())
+        }
+    }
+
     fun profileSummary(): String = "Owner skill portfolio imported from the provided CV. Mayra may update this profile only with Owner-approved, evidenced skills or completed learning."
 
     fun rule(): String =
