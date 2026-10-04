@@ -1,4 +1,5 @@
 name: Build Mayra Android
+# CI verification workflow
 
 on:
   workflow_dispatch:
