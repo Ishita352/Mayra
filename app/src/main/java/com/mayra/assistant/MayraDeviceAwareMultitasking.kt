@@ -41,7 +41,7 @@ object MayraDeviceAwareMultitasking {
             cpuAvailablePercent >= 35 && memoryAvailablePercent >= 35 && batteryPercent >= 25 -> 0.75
             else -> 0.5
         }
-        val recommended = (base * loadFactor * resourceFactor).toInt().coerceIn(1, base)
+        val recommended = (base.toDouble() * loadFactor * resourceFactor).toInt().coerceIn(1, base)
         return Capacity(health, load, recommended, "Concurrency is adapted to current device health and available resources.")
     }
 
