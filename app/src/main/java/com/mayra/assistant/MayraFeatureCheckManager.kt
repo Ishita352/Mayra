@@ -147,6 +147,16 @@ class MayraFeatureCheckManager(private val context: Context) {
             .apply()
     }
 
+    /**
+     * Safety migration: older builds may have persisted these features as ON
+     * even though their end-to-end implementation is not available.
+     */
+    fun enforceUnavailableFeaturesOff() {
+        setEnabled(CALL, false)
+        setEnabled(COMPUTER, false)
+        setEnabled(QUICK_LINK, false)
+    }
+
     fun markSetupComplete() {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean(KEY_SETUP_COMPLETED, true).apply()
     }
