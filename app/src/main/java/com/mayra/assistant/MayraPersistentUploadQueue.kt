@@ -1,11 +1,14 @@
 package com.mayra.assistant
 
 import android.content.Context
+import android.content.SharedPreferences
 import org.json.JSONArray
 import org.json.JSONObject
 
-class MayraPersistentUploadQueue(context: Context) {
-    private val p = context.getSharedPreferences("mayra_upload_queue", Context.MODE_PRIVATE)
+class MayraPersistentUploadQueue(private val p: SharedPreferences) {
+    constructor(context: Context) : this(
+        context.getSharedPreferences("mayra_upload_queue", Context.MODE_PRIVATE)
+    )
 
     data class Item(val itemId: String, val queuedAtMillis: Long, val ownerApproved: Boolean)
 
