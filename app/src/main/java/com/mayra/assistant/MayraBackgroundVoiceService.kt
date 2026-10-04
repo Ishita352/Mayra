@@ -17,6 +17,12 @@ import android.speech.tts.TextToSpeech
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import java.util.Locale
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
+import java.io.PrintWriter
+import java.net.ServerSocket
+import org.json.JSONObject
 
 /**
  * Keeps Mayra's voice command listener alive outside the Activity UI.
@@ -42,11 +48,15 @@ class MayraBackgroundVoiceService : Service() {
     private var recognizer: SpeechRecognizer? = null
     private var tts: TextToSpeech? = null
     private var restarting = false
+    private var phoneServer: ServerSocket? = null
+    private var phoneServerThread: Thread? = null
+    private val phonePort = 8766
 
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
         tts = TextToSpeech(this) {}
+        startPhoneCommandServer()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -116,6 +126,60 @@ class MayraBackgroundVoiceService : Service() {
         }, 900L)
     }
 
+    private fun startPhoneCommandServer() {
+        if (!prefs.getBoolean("master_on", false) || !prefs.getBoolean("owner_verified", false)) return
+        if (phoneServer != null) return
+        phoneServerThread = Thread {
+            try {
+                phoneServer = ServerSocket(phonePort)
+                while (!Thread.currentThread().isInterrupted && canRun()) {
+                    val socket = phoneServer?.accept() ?: break
+                    Thread { handlePhoneConnection(socket) }.start()
+                }
+            } catch (_: Exception) {
+                // Android standalone operation must continue if the optional LAN listener fails.
+            } finally {
+                try { phoneServer?.close() } catch (_: Exception) {}
+                phoneServer = null
+            }
+        }.also { it.isDaemon = true; it.start() }
+    }
+
+    private fun handlePhoneConnection(socket: java.net.Socket) {
+        socket.use {
+            try {
+                it.soTimeout = 5000
+                val reader = BufferedReader(InputStreamReader(it.getInputStream(), Charsets.UTF_8))
+                val writer = PrintWriter(OutputStreamWriter(it.getOutputStream(), Charsets.UTF_8), true)
+                val line = reader.readLine() ?: return
+                val request = JSONObject(line)
+                val expected = prefs.getString("windows_paired_token", null)
+                val token = request.optString("session_token")
+                if (expected.isNullOrBlank() || token != expected) {
+                    writer.println(JSONObject().put("ok", false).put("error", "Authentication required"))
+                    return
+                }
+                if (request.optString("action") != "PHONE_COMMAND") {
+                    writer.println(JSONObject().put("ok", false).put("error", "Action not allowed"))
+                    return
+                }
+                val command = request.optString("command")
+                val result = MayraBackgroundCommandRouter.route(this, command)
+                if (result.handled) {
+                    speak(result.response)
+                    writer.println(JSONObject().put("ok", true).put("message", result.response))
+                } else {
+                    writer.println(JSONObject().put("ok", false).put("error", "Command not allowed on Android background channel"))
+                }
+            } catch (_: Exception) {
+                try {
+                    PrintWriter(OutputStreamWriter(socket.getOutputStream(), Charsets.UTF_8), true)
+                        .println(JSONObject().put("ok", false).put("error", "Android connection error"))
+                } catch (_: Exception) {}
+            }
+        }
+    }
+
     private fun handleCommand(spoken: String) {
         sendBroadcast(Intent(ACTION_COMMAND).setPackage(packageName).putExtra(EXTRA_SPOKEN, spoken))
         val result = MayraBackgroundCommandRouter.route(this, spoken)
@@ -168,6 +232,10 @@ class MayraBackgroundVoiceService : Service() {
     override fun onDestroy() {
         stopListening()
         recognizer?.destroy()
+        try { phoneServer?.close() } catch (_: Exception) {}
+        phoneServer = null
+        phoneServerThread?.interrupt()
+        phoneServerThread = null
         recognizer = null
         tts?.shutdown()
         tts = null
