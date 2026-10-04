@@ -83,7 +83,7 @@ object MayraVoiceEngine {
 
     fun applyProfile(context: Context, profileId: String): Boolean {
         val profile = profiles.firstOrNull { it.id == profileId } ?: return false
-        select(context, profileId)
+        if (!select(context, profileId)) return false
         val tuning = profileTuning(profile)
         setTuning(context, tuning.speed, tuning.pitch)
         return true
