@@ -50,7 +50,8 @@ object MayraCapabilityRegistry {
         Capability(46, "Hindu scriptures and Ayurveda knowledge", Status.COMPLETE),
         Capability(47, "Education intelligence and Burdwan academic updates", Status.COMPLETE),
         Capability(48, "Lawful external study resources and note-income workflow", Status.COMPLETE),
-        Capability(49, "E-commerce, USD-first income and market intelligence", Status.COMPLETE)
+        Capability(49, "E-commerce, USD-first income and market intelligence", Status.COMPLETE),
+        Capability(50, "Video/photo editing, YouTube and social-media work intelligence", Status.COMPLETE)
     )
 
     fun all(): List<Capability> = capabilities
