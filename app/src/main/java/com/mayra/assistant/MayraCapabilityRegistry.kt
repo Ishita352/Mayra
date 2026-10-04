@@ -62,6 +62,7 @@ object MayraCapabilityRegistry {
         Capability(58, "Protected Android + Windows 10 device safety and Owner-authorized control", Status.IN_PROGRESS),
         Capability(59, "Owner approval gate with controllable background automations", Status.IN_PROGRESS),
         Capability(60, "Multilingual grammar and language intelligence", Status.IN_PROGRESS)
+        Capability(61, "CV-derived advanced Owner skill portfolio and CV-free opportunity matching", Status.IN_PROGRESS)
     )
 
     fun all(): List<Capability> = capabilities
