@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.app.KeyguardManager
 import android.content.Intent
+import android.speech.tts.TextToSpeech
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
@@ -26,6 +27,7 @@ class ModernMayraHomeActivity : FragmentActivity() {
     private val prefs by lazy { getSharedPreferences("mayra_secure", MODE_PRIVATE) }
     private lateinit var orb: TextView
     private lateinit var status: TextView
+    private var welcomeTts: TextToSpeech? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,6 +79,7 @@ class ModernMayraHomeActivity : FragmentActivity() {
                     })
                     identity.recognizeVerifiedOwner(MayraFounderIdentity.VerificationMethod.ANDROID_BIOMETRIC)
                     showHome()
+                    speakOwnerWelcome()
                 }
             })
         val info = BiometricPrompt.PromptInfo.Builder()
@@ -85,6 +88,23 @@ class ModernMayraHomeActivity : FragmentActivity() {
             .setAllowedAuthenticators(authenticators)
             .build()
         prompt.authenticate(info)
+    }
+
+    private fun speakOwnerWelcome() {
+        welcomeTts?.shutdown()
+        welcomeTts = TextToSpeech(this) { result ->
+            if (result == TextToSpeech.SUCCESS) {
+                welcomeTts?.let { speech ->
+                    speech.language = Locale("bn", "IN")
+                    speech.speak(
+                        "Welcome Boss, বলুন কী সাহায্য করতে পারি",
+                        TextToSpeech.QUEUE_FLUSH,
+                        null,
+                        "mayra_owner_welcome"
+                    )
+                }
+            }
+        }
     }
 
     private fun showHome() {
@@ -575,5 +595,12 @@ object MayraBackgroundVoiceServiceStarter {
         val intent = android.content.Intent(context, MayraBackgroundVoiceService::class.java)
             .setAction(MayraBackgroundVoiceService.ACTION_STOP)
         context.startService(intent)
+    }
+
+    override fun onDestroy() {
+        welcomeTts?.stop()
+        welcomeTts?.shutdown()
+        welcomeTts = null
+        super.onDestroy()
     }
 }
