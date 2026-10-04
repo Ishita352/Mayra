@@ -329,7 +329,22 @@ class ModernMayraHomeActivity : FragmentActivity() {
                             } catch (_: Exception) { "" }
                             if (token.isNotBlank()) {
                                 session.markPaired("windows-10", host, port, token)
-                                status.text = "Windows 10 paired successfully ✓"
+                                val phoneHost = LocalDeviceLinkCoordinator.localLanAddress()
+                                if (phoneHost != null) {
+                                    val registration = LocalDeviceLinkCoordinator().registerPhone(
+                                        LocalDeviceLinkCoordinator.Endpoint(host, port),
+                                        token,
+                                        phoneHost,
+                                        8766
+                                    )
+                                    status.text = if (registration.ok) {
+                                        "Windows 10 paired successfully ✓ — two-way command channel registered."
+                                    } else {
+                                        "Windows 10 paired ✓ — Android endpoint registration pending; Android standalone mode remains active."
+                                    }
+                                } else {
+                                    status.text = "Windows 10 paired ✓ — local network address unavailable; Android standalone mode remains active."
+                                }
                             } else {
                                 status.text = "Pairing did not complete. Windows owner approval may still be pending."
                             }
