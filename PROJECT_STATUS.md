@@ -101,6 +101,24 @@ Estimated overall completion: ~38% (planning estimate based on feature scope, no
 31. Master documentation, backup and release package
 32. Final project certificate after completion
 
+
+
+## Additional 7 requirements from earlier conversations — added to the master backlog
+33. Public Mayra website: free GitHub-connected hosting, direct online access such as gopalbasak.com, and step-by-step GitHub Pages/custom-domain publication workflow.
+34. Website ↔ Mayra integration: Owner-controlled Mayra voice/chat interface, phone/computer access, permission-controlled computer actions, GitHub-based website content/code workflow, and Owner permission required for live publishing.
+35. Advanced Computer/System Control: broader Owner commands for Windows 10 and Android covering settings/system tasks, apps/files, network, display, sound and similar capabilities, subject to OS permissions and Owner confirmation for risky changes.
+36. Detailed Income-Platform Automation: discover AI-permitted income platforms, notify Owner, create/use accounts and biodata only after permission, request secrets only when needed, execute allowed instructed work, verify/submit with Owner confirmation, track completed/pending earnings, and never perform financial transactions.
+37. Income Website Human-Only Rule Engine: if a site prohibits AI/automation, Mayra must not bypass the rule or submit automatically; assist the Owner with manual completion instead. No OTP/CAPTCHA/identity bypass.
+38. Universal Income Rules / Training Layer: one foundational rule/training layer that applies the income-site safety and AI-permission rules consistently across all income websites, with controlled future skill development.
+39. Advanced Video / Information Fact-Check: extract claims, cross-check multiple reliable public sources, detect recycled/old footage where possible, provide source links/evidence status, identify uncertainty and source conflicts.
+
+## Combined backlog policy
+- The 39 items above are the authoritative combined backlog for Project Mayra.
+- Items 33–39 are committed implementation requirements, not merely notes.
+- Work proceeds sequentially: implement → unit test → integrate → CI → fix errors → continue.
+- Existing foundations count as partial work, not full completion.
+- No feature may weaken the Financial Lock, Owner control, permission boundaries, or human-only site rules.
+
 ## Permanent boundaries
 - ₹0 project rule remains active.
 - Financial Lock remains absolute.
