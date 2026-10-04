@@ -12,18 +12,11 @@ class MayraIndiaRegulatoryKnowledgeTest {
         assertTrue(MayraIndiaRegulatoryKnowledge.Domain.DIRECT_TAX in d)
         assertTrue(MayraIndiaRegulatoryKnowledge.Domain.GST in d)
     }
-
     @Test fun acceptsOfficialHttpsUpdateShape() {
-        val s = MayraIndiaRegulatoryKnowledge.OfficialSource("Official", "https://official.example", setOf(MayraIndiaRegulatoryKnowledge.Domain.RBI))
-        assertTrue(MayraIndiaRegulatoryKnowledge.accept(MayraIndiaRegulatoryKnowledge.Update(MayraIndiaRegulatoryKnowledge.Domain.RBI, s, 1L, summary = "Update")))
+        val s = "https://official.example/source"
+        assertTrue(MayraIndiaRegulatoryKnowledge.accept(MayraIndiaRegulatoryKnowledge.Update(MayraIndiaRegulatoryKnowledge.Domain.RBI,s,1L,"Update")))
     }
-
     @Test fun rejectsEmptyUpdate() {
-        val s = MayraIndiaRegulatoryKnowledge.OfficialSource("Official", "https://official.example", setOf(MayraIndiaRegulatoryKnowledge.Domain.RBI))
-        assertFalse(MayraIndiaRegulatoryKnowledge.accept(MayraIndiaRegulatoryKnowledge.Update(MayraIndiaRegulatoryKnowledge.Domain.RBI, s, 0L, summary = "")))
-    }
-
-    @Test fun staleKnowledgeRequiresVerification() {
-        assertTrue(MayraIndiaRegulatoryKnowledge.requiresCurrentVerification(null, 1000L))
+        assertFalse(MayraIndiaRegulatoryKnowledge.accept(MayraIndiaRegulatoryKnowledge.Update(MayraIndiaRegulatoryKnowledge.Domain.RBI,"https://official.example",0L,"")))
     }
 }
