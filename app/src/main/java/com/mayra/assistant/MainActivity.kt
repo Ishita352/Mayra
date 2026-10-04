@@ -35,6 +35,8 @@ class MainActivity : FragmentActivity() {
     private var pendingPdfEditText: String? = null
     private var pendingDocxPdfText: String? = null
     private var capturingWhatsAppReply = false
+    private var welcomePendingAfterLock = false
+    private var welcomeShownForCurrentUnlock = false
 
     private val documentPicker = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -189,6 +191,20 @@ class MainActivity : FragmentActivity() {
         showVoiceResult(result.message)
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (!prefs.getBoolean("owner_verified", false)) return
+        val keyguard = getSystemService(KeyguardManager::class.java)
+        if (!hasFocus && keyguard.isKeyguardLocked) {
+            welcomePendingAfterLock = true
+            welcomeShownForCurrentUnlock = false
+        } else if (hasFocus && !keyguard.isKeyguardLocked && welcomePendingAfterLock && !welcomeShownForCurrentUnlock) {
+            welcomePendingAfterLock = false
+            welcomeShownForCurrentUnlock = true
+            speakResponse("Welcome, Boss! বলুন, কী সাহায্য করতে পারি?")
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MayraMemoryStore.initialize(this)
@@ -221,7 +237,7 @@ class MainActivity : FragmentActivity() {
                 super.onAuthenticationSucceeded(result)
                 prefs.edit().putBoolean("owner_verified", true).apply()
                 showAssistant()
-                speakResponse("স্বাগতম বস। মায়রা প্রস্তুত আছে।")
+                speakResponse("Welcome, Boss! বলুন, কী সাহায্য করতে পারি?")
             }
         })
         val info = BiometricPrompt.PromptInfo.Builder()
