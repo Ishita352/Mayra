@@ -17,8 +17,7 @@ class MayraCharacterSystemTest {
         assertTrue(MayraCharacterSystem.all().all { it.supportsWalking })
     }
 
-    @Test fun unknownCharacterCannotBeSelected() {
-        val fakePrefs = android.app.Application().getSharedPreferences("test_character", 0)
-        assertFalse(MayraCharacterSystem.select(fakePrefs, "unknown"))
+    @Test fun unknownCharacterIsRejectedByLookup() {
+        assertNull(MayraCharacterSystem.find("unknown"))
     }
 }
