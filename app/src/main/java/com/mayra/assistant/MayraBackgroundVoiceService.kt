@@ -232,6 +232,7 @@ class MayraBackgroundVoiceService : Service() {
                 prefs,
                 ownerVerified = prefs.getBoolean("owner_verified", false) &&
                     prefs.getBoolean("owner_command_authorized", false),
+                ownerCommandAuthorized = prefs.getBoolean("owner_command_authorized", false),
                 masterOn = prefs.getBoolean("master_on", false),
                 locked = true,
                 task = spoken
