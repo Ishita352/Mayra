@@ -32,6 +32,7 @@ class MayraFeatureCheckManager(private val context: Context) {
         const val EXCEL = "excel_data"
         const val DOCUMENTS = "documents"
         const val SECURITY = "security"
+        const val INTERVIEW = "interview_assistant"
 
         fun specs() = listOf(
             FeatureSpec(OWNER, "Owner Verification", "Owner identity gate; no installation password."),
@@ -49,7 +50,8 @@ class MayraFeatureCheckManager(private val context: Context) {
             FeatureSpec(JOBS, "Job Watcher", "Job/freelance watcher foundation."),
             FeatureSpec(EXCEL, "Excel / Data Analysis", "Spreadsheet analysis foundation."),
             FeatureSpec(DOCUMENTS, "Documents / PDF / DOCX", "Document engines."),
-            FeatureSpec(SECURITY, "Security Controls", "Owner-controlled security gates.")
+            FeatureSpec(SECURITY, "Security Controls", "Owner-controlled security gates."),
+            FeatureSpec(INTERVIEW, "Interview Assistant", "Free interview preparation, mock interviews and answer coaching.")
         )
 
         fun prefs(context: Context): SharedPreferences = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -108,6 +110,7 @@ class MayraFeatureCheckManager(private val context: Context) {
             EXCEL -> CheckResult(true, "Excel/Data Analysis foundation is available.")
             DOCUMENTS -> CheckResult(true, "PDF/DOCX/TXT document engines are available.")
             SECURITY -> CheckResult(true, "Security control gate is available.")
+            INTERVIEW -> CheckResult(true, "Interview preparation, mock interview and answer coaching engine is available.")
             else -> CheckResult(false, "Unknown feature.")
         }
     }
@@ -121,6 +124,7 @@ class MayraFeatureCheckManager(private val context: Context) {
             CALL -> FeatureToggleRegistry.setEnabled(p, FeatureToggleRegistry.INCOMING_CALL_ASSISTANT, enabled)
             WHATSAPP -> FeatureToggleRegistry.setEnabled(p, FeatureToggleRegistry.WHATSAPP_ASSISTANT, enabled)
             SECURITY -> FeatureToggleRegistry.setEnabled(p, FeatureToggleRegistry.SECURITY, enabled)
+            INTERVIEW -> p.edit().putBoolean("interview_assistant_enabled", enabled).apply()
             CHARACTER_3D -> p.edit().putBoolean("mayra_3d_character_enabled", enabled).apply()
             VOICE_LIGHT -> p.edit().putBoolean("mayra_voice_light_enabled", enabled).apply()
             LOCKED -> p.edit().putBoolean("mayra_active_while_locked", enabled).apply()
