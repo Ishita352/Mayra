@@ -98,7 +98,6 @@ class MayraReferenceHomeActivity : FragmentActivity() {
         body.addView(toggleRow("🔇","Silent Mode — Only Listen",prefs.getBoolean("mayra_silent_mode_behavior",true)){v->prefs.edit().putBoolean("mayra_silent_mode_behavior",v).apply()})
         body.addView(space(8))
         val menu=button("☰  MAIN MENU / KNOWLEDGE HUB",blue); menu.setOnClickListener{showMainMenu()}; body.addView(menu)
-        val pc=button("▣  PHONE ↔ WINDOWS 10",purple); pc.setOnClickListener{showPairing()}; body.addView(pc)
         body.addView(label("No Password  •  Owner approval required for self-development changes",11f,Color.rgb(115,155,195)))
         setContentView(ScrollView(this).apply{setBackgroundColor(bg);isFillViewport=true;addView(body)})
     }
