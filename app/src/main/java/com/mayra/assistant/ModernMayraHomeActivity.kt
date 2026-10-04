@@ -59,8 +59,11 @@ class ModernMayraHomeActivity : FragmentActivity() {
 
     private fun authenticateOwner() {
         val manager = BiometricManager.from(this)
-        if (manager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) != BiometricManager.BIOMETRIC_SUCCESS) {
-            Toast.makeText(this, "এই ফোনে supported strong biometric সেটআপ নেই।", Toast.LENGTH_LONG).show()
+        val authenticators =
+            BiometricManager.Authenticators.BIOMETRIC_WEAK or
+                BiometricManager.Authenticators.DEVICE_CREDENTIAL
+        if (manager.canAuthenticate(authenticators) != BiometricManager.BIOMETRIC_SUCCESS) {
+            Toast.makeText(this, "Face/Fingerprint বা ফোনের PIN/Pattern/Password সেটআপ নেই।", Toast.LENGTH_LONG).show()
             return
         }
         val prompt = BiometricPrompt(this, ContextCompat.getMainExecutor(this),
@@ -77,9 +80,8 @@ class ModernMayraHomeActivity : FragmentActivity() {
             })
         val info = BiometricPrompt.PromptInfo.Builder()
             .setTitle("Mayra Owner Verification")
-            .setSubtitle("Face অথবা Fingerprint দিয়ে যাচাই করুন")
-            .setNegativeButtonText("Cancel")
-            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+            .setSubtitle("Face/Fingerprint ব্যবহার করুন; প্রয়োজনে PIN/Pattern/Password")
+            .setAllowedAuthenticators(authenticators)
             .build()
         prompt.authenticate(info)
     }
