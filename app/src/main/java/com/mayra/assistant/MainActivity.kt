@@ -352,7 +352,7 @@ class MainActivity : FragmentActivity() {
             isChecked = FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.INCOMING_CALL_ASSISTANT)
             setOnCheckedChangeListener { _, checked ->
                 FeatureToggleRegistry.setEnabled(prefs, FeatureToggleRegistry.INCOMING_CALL_ASSISTANT, checked)
-                showVoiceResult(if (checked) "Incoming Call Assistant ON — Android-supported call workflow-এর জন্য প্রস্তুত।" else "Incoming Call Assistant OFF।")
+                showVoiceResult(if (checked) "Incoming Call Assistant ON — call ring window-এর শেষ ২ সেকেন্ডে auto-answer করার workflow সক্রিয়।" else "Incoming Call Assistant OFF।")
             }
         })
         layout.addView(Switch(this).apply {
