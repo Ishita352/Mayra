@@ -41,7 +41,17 @@ object MayraBackgroundCommandRouter {
             return Result(true, "বস, Mayra automatic language mode চালু হয়েছে।")
         }
 
-        if (listOf("health check", "self heal", "self-healing", "system check", "সিস্টেম চেক", "নিজে ঠিক", "स्वास्थ्य जांच").any { lower.contains(it) }) {
+        if (listOf(
+                "develop yourself", "self development", "self-development",
+                "নিজেকে develop", "নিজেকে ডেভেলপ", "নিজেকে আপডেট", "নিজে নিজেকে উন্নত",
+                "নিজের কোড ঠিক", "self update", "self-repair", "নিজে ঠিক"
+            ).any { lower.contains(it) }) {
+            val description = spoken.trim().ifBlank { "Improve Mayra safely" }
+            val result = MayraSelfDevelopmentCommand.request(prefs, description)
+            return Result(true, result.response)
+        }
+
+        if (listOf("health check", "self heal", "self-healing", "system check", "সিস্টেম চেক", "स्वास्थ्य जांच").any { lower.contains(it) }) {
             val result = MayraHealthMonitor.run(prefs, context)
             return Result(true, MayraHealthMonitor.safeRecoveryMessage(result))
         }
