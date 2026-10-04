@@ -31,7 +31,7 @@ object MayraDeviceAwareMultitasking {
             Health.CRITICAL -> 1
         }
         val loadFactor = when (load) {
-            Load.LIGHT -> 1
+            Load.LIGHT -> 1.0
             Load.MODERATE -> 0.8
             Load.HEAVY -> 0.5
             Load.EXCESSIVE -> 0.25
