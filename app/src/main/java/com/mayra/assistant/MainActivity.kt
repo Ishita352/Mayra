@@ -558,6 +558,14 @@ class MainActivity : FragmentActivity() {
             TemporaryOwnerAccessManager.record(this, "VOICE_COMMAND", "RECEIVED", spoken.take(300))
         }
         val lowerSpoken = spoken.lowercase(Locale.ROOT)
+        MayraActionPermissionPolicy.automationVoiceCommand(spoken)?.let { (automation, enabled) ->
+            MayraActionPermissionPolicy.setAutomation(prefs, automation, enabled)
+            val state = if (enabled) "চালু" else "বন্ধ"
+            val msg = "Mayra " + automation.key + " background automation " + state + " করা হয়েছে।"
+            showVoiceResult(msg)
+            speakResponse(msg)
+            return
+        }
         MayraMoodSystem.commandMood(spoken)?.let { mood ->
             MayraMoodSystem.set(prefs, mood)
             val msg = "Mayra " + mood.label + " Mood চালু হয়েছে। এখন থেকে আমার voice style এই mood অনুযায়ী থাকবে।"
