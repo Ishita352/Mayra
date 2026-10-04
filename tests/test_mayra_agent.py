@@ -107,7 +107,7 @@ class MayraAgentTests(unittest.TestCase):
         self.assertIsNone(mayra_agent.phone_endpoint())
 
     @patch("mayra_agent.platform.system", return_value="Windows")
-    @patch("mayra_agent.os.startfile")
+    @patch("mayra_agent.os.startfile", create=True)
     def test_browser_remote_control_is_executable(self, startfile, _system):
         self.assertTrue(mayra_agent.execute("OPEN_BROWSER")["ok"])
         self.assertTrue(mayra_agent.execute("OPEN_BROWSER:https://example.com")["ok"])
