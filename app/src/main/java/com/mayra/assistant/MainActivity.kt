@@ -396,7 +396,31 @@ class MainActivity : FragmentActivity() {
             text = "\nHome screen-এর পুরনো ON/OFF switches এবং feature buttons সরিয়ে দেওয়া হয়েছে।\n\nআপনি পরে যে button-এর নাম দেবেন, শুধু সেগুলিই Home screen-এ যোগ করা হবে। অন্য কাজ voice command-এর মাধ্যমে করা হবে।\n\n🔒 Payment Safety: ON — Mayra কোনো payment/banking/wallet transaction শুরু করবে না।"
             textSize = 17f
         })
+        layout.addView(Button(this).apply {
+            text = if (prefs.getBoolean("master_on", true)) "🟢 মায়রা চালু আছে — বন্ধ করুন" else "🔴 মায়রা বন্ধ আছে — চালু করুন"
+            textSize = 18f
+            setOnClickListener { toggleMayraMaster() }
+        })
+        layout.addView(TextView(this).apply {
+            text = "\nOFF করলে active work, voice execution ও background work থামবে। Memory, knowledge, settings এবং saved session মুছে যাবে না। ON করলে আগের সংরক্ষিত state থেকেই resume হবে।"
+            textSize = 16f
+        })
         setContentView(ScrollView(this).apply { addView(layout) })
+    }
+    private fun toggleMayraMaster() {
+        val currentlyOn = prefs.getBoolean("master_on", true)
+        if (currentlyOn) {
+            sessionState.saveHome()
+            semanticMemoryBridge.saveHomeResume()
+            prefs.edit().putBoolean("master_on", false).apply()
+            BackgroundWorkCoordinator.cancelAll(this)
+            showAssistant(saveSession = false)
+            showVoiceResult("Mayra বন্ধ করা হয়েছে। Memory, knowledge ও saved state সংরক্ষিত আছে।")
+        } else {
+            prefs.edit().putBoolean("master_on", true).apply()
+            showAssistant(saveSession = false)
+            showVoiceResult("Mayra আবার চালু হয়েছে এবং আগের saved state/knowledge থেকেই resume করছে।")
+        }
     }
     private fun sectionButton(label: String, action: () -> Unit) = Button(this).apply {
         text = label
