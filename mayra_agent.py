@@ -109,8 +109,10 @@ def approve_pairing(code):
         return _session_token
 
 
-def register_phone(host, port):
+def register_phone(host, port, token=None):
     global _phone_endpoint
+    if not authenticated(token):
+        return False
     if not isinstance(host, str) or not host.strip() or not isinstance(port, int) or not (1 <= port <= 65535):
         return False
     with _state_lock:
