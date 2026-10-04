@@ -152,9 +152,9 @@ class MayraFeatureCheckManager(private val context: Context) {
      * even though their end-to-end implementation is not available.
      */
     fun enforceUnavailableFeaturesOff() {
+        // Call Assist remains unavailable until its end-to-end call transport is verified.
         setEnabled(CALL, false)
-        setEnabled(COMPUTER, false)
-        setEnabled(QUICK_LINK, false)
+        // Computer pairing and Quick Owner Link are implemented capabilities; do not disable them here.
     }
 
     fun markSetupComplete() {
