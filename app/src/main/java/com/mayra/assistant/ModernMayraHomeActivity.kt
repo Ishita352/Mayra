@@ -159,9 +159,22 @@ class ModernMayraHomeActivity : FragmentActivity() {
         row2.addView(card("☎", "CALL ASSIST", "Approved calls") { openAssistant() }, weightParams())
         grid.addView(row2)
         val row3 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-        row3.addView(card("✦", "3D CHARACTER", "Bring Mayra alive") {
-            prefs.edit().putBoolean("mayra_3d_character_enabled", true).apply()
-            animateOrb()
+        row3.addView(card("✦", "3D CHARACTER", "10 character styles") {
+            if (!prefs.getBoolean("mayra_3d_character_enabled", false)) {
+                prefs.edit().putBoolean("mayra_3d_character_enabled", true).apply()
+            }
+            val names = MayraCharacterSystem.all().map { it.name }.toTypedArray()
+            val current = MayraCharacterSystem.current(prefs)
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Mayra Character")
+                .setSingleChoiceItems(names, names.indexOf(current.name)) { dialog, which ->
+                    MayraCharacterSystem.select(prefs, MayraCharacterSystem.all()[which].id)
+                    status.text = "Character: ${MayraCharacterSystem.all()[which].name}"
+                    dialog.dismiss()
+                    animateOrb()
+                }
+                .setNegativeButton("Close", null)
+                .show()
         }, weightParams())
         row3.addView(card("☼", "VOICE LIGHT", "Speaking ring") {
             val next = !prefs.getBoolean("mayra_voice_light_enabled", false)
