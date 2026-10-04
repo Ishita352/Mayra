@@ -39,4 +39,21 @@ class MayraExternalStudyResourcePolicyTest {
             MayraExternalStudyResourcePolicy.decide(r, MayraExternalStudyResourcePolicy.Use.SELL)
         )
     }
+    @Test
+    fun workflowRequiresApprovalBeforePreparation() {
+        val o = MayraNoteIncomeWorkflow.Opportunity(
+            "Study Platform", "https://example.com/sell", "Physics",
+            MayraEducationIntelligence.AcademicLevel.UNDERGRADUATE,
+            "Original Notes", true, true
+        )
+        assertEquals(
+            MayraNoteIncomeWorkflow.Stage.REVIEW_REQUIRED,
+            MayraNoteIncomeWorkflow.stage(o, false)
+        )
+        assertEquals(
+            MayraNoteIncomeWorkflow.Stage.APPROVED,
+            MayraNoteIncomeWorkflow.stage(o, true)
+        )
+    }
+
 }
