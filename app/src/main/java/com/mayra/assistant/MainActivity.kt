@@ -561,6 +561,36 @@ class MainActivity : FragmentActivity() {
         if (TemporaryOwnerAccessManager.isActive(this)) {
             TemporaryOwnerAccessManager.record(this, "VOICE_COMMAND", "RECEIVED", spoken.take(300))
         }
+        val runtimeVoice = MayraVoiceRuntime.route(spoken)
+        when (runtimeVoice.action) {
+            MayraVoiceRuntime.Action.STOP_SPEAKING -> {
+                responseTts?.stop()
+                setVoiceLight(false)
+                showVoiceResult(runtimeVoice.response)
+                return
+            }
+            MayraVoiceRuntime.Action.OFFLINE_MODE -> {
+                showVoiceResult(runtimeVoice.response)
+                speakResponse(runtimeVoice.response)
+                return
+            }
+            MayraVoiceRuntime.Action.RUN_OFFLINE_TASKS -> {
+                val allowed = MayraOfflineVoiceWorkflow.Task.entries
+                    .filter { it != MayraOfflineVoiceWorkflow.Task.CLOUD_UPLOAD }
+                    .joinToString(", ") { it.name }
+                val message = runtimeVoice.response + "\\nAvailable local tasks: " + allowed
+                showVoiceResult(message)
+                speakResponse(message)
+                return
+            }
+            MayraVoiceRuntime.Action.QUEUE_UPLOAD -> {
+                val message = runtimeVoice.response
+                showVoiceResult(message)
+                speakResponse(message)
+                return
+            }
+            MayraVoiceRuntime.Action.NONE -> Unit
+        }
         val lowerSpoken = spoken.lowercase(Locale.ROOT)
         MayraActionPermissionPolicy.automationVoiceCommand(spoken)?.let { (automation, enabled) ->
             MayraActionPermissionPolicy.setAutomation(prefs, automation, enabled)
