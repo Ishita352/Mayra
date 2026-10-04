@@ -159,7 +159,18 @@ class MayraBackgroundVoiceService : Service() {
                     writer.println(JSONObject().put("ok", false).put("error", "Authentication required"))
                     return
                 }
-                if (request.optString("action") != "PHONE_COMMAND") {
+                val action = request.optString("action")
+                if (action == "PHONE_LOGOUT") {
+                    prefs.edit()
+                        .remove("windows_paired_device")
+                        .remove("windows_paired_host")
+                        .remove("windows_paired_port")
+                        .remove("windows_paired_token")
+                        .apply()
+                    writer.println(JSONObject().put("ok", true).put("message", "Windows login revoked on Android"))
+                    return
+                }
+                if (action != "PHONE_COMMAND") {
                     writer.println(JSONObject().put("ok", false).put("error", "Action not allowed"))
                     return
                 }
