@@ -7,9 +7,9 @@ import org.junit.Test
 class MayraVoiceEngineTest {
     @Test
     fun hasTwentyVoiceProfilesIncludingGopalMatch() {
-        assertEquals(20, MayraVoiceEngine.profiles.size)
+        assertEquals(21, MayraVoiceEngine.profiles.size)
         assertEquals(10, MayraVoiceEngine.profiles.count { it.gender == "female" })
-        assertEquals(9, MayraVoiceEngine.profiles.count { it.gender == "male" })
+        assertEquals(10, MayraVoiceEngine.profiles.count { it.gender == "male" })
         assertTrue(MayraVoiceEngine.profiles.single { it.isGopalMatch }.id == "gopal_voice_match")
     }
 
