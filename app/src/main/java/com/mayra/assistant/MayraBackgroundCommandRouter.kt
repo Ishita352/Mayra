@@ -24,6 +24,23 @@ object MayraBackgroundCommandRouter {
         val off = lower.contains("off") || lower.contains("বন্ধ") ||
             lower.contains("disable") || lower.contains("बंद")
 
+        if (listOf("bengali mode", "বাংলা মোড", "বাংলা", "bangla").any { lower == it }) {
+            prefs.edit().putString("mayra_voice_language", "bn").apply()
+            return Result(true, "বস, Mayra voice language বাংলা করা হয়েছে।")
+        }
+        if (listOf("hindi mode", "हिन्दी मोड", "हिंदी मोड", "हिन्दी", "हिंदी").any { lower == it }) {
+            prefs.edit().putString("mayra_voice_language", "hi").apply()
+            return Result(true, "बॉस, Mayra voice language हिन्दी कर दिया गया है।")
+        }
+        if (listOf("english mode", "english", "इंग्लिश मोड", "ইংরেজি মোড").any { lower == it }) {
+            prefs.edit().putString("mayra_voice_language", "en").apply()
+            return Result(true, "Boss, Mayra voice language is now English.")
+        }
+        if (listOf("auto language", "automatic language", "অটো ভাষা", "भाषा ऑटो").any { lower == it }) {
+            prefs.edit().putString("mayra_voice_language", "auto").apply()
+            return Result(true, "বস, Mayra automatic language mode চালু হয়েছে।")
+        }
+
         if (listOf("health check", "self heal", "self-healing", "system check", "সিস্টেম চেক", "নিজে ঠিক", "स्वास्थ्य जांच").any { lower.contains(it) }) {
             val result = MayraHealthMonitor.run(prefs, context)
             return Result(true, MayraHealthMonitor.safeRecoveryMessage(result))
