@@ -601,6 +601,19 @@ class MainActivity : FragmentActivity() {
             return
         }
         val lowerCommand = spoken.lowercase(Locale.ROOT)
+
+        // Mayra can report its installed feature inventory and the current check/ON state.
+        if (listOf(
+                "what features", "which features", "feature status", "features status",
+                "কি কি ফিচার", "কোন কোন ফিচার", "ফিচারগুলোর অবস্থা", "ফিচার চেক হয়েছে",
+                "फीचर कौन कौन", "फीचर स्टेटस"
+            ).any { lowerCommand.contains(it) }) {
+            val message = "বস, Mayra-র feature status:\n" + MayraFeatureCheckManager.summary(this)
+            showVoiceResult(message)
+            speakResponse(message)
+            return
+        }
+
         val voiceWhatsAppMarker = listOf(
             "whatsapp voice message", "whatsapp-এ voice message",
             "whatsapp এ voice message", "হোয়াটসঅ্যাপে ভয়েস মেসেজ",
