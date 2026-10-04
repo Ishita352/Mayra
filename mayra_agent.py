@@ -193,6 +193,19 @@ def phone_endpoint():
         return _phone_endpoint
 
 
+def _notify_phone_logout(endpoint, token):
+    if endpoint is None or not token:
+        return
+    host, port = endpoint
+    try:
+        with socket.create_connection((host, port), timeout=3) as phone:
+            payload = {"action": "PHONE_LOGOUT", "session_token": token}
+            phone.sendall((json.dumps(payload) + "\n").encode("utf-8"))
+            phone.recv(1024)
+    except (OSError, ValueError):
+        pass
+
+
 def revoke_session():
     global _session_token, _owner_approved_code, _phone_endpoint
     with _state_lock:
@@ -320,9 +333,12 @@ def handle_connection(conn):
                     if not token:
                         response["error"] = "Pairing code invalid, expired, or not owner-approved"}
                 elif action == "REVOKE":
-                    if authenticated(request.get("session_token")):
+                    token = request.get("session_token")
+                    if authenticated(token):
+                        endpoint = phone_endpoint()
+                        _notify_phone_logout(endpoint, token)
                         revoke_session()
-                        response = {"ok": True, "message": "Session revoked"}
+                        response = {"ok": True, "message": "Session revoked on Windows and Android when reachable"}
                     else:
                         response = {"ok": False, "error": "Authentication required"}
                 elif action == "REGISTER_PHONE":
@@ -409,6 +425,9 @@ def main():
             if command.startswith("PAIR ") and owner_approve(command[5:].strip()):
                 print("Owner approval recorded. The paired device may now complete pairing.")
             elif command == "REVOKE":
+                token = _session_token
+                endpoint = phone_endpoint()
+                _notify_phone_logout(endpoint, token)
                 revoke_session()
                 print("Session revoked; both devices must pair again.")
             elif command.startswith("PHONE "):
