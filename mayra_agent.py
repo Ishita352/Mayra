@@ -124,11 +124,12 @@ def phone_endpoint():
 
 
 def revoke_session():
-    global _session_token, _session_expires, _owner_approved_code
+    global _session_token, _session_expires, _owner_approved_code, _phone_endpoint
     with _state_lock:
         _session_token = None
         _session_expires = 0.0
         _owner_approved_code = None
+        _phone_endpoint = None
 
 
 def authenticated(token):
