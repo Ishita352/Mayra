@@ -45,7 +45,7 @@ class MayraInProgressCompletionTest {
         val s = MayraUserControlCenter.state(p)
         assertTrue(s.camera && s.threeDCharacter && s.voiceLight && s.whatsappImportant && s.lockedPhoneActive)
         assertEquals(85, s.volumePercent)
-        assertEquals(9, MayraUserControlCenter.voiceCommands().size)
+        assertEquals(10, MayraUserControlCenter.voiceCommands().size)
     }
 
     @Test fun deviceSafetyBlocksSecurityAndFinancialActions() {
