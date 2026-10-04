@@ -7,10 +7,10 @@ Mayra is a work-in-progress personal assistant for Android and Windows.
 - Android debug APK builds through GitHub Actions.
 - Android project structure and package identity are checked in CI before Android tests/build.
 - Android build configuration is currently Gradle Kotlin DSL: `settings.gradle.kts`, root `build.gradle.kts`, and `app/build.gradle.kts`.
-- Android voice commands recognize Bengali, English, and Hindi phrases for phone actions and planned computer actions.
-- The Windows agent is a **local-only MVP**. Its implemented local allowlist includes `PING`, `OPEN_NOTEPAD`, `OPEN_CALCULATOR`, and opening Windows/Network/Display/Sound Settings. Other declared capabilities remain unavailable until their modules are implemented.
-- Phone-to-Windows pairing and remote commands are **not implemented yet**.
-- Do not expose the Windows agent to a network. It binds to `127.0.0.1` intentionally until authenticated TLS pairing is implemented.
+- Android voice commands support Bengali, Hindi, and English language selection, with owner authorization required for background commands.
+- The Windows agent remains a **local-only MVP** with a strict command allowlist. Its implemented local allowlist includes `PING`, `OPEN_NOTEPAD`, `OPEN_CALCULATOR`, and selected Windows settings.
+- Android contains the phone-side pairing/session architecture, one-time code flow, persistent session token, owner approval gates, and LAN transport helpers. A Windows companion must still be configured and verified on a real Windows 10 machine before phone↔PC operation can be declared production-ready.
+- Do not expose an unverified Windows agent to an untrusted network.
 
 ## Windows setup
 
