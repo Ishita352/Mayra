@@ -11,20 +11,41 @@ import java.util.Locale
 object MayraBackgroundCommandRouter {
     data class Result(val handled: Boolean, val response: String)
 
-    fun route(context: Context, spoken: String): Result {\n        val prefs = context.getSharedPreferences("mayra_secure", Context.MODE_PRIVATE)
-        val lower = spoken.lowercase(Locale.ROOT).trim()
-        val off = lower.contains("off") || lower.contains("বন্ধ") || lower.contains("disable") || lower.contains("बंद")
+    fun route(context: Context, spoken: String): Result {
+        val prefs = context.getSharedPreferences("mayra_secure", Context.MODE_PRIVATE)
+        return route(prefs, spoken, context)
+    }
 
-        if (listOf("master off", "mayra off", "মায়রা অফ", "মায়রা অফ", "मायरा बंद").any { lower.contains(it) }) {
+    fun route(prefs: SharedPreferences, spoken: String): Result =
+        route(prefs, spoken, null)
+
+    private fun route(prefs: SharedPreferences, spoken: String, context: Context?): Result {
+        val lower = spoken.lowercase(Locale.ROOT).trim()
+        val off = lower.contains("off") || lower.contains("বন্ধ") ||
+            lower.contains("disable") || lower.contains("बंद")
+
+        if (listOf("master off", "mayra off", "মায়রা অফ", "মায়রা অফ", "मायरा बंद")
+                .any { lower.contains(it) }) {
             prefs.edit().putBoolean("master_on", false).apply()
             return Result(true, "বস, Mayra Master OFF করেছি।")
         }
-        if (listOf("voice command off", "stop listening", "ভয়েস কমান্ড বন্ধ", "ভয়েস কমান্ড বন্ধ", "voice off").any { lower.contains(it) }) {
-            FeatureToggleRegistry.setEnabled(prefs, FeatureToggleRegistry.VOICE_COMMAND, false)
+        if (listOf(
+                "voice command off", "stop listening",
+                "ভয়েস কমান্ড বন্ধ", "ভয়েস কমান্ড বন্ধ", "voice off"
+            ).any { lower.contains(it) }) {
+            FeatureToggleRegistry.setEnabled(
+                prefs,
+                FeatureToggleRegistry.VOICE_COMMAND,
+                false
+            )
             return Result(true, "বস, Voice Command বন্ধ করেছি।")
         }
-        if (listOf("feature status", "what features", "কি কি ফিচার", "কোন কোন ফিচার", "ফিচারগুলোর অবস্থা", "फीचर स्टेटस").any { lower.contains(it) }) {
-            return Result(true, featureSummary ?: "Feature status requires the Mayra app context.")
+        if (listOf(
+                "feature status", "what features", "কি কি ফিচার",
+                "কোন কোন ফিচার", "ফিচারগুলোর অবস্থা", "फीचर स्टेटस"
+            ).any { lower.contains(it) }) {
+            return Result(true, context?.let { MayraFeatureCheckManager.summary(it) }
+                ?: "Feature status requires the Mayra app context.")
         }
 
         MayraMoodSystem.commandMood(spoken)?.let { mood ->
@@ -36,7 +57,8 @@ object MayraBackgroundCommandRouter {
             prefs.edit().putBoolean("mayra_3d_character_enabled", !off).apply()
             return Result(true, if (off) "3D Character OFF।" else "3D Character ON।")
         }
-        if (lower.contains("voice light") || lower.contains("ভয়েস লাইট") || lower.contains("ভয়েস লাইট")) {
+        if (lower.contains("voice light") ||
+            lower.contains("ভয়েস লাইট") || lower.contains("ভয়েস লাইট")) {
             prefs.edit().putBoolean("mayra_voice_light_enabled", !off).apply()
             return Result(true, if (off) "Voice Light OFF।" else "Voice Light ON।")
         }
