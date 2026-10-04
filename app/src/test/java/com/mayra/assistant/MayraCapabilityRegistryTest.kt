@@ -1,0 +1,24 @@
+package com.mayra.assistant
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Test
+
+class MayraCapabilityRegistryTest {
+    @Test fun containsAllActiveFollowUpCapabilities() {
+        assertEquals(37, MayraCapabilityRegistry.all().size)
+        assertEquals(1, MayraCapabilityRegistry.count(MayraCapabilityRegistry.Status.COMPLETE))
+        assertEquals(1, MayraCapabilityRegistry.count(MayraCapabilityRegistry.Status.IN_PROGRESS))
+    }
+
+    @Test fun idsAreUniqueAndResolvable() {
+        val ids = MayraCapabilityRegistry.all().map { it.id }
+        assertEquals(ids.size, ids.toSet().size)
+        ids.forEach { assertNotNull(MayraCapabilityRegistry.byId(it)) }
+    }
+
+    @Test fun financialTransactionIsNotIntroducedAsACapability() {
+        val titles = MayraCapabilityRegistry.all().map { it.title.lowercase() }
+        assertEquals(false, titles.any { "financial transaction" in it })
+    }
+}
