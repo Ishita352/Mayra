@@ -567,7 +567,7 @@ class MainActivity : FragmentActivity() {
         setContentView(ScrollView(this).apply { addView(layout) })
     }
 
-    private fun showIncomeWorkflow() {
+    private fun showNoteIncomeWorkflow() {\n        val text = "Mayra can prepare a research brief for a selected study-material marketplace.\n\n" +\n            "It can organize subject, level, requirements, original-note structure and a final review checklist.\n\n" +\n            MayraNoteIncomeWorkflow.ownerUploadRule()\n        showModule("Study Material Research", text)\n    }\n\n    private fun showIncomeWorkflow() {
         val sample = listOf(
             MayraIncomeWorkflow.Opportunity("job-1","Android Developer freelance","Owner research",MayraIncomeWorkflow.Type.FREELANCE,true),
             MayraIncomeWorkflow.Opportunity("job-2","General online task","Unknown platform",MayraIncomeWorkflow.Type.ACTIVE_INCOME,false)
