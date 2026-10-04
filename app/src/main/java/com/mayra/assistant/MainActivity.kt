@@ -26,6 +26,7 @@ class MainActivity : FragmentActivity() {
     private val sessionState by lazy { MayraSessionState(prefs) }
     private val familyAccountManager by lazy { MayraFamilyAccountManager(MayraFamilyAccountManager.SharedPreferencesStore(prefs)) }
     private val semanticMemory by lazy { MayraSemanticMemory(MayraSemanticMemory.SharedPreferencesStore(this)) }
+    private val semanticMemoryBridge by lazy { MayraSemanticMemoryBridge(this, semanticMemory) }
     private val founderIdentity by lazy { MayraFounderIdentity(object : MayraFounderIdentity.Store { override fun get(key: String) = prefs.getString(key, null); override fun put(key: String, value: String) { prefs.edit().putString(key, value).apply() } }) }
     private var activeFamilySession: MayraFamilyAccountManager.AuthenticatedSession? = null
     private val prefs by lazy { getSharedPreferences("mayra_secure", MODE_PRIVATE) }
@@ -345,7 +346,7 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun showAssistant(saveSession: Boolean = true) {
-        if (saveSession) sessionState.saveHome()
+        if (saveSession) { sessionState.saveHome(); semanticMemoryBridge.saveHomeResume() }
 
         MayraNotificationCenter.ensureChannel(this)
         requestNotificationPermissionIfNeeded()
@@ -870,6 +871,7 @@ class MainActivity : FragmentActivity() {
 
     private fun showModule(title: String, details: String) {
         sessionState.saveModule(title, details)
+        semanticMemoryBridge.saveModuleResume(title, details)
         val layout = baseLayout()
         layout.addView(TextView(this).apply { text = title; textSize = 28f })
         layout.addView(TextView(this).apply { text = "\n$details"; textSize = 17f })
