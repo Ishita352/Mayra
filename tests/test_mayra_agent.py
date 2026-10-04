@@ -137,6 +137,16 @@ class MayraAgentTests(unittest.TestCase):
                     self.assertTrue(result["ok"])
                     self.assertIn("Media command sent", result["message"])
 
+
+    def test_bridge_capabilities_is_read_only_and_safe(self):
+        with patch("mayra_agent.shutil.which", side_effect=lambda name: "C:\\tools\\\" + name if name in {"scrcpy", "adb"} else None):
+            result = mayra_agent.execute("BRIDGE_CAPABILITIES")
+        self.assertTrue(result["ok"])
+        self.assertTrue(result["components"]["scrcpy"])
+        self.assertTrue(result["components"]["adb"])
+        self.assertFalse(result["components"]["localsend"])
+        self.assertEqual(result["design"]["screen_control"], "scrcpy-compatible")
+
     def test_remote_arbitrary_command_is_rejected(self):
         code = mayra_agent.start_pairing()
         self.assertTrue(mayra_agent.owner_approve(code))
