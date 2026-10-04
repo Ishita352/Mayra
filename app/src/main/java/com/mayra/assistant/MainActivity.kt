@@ -402,11 +402,60 @@ class MainActivity : FragmentActivity() {
             setOnClickListener { toggleMayraMaster() }
         })
         layout.addView(TextView(this).apply {
-            text = "\nOFF করলে active work, voice execution ও background work থামবে। Memory, knowledge, settings এবং saved session মুছে যাবে না। ON করলে আগের সংরক্ষিত state থেকেই resume হবে।"
+            text = "\nOFF করলে active work, voice execution ও background work থামবে। Memory, knowledge, settings এবং saved session মুছে যাবে না। ON করলে আগের সংরক্ষিত state থেকেই resume হবে."
             textSize = 16f
         })
+        addNewOwnerControls(layout)
         setContentView(ScrollView(this).apply { addView(layout) })
     }
+    private fun addNewOwnerControls(layout: LinearLayout) {
+        val controls = listOf(
+            MayraUserControlCenter.CAMERA,
+            MayraUserControlCenter.INCOMING_CALLS,
+            MayraUserControlCenter.THREE_D_CHARACTER,
+            MayraUserControlCenter.VOICE_LIGHT,
+            MayraUserControlCenter.WHATSAPP_IMPORTANT
+        )
+        controls.forEach { control ->
+            layout.addView(Button(this).apply {
+                text = MayraUserControlCenter.label(control) + if (isControlEnabled(control)) " — ON" else " — OFF"
+                textSize = 17f
+                setOnClickListener { toggleOwnerControl(control) }
+            })
+        }
+        layout.addView(TextView(this).apply {
+            text = "\nএই পাঁচটি control voice command দিয়েও চালু/বন্ধ করা যাবে। গুরুত্বপূর্ণ কাজের জন্য Mayra প্রয়োজনীয় Android/WhatsApp permission চাইবে; কোনো covert access নয়."
+            textSize = 15f
+        })
+    }
+
+    private fun isControlEnabled(control: String): Boolean = when (control) {
+        MayraUserControlCenter.CAMERA -> FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.CAMERA)
+        MayraUserControlCenter.INCOMING_CALLS -> FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.INCOMING_CALL_ASSISTANT)
+        MayraUserControlCenter.THREE_D_CHARACTER -> prefs.getBoolean("mayra_3d_character_enabled", false)
+        MayraUserControlCenter.VOICE_LIGHT -> prefs.getBoolean("mayra_voice_light_enabled", true)
+        MayraUserControlCenter.WHATSAPP_IMPORTANT -> prefs.getBoolean("mayra_whatsapp_important_enabled", true)
+        else -> false
+    }
+
+    private fun toggleOwnerControl(control: String) {
+        if (!prefs.getBoolean("master_on", true)) {
+            showVoiceResult("Mayra Master OFF — এই control পরিবর্তন করা যাবে না।")
+            return
+        }
+        val enabled = !isControlEnabled(control)
+        MayraUserControlCenter.set(prefs, control, enabled)
+        val message = when (control) {
+            MayraUserControlCenter.CAMERA -> if (enabled) "Camera Access ON।" else "Camera Access OFF।"
+            MayraUserControlCenter.INCOMING_CALLS -> if (enabled) "Incoming Call Assistant ON। Android-এর অনুমতি ও supported telecom capability অনুযায়ী call receive/answer করা যাবে।" else "Incoming Call Assistant OFF।"
+            MayraUserControlCenter.THREE_D_CHARACTER -> if (enabled) "3D Character ON।" else "3D Character OFF।"
+            MayraUserControlCenter.VOICE_LIGHT -> if (enabled) "Voice Light ON। Mayra কথা বলার সময় visual light indication দেখাবে।" else "Voice Light OFF।"
+            else -> if (enabled) "Important-information WhatsApp channel ON। Authorized integration না থাকলে Mayra message prepare করবে, সরাসরি send করবে না।" else "Important-information WhatsApp channel OFF।"
+        }
+        showVoiceResult(message)
+        speakResponse(message)
+    }
+
     private fun toggleMayraMaster() {
         val currentlyOn = prefs.getBoolean("master_on", true)
         if (currentlyOn) {
