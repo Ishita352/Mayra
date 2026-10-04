@@ -90,7 +90,7 @@ class LocalDeviceLinkCoordinator(
         }
     }
 
-    fun requestPair(endpoint: Endpoint, code: String): TransportResult =
+    fun quickPair(endpoint: Endpoint, ownerId: String, code: String): TransportResult =\n        request(endpoint, JSONObject().put("action", "QUICK_PAIR").put("owner_id", ownerId).put("code", code))\n\n    fun requestPair(endpoint: Endpoint, code: String): TransportResult =
         request(endpoint, JSONObject().put("action", "PAIR_REQUEST").put("code", code))
 
     fun completePair(endpoint: Endpoint, code: String): TransportResult =
