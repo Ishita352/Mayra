@@ -14,22 +14,31 @@ class MayraMultilingualGrammarEngineTest {
     }
 
     @Test
+    fun primaryLanguagesRequireComprehensiveCompetence() {
+        listOf("bn", "hi", "en").forEach {
+            assertTrue(MayraMultilingualGrammarEngine.hasComprehensivePrimaryCompetence(it))
+        }
+        assertTrue(MayraMultilingualGrammarEngine.primaryCompetenceAreas().size >= 10)
+    }
+
+    @Test
     fun indianAndInternationalLanguageProfilesExist() {
         assertTrue(MayraMultilingualGrammarEngine.indianLanguages().size >= 10)
         assertTrue(MayraMultilingualGrammarEngine.internationalLanguages().size >= 8)
     }
 
     @Test
-    fun speakingRulesAreLanguageAware() {
-        assertTrue(
-            MayraMultilingualGrammarEngine.speakingRule("bn").contains("grammar")
-        )
-        assertTrue(
-            MayraMultilingualGrammarEngine.speakingRule("hi").contains("syntax")
-        )
-        assertTrue(
-            MayraMultilingualGrammarEngine.speakingRule("en").contains("word choice")
-        )
+    fun primarySpeakingRuleRequiresGrammarAndVocabulary() {
+        val rule = MayraMultilingualGrammarEngine.speakingRule("bn")
+        assertTrue(rule.contains("grammar"))
+        assertTrue(rule.contains("vocabulary"))
+        assertTrue(rule.contains("natural conversational usage"))
+    }
+
+    @Test
+    fun conversationRuleMakesPrimaryCompetenceMandatory() {
+        val rule = MayraMultilingualGrammarEngine.conversationRule()
+        assertTrue(rule.contains("comprehensive grammar and vocabulary competence is mandatory"))
     }
 
     @Test
