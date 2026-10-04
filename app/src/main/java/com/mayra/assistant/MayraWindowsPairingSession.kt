@@ -54,7 +54,7 @@ class MayraWindowsPairingSession(
     fun pairedHost(): String? = store.get(KEY_HOST)?.takeIf { it.isNotBlank() }
     fun pairedPort(): Int = store.get(KEY_PORT)?.toIntOrNull() ?: 8765
     fun sessionToken(): String? = store.get(KEY_TOKEN)?.takeIf { it.isNotBlank() }
-    fun isPaired(): Boolean = pairedDeviceId() != null && sessionToken() != null
+    fun isPaired(): Boolean = pairedDeviceId() != null
 
     fun revoke() {
         store.remove(KEY_PAIRED_DEVICE)
