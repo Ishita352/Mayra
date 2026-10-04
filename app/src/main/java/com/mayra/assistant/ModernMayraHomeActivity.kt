@@ -174,7 +174,13 @@ class ModernMayraHomeActivity : FragmentActivity() {
             if (FeatureToggleRegistry.isEnabled(prefs, FeatureToggleRegistry.WHATSAPP_ASSISTANT)) showWhatsAppVoiceDialog()
             else status.text = "WhatsApp is OFF — it must be successfully checked during setup first."
         }, weightParams())
-        row4.addView(card("◎", "INTERVIEW", "Mock + coaching") {\n            if (MayraFeatureCheckManager.isEnabled(this, MayraFeatureCheckManager.INTERVIEW)) {\n                startActivity(Intent(this, MayraInterviewAssistantActivity::class.java))\n            } else {\n                status.text = "Interview Assistant is OFF — enable it during first-time setup."\n            }\n        }, weightParams())
+        row4.addView(card("◎", "INTERVIEW", "Mock + coaching") {
+            if (MayraFeatureCheckManager.isEnabled(this, MayraFeatureCheckManager.INTERVIEW)) {
+                startActivity(Intent(this, MayraInterviewAssistantActivity::class.java))
+            } else {
+                status.text = "Interview Assistant is OFF — enable it during first-time setup."
+            }
+        }, weightParams())
         grid.addView(row4)
         root.addView(grid)
         root.addView(space(14))
