@@ -489,6 +489,54 @@ class MainActivity : FragmentActivity() {
             showVoiceResult("Mayra আবার চালু হয়েছে এবং আগের saved state/knowledge থেকেই resume করছে।")
         }
     }
+    private fun showDocxEditor(text: String) {
+        val editor = EditText(this).apply {
+            setText(text)
+            setSelection(length())
+            minLines = 12
+            gravity = android.view.Gravity.TOP
+        }
+        val layout = baseLayout()
+        layout.addView(TextView(this).apply { text = "DOCX Editor"; textSize = 28f })
+        layout.addView(editor)
+        layout.addView(Button(this).apply {
+            text = "Save edited DOCX"
+            setOnClickListener {
+                pendingDocxEditText = editor.text.toString()
+                docxEditPicker.launch("Mayra-edited.docx")
+            }
+        })
+        layout.addView(Button(this).apply {
+            text = "← Mayra Home"
+            setOnClickListener { showAssistant() }
+        })
+        setContentView(ScrollView(this).apply { addView(layout) })
+    }
+
+    private fun showPdfEditor(text: String) {
+        val editor = EditText(this).apply {
+            setText(text)
+            setSelection(length())
+            minLines = 12
+            gravity = android.view.Gravity.TOP
+        }
+        val layout = baseLayout()
+        layout.addView(TextView(this).apply { text = "PDF Text Editor"; textSize = 28f })
+        layout.addView(editor)
+        layout.addView(Button(this).apply {
+            text = "Save edited PDF"
+            setOnClickListener {
+                pendingPdfEditText = editor.text.toString()
+                pdfCreatePicker.launch("Mayra-edited.pdf")
+            }
+        })
+        layout.addView(Button(this).apply {
+            text = "← Mayra Home"
+            setOnClickListener { showAssistant() }
+        })
+        setContentView(ScrollView(this).apply { addView(layout) })
+    }
+
     private fun sectionButton(label: String, action: () -> Unit) = Button(this).apply {
         text = label
         setOnClickListener { action() }
