@@ -66,12 +66,11 @@ jobs:
             "include(\":app\")|settings.gradle.kts"
             "owner_command_authorized|app/src/main/java/com/mayra/assistant/ModernMayraHomeActivity.kt"
             "owner_command_authorized|app/src/main/java/com/mayra/assistant/MainActivity.kt"
-            "Welcome Boss|app/src/main/java/com/mayra/assistant/ModernMayraHomeActivity.kt"
+            "রাধে রাধে বস|app/src/main/java/com/mayra/assistant/ModernMayraHomeActivity.kt"
             "recognitionLanguage|app/src/main/java/com/mayra/assistant/MayraBackgroundVoiceService.kt"
             "mayra_voice_language|app/src/main/java/com/mayra/assistant/MayraBackgroundVoiceService.kt"
             "owner_command_authorized|app/src/main/java/com/mayra/assistant/MayraBackgroundVoiceService.kt"
             "ownerCommandAuthorized|app/src/main/java/com/mayra/assistant/MayraLockedPhoneVoiceGate.kt"
-            "Owner verification required|app/src/main/java/com/mayra/assistant/MayraBackgroundVoiceService.kt"
             "bengali mode|app/src/main/java/com/mayra/assistant/MayraBackgroundCommandRouter.kt"
             "Mayra Owner Command Access|app/src/main/java/com/mayra/assistant/MainActivity.kt"
           )
