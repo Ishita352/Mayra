@@ -118,10 +118,11 @@ jobs:
           set -euo pipefail
           sha256sum app/build/outputs/apk/debug/app-debug.apk | tee app-debug.apk.sha256
 
-      - name: Upload APK
+      - name: Upload Single Download Bundle (APK + Profile)
         uses: actions/upload-artifact@v4
         with:
-          name: mayra-debug-apk
+          name: mayra-app-and-profile
           path: |
             app/build/outputs/apk/debug/app-debug.apk
+            MAYRA_OWNER_PROFILE.txt
             app-debug.apk.sha256

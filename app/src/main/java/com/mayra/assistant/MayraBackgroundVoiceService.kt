@@ -213,10 +213,6 @@ class MayraBackgroundVoiceService : Service() {
     override fun onDestroy() {
         stopListening()
         recognizer?.destroy()
-        try { phoneServer?.close() } catch (_: Exception) {}
-        phoneServer = null
-        phoneServerThread?.interrupt()
-        phoneServerThread = null
         recognizer = null
         tts?.shutdown()
         tts = null

@@ -1,0 +1,28 @@
+===================================================================
+PROJECT MAYRA AI ASSISTANT — OWNER PROFILE & SYSTEM OVERVIEW
+===================================================================
+
+[ OWNER / FOUNDER PROFILE ]
+- Name: Gopal Basak (Boss)
+- Identity: Founder & Sole Owner of Project Mayra
+- Platform Primary: Android Phone
+- Secondary Companion: Windows 10 PC
+- Authentication Mode: Password-Free Android Biometric (Face / Fingerprint) & Approved Voice
+- Primary Greeting: "Welcome Boss, বলুন কী সাহায্য করতে পারি"
+- Cost Principle: ₹0 Investment / Strictly Free & Open Source Tools Only
+- Financial Safety Lock: Active (No financial transactions / No auto-spending)
+
+[ MAYRA AI ASSISTANT FEATURES INCLUDED IN THIS APK ]
+1. Master ON/OFF Switch with State & Memory Persistence
+2. Password-Free Biometric Verification & Voice Greeting
+3. Bengali + Hindi + English Trilingual Voice Command Engine
+4. Dark Neon Futuristic UI with Glowing Orb Visualizer & Voice Light Indicator
+5. 3D Character Selection & Mood System
+6. Job Watcher (2-Hour Scanning Cycle, OneForma & Freelance Jobs, $ USD -> INR)
+7. Interview Assistant (CV/JD Analysis, Mock Interview Practice)
+8. Windows 10 Companion Local Link (scrcpy / LocalSend / KDE Connect localized paradigms)
+9. Camera, Incoming Call Assist, WhatsApp Important Info Channel & Locked Phone Mode
+
+===================================================================
+Developed specifically for Gopal Basak by Mayra AI System.
+===================================================================

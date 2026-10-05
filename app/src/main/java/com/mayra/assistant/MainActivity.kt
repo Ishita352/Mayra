@@ -26,6 +26,24 @@ import java.util.Date
 import java.util.Locale
 
 class MainActivity : FragmentActivity() {
+    private val prefs by lazy { getSharedPreferences("mayra_secure", MODE_PRIVATE) }
+    private val founderIdentity by lazy { MayraFounderIdentity(object : MayraFounderIdentity.Store {
+        override fun get(key: String): String? = prefs.getString(key, null)
+        override fun put(key: String, value: String) { prefs.edit().putString(key, value).apply() }
+    }) }
+    private var responseTts: TextToSpeech? = null
+    private var voiceLightOverlay: MayraVoiceLightOverlay? = null
+    private var welcomePendingAfterLock = false
+    private var welcomeShownForCurrentUnlock = false
+    private var capturingWhatsAppReply = false
+    private var pendingPdfText: String? = null
+    private var pendingDocxText: String? = null
+    private var pendingDocxEditText: String? = null
+    private var pendingPdfEditText: String? = null
+    private var pendingDocxPdfText: String? = null
+    private val voiceRequestCode = 9101
+    private val notificationRequestCode = 9102
+
     private val sessionState by lazy { MayraSessionState(prefs) }
     private val familyAccountManager by lazy { MayraFamilyAccountManager(MayraFamilyAccountManager.SharedPreferencesStore(prefs)) }
     private val semanticMemory by lazy { MayraSemanticMemory(MayraSemanticMemory.SharedPreferencesStore(this)) }
